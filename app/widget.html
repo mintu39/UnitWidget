@@ -10,25 +10,43 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h2>Kijiji Listing Autofill</h2>
-    <input type="text" id="unitUrl" placeholder="Paste Kijiji Listing URL here" />
+  <div class="widget-container">
+    <input type="text" id="unitUrl" placeholder="ENTER UNIT EXTERNAL URL" />
     <button id="fetchDataBtn">Fetch Data</button>
-    <p id="status" class="status-text"></p>
 
-    <div class="fields-container">
-      <table>
-        <thead>
-          <tr>
-            <th>CRM Field</th>
-            <th>Extracted Value</th>
-          </tr>
-        </thead>
-        <tbody id="fieldTable">
-          <!-- Rows will be populated by script.js -->
-        </tbody>
-      </table>
-    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>CRM RECORD API NAME</th>
+          <th>FETCH DATA MAPP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Market_Price_With_Parking_and_Locker</td>
+          <td><input type="text" id="Market_Price_With_Parking_and_Locker" /></td>
+        </tr>
+        <tr>
+          <td>Posting_Title_With_Parking_and_Locker</td>
+          <td><input type="text" id="Posting_Title_With_Parking_and_Locker" /></td>
+        </tr>
+        <tr>
+          <td>Bedrooms</td>
+          <td><input type="text" id="Bedrooms" /></td>
+        </tr>
+        <tr>
+          <td>Bathrooms</td>
+          <td><input type="text" id="Bathrooms" /></td>
+        </tr>
+        <tr>
+          <td>Number_of_Parking_Spaces</td>
+          <td><input type="text" id="Number_of_Parking_Spaces" /></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button id="updateDataBtn">Update Data</button>
+    <p id="status"></p>
   </div>
 
   <script src="https://js.zohostatic.com/support/v2.0/ZohoEmbededAppSDK.min.js"></script>
