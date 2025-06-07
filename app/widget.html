@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kijiji Scraper Widget</title>
+  <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Kijiji Listing Autofill</h2>
+    <input type="text" id="unitUrl" placeholder="Paste Kijiji Listing URL here" />
+    <button id="fetchDataBtn">Fetch Data</button>
+    <p id="status" class="status-text"></p>
+
+    <div class="fields-container">
+      <table>
+        <thead>
+          <tr>
+            <th>CRM Field</th>
+            <th>Extracted Value</th>
+          </tr>
+        </thead>
+        <tbody id="fieldTable">
+          <!-- Rows will be populated by script.js -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="https://js.zohostatic.com/support/v2.0/ZohoEmbededAppSDK.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
