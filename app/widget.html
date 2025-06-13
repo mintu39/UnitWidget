@@ -1,55 +1,837 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Kijiji Scraper Widget</title>
+  <title>Kijiji Scraper Widget (Web Tab)</title>
   <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
 </head>
+
 <body>
-  <div class="widget-container">
-    <input type="text" id="unitUrl" placeholder="ENTER UNIT EXTERNAL URL" />
-    <button id="fetchDataBtn">Fetch Data</button>
+<!-- Part 1: Kijiji URL and Lead Data -->
+<div class="container my-4 p-4 bg-white rounded shadow">
+  <h3 class="mb-4">Kijiji Data Importer</h3>
 
-    <table>
-      <thead>
-        <tr>
-          <th>CRM RECORD API NAME</th>
-          <th>FETCH DATA MAPP</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Market_Price_With_Parking_and_Locker</td>
-          <td><input type="text" id="Market_Price_With_Parking_and_Locker" /></td>
-        </tr>
-        <tr>
-          <td>Posting_Title_With_Parking_and_Locker</td>
-          <td><input type="text" id="Posting_Title_With_Parking_and_Locker" /></td>
-        </tr>
-        <tr>
-          <td>Bedrooms</td>
-          <td><input type="text" id="Bedrooms" /></td>
-        </tr>
-        <tr>
-          <td>Bathrooms</td>
-          <td><input type="text" id="Bathrooms" /></td>
-        </tr>
-        <tr>
-          <td>Number_of_Parking_Spaces</td>
-          <td><input type="text" id="Number_of_Parking_Spaces" /></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <button id="updateDataBtn">Update Data</button>
-    <p id="status"></p>
+  <!-- URL & Fetch Button -->
+  <div class="row mb-4">
+    <div class="col-md-9">
+      <input type="text" class="form-control" id="unitUrl" placeholder="Enter Kijiji Listing URL">
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-primary w-100" id="fetchDataBtn">Fetch Data</button>
+    </div>
   </div>
+ <div id="pageLoader" style="display: none; position: fixed; top: 0; left: 0; 
+  width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 9999; 
+  justify-content: center; align-items: center; flex-direction: column;">
 
-  <script src="https://js.zohostatic.com/support/v2.0/ZohoEmbededAppSDK.min.js"></script>
-  <script src="script.js"></script>
+  <img src="/app/logo-dark.png" 
+       alt="Loading..." 
+        class="rotating-logo" 
+       style="width: 80px; height: 80px; animation: pulse 1.2s ease-in-out infinite;" />
+
+  <p style="margin-top: 1rem; font-weight: 800; color: #1a1a1a;">Fetching Ad details...</p>
+</div>
+<div id="pageLoader2" style="display: none; position: fixed; top: 0; left: 0; 
+  width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 9999; 
+  justify-content: center; align-items: center; flex-direction: column;">
+
+  <img src="/app/logo-dark.png" 
+       alt="Loading..." 
+        class="rotating-logo" 
+       style="width: 80px; height: 80px; animation: pulse 1.2s ease-in-out infinite;" />
+
+  <p style="margin-top: 1rem; font-weight: 800; color: #1a1a1a;">Creating Records...</p>
+</div>
+
+
+
+  <!-- Leads Section -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Prospect Data</h5>
+    </div>
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="Last_Name" class="form-label">Full Name</label>
+          <input type="text" class="form-control" id="Last_Name" />
+        </div>
+        <div class="col-md-6">
+          <label for="Mobile" class="form-label">Mobile</label>
+          <input type="text" class="form-control" id="Mobile" />
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="Phone" class="form-label">Phone</label>
+          <input type="text" class="form-control" id="Phone" />
+        </div>
+        <div class="col-md-6">
+          <label for="City" class="form-label">City</label>
+          <input type="text" class="form-control" id="City" />
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="Email" class="form-label">Email</label>
+          <input type="text" class="form-control" id="Email" />
+        </div>
+        <div class="col-md-6">
+          <label for="Lead_Source" class="form-label">Prospect Source</label>
+          <input type="text" class="form-control" id="Lead_Source" value="Kijiji" />
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="Asking_Price" class="form-label">Asking Price</label>
+          <input type="text" class="form-control" id="Asking_Price" />
+        </div>
+        <div class="col-md-6">
+          <label for="Lead_Priority_Level" class="form-label">Lead Priority Level</label>
+          <input type="text" class="form-control" id="Lead_Priority_Level" value="High" />
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="URL" class="form-label">Listing Profile URL</label>
+          <input type="text" class="form-control" id="URL" />
+        </div>
+        <div class="col-md-6">
+          <label for="Available_Date" class="form-label">Available Date</label>
+          <input type="text" class="form-control" id="Available_Date" disabled />
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="Ad_ID_New" class="form-label">Ad ID</label>
+          <input type="text" class="form-control" id="Ad_ID_New" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Part 2: Units (Prospects) Data -->
+<div class="card mb-4">
+  <div class="card-header bg-success text-white">
+    <h5 class="mb-0">Unit Data</h5>
+  </div>
+  <div class="card-body">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Interested_Unit_Title" class="form-label">Unit Name</label>
+        <input type="text" class="form-control" id="Interested_Unit_Title" />
+      </div>
+      <div class="col-md-6">
+        <label for="Available_Date_Unit" class="form-label">Available Date</label>
+        <input type="text" class="form-control" id="Available_Date_Unit" disabled />
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Unit_Type" class="form-label">Unit Type</label>
+        <input type="text" class="form-control" id="Unit_Type" />
+      </div>
+      <div class="col-md-6">
+        <label for="Approximate_Sq_Ft" class="form-label">Approximate Sq Ft</label>
+        <input type="number" class="form-control" id="Approximate_Sq_Ft" />
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Maximum_Occupants" class="form-label">Maximum Occupants</label>
+        <input type="number" class="form-control" id="Maximum_Occupants" />
+      </div>
+      <div class="col-md-6">
+        <label for="Property_Condition" class="form-label">Property Condition</label>
+        <input type="text" class="form-control" id="Property_Condition" />
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Year_Last_Renovated" class="form-label">Year Last Renovated</label>
+        <input type="number" class="form-control" id="Year_Last_Renovated" />
+      </div>
+      <div class="col-md-6">
+        <label for="Number_of_Levels" class="form-label">Number of Levels in Unit</label>
+        <input type="text" class="form-control" id="Number_of_Levels" />
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Unit_Facing" class="form-label">Unit Facing</label>
+        <input type="text" class="form-control" id="Unit_Facing" />
+      </div>
+      <div class="col-md-6">
+        <label for="Lawn_Snow_Care" class="form-label">Lawn and Snow Care</label>
+        <input type="text" class="form-control" id="Lawn_Snow_Care" />
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Part 3: Basement, Furnishing, and Feature Flags -->
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Basement_Included" class="form-label">Basement Included</label>
+        <input type="text" class="form-control" id="Basement_Included" />
+      </div>
+      <div class="col-md-6">
+        <label for="Basement_Details" class="form-label">Basement Details</label>
+        <textarea class="form-control" id="Basement_Details" rows="2" placeholder="Ex: 1 Bedroom, 1 Bath, Open Area"></textarea>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Furnished" class="form-label">Furnished</label>
+        <input type="text" class="form-control" id="Furnished" />
+      </div>
+      <div class="col-md-6">
+        <label for="Entrance_Type" class="form-label">Basement Entrance</label>
+        <input type="text" class="form-control" id="Entrance_Type" />
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Corner_Unit" />
+          <label class="form-check-label" for="Corner_Unit">Corner Unit</label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Central_Vacuum" />
+          <label class="form-check-label" for="Central_Vacuum">Central Vacuum</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Penthouse" />
+          <label class="form-check-label" for="Penthouse">Penthouse</label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Natural_Sunlight" />
+          <label class="form-check-label" for="Natural_Sunlight">Natural Sunlight</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Fireplace_Common_Area" />
+          <label class="form-check-label" for="Fireplace_Common_Area">Fireplace - Common Area</label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Fireplace_Bedroom" />
+          <label class="form-check-label" for="Fireplace_Bedroom">Fireplace - Bedroom</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Upgraded_Bathrooms" />
+          <label class="form-check-label" for="Upgraded_Bathrooms">Upgraded Bathrooms</label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Backsplash_Kitchen" />
+          <label class="form-check-label" for="Backsplash_Kitchen">Backsplash - Kitchen</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Upgraded_Kitchen" />
+          <label class="form-check-label" for="Upgraded_Kitchen">Upgraded Kitchen</label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Dishwasher_Included" />
+          <label class="form-check-label" for="Dishwasher_Included">Dishwasher - Included</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Part 4: Flooring, Ceiling, Bedrooms, and Bathroom Layouts -->
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Flooring_Common_Area" class="form-label">Flooring - Common Area</label>
+        <select class="form-control" id="flooringCommonArea">
+          <option value="">Select</option>
+          <option value="Vinyl">Vinyl</option>
+          <option value="Laminate">Laminate</option>
+          <option value="Carpet">Carpet</option>
+          <option value="Hardwood">Hardwood</option>
+          <option value="Tile">Tile</option>
+          <option value="Concrete">Concrete</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="Ceiling_Height" class="form-label">Ceiling Height</label>
+        <select class="form-control" id="Ceiling_Height">
+          <option value="">Select</option>
+          <option value="7 Foot">7 Foot</option>
+          <option value="8 Foot">8 Foot</option>
+          <option value="9 Foot">9 Foot</option>
+          <option value="10 Foot">10 Foot</option>
+          <option value="15 Foot">15 Foot as a Ceiling Height</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Window_Coverings_Common" class="form-label">Window Coverings - Common Area</label>
+        <select class="form-control" id="Window_Coverings_Common">
+          <option value="">Select</option>
+          <option value="Roller">Roller</option>
+          <option value="1'' Aluminum Blinds">1'' Aluminum Blinds</option>
+          <option value="2'' Faux Blinds">2'' Faux Blinds</option>
+          <option value="California Shutters">California Shutters</option>
+          <option value="Vertical">Vertical</option>
+          <option value="No Window Coverings">No Window Coverings</option>
+          <option value="Drapes">Drapes</option>
+          <option value="Zebra">Zebra</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="Window_Coverings_Bedroom" class="form-label">Window Coverings - Bedrooms</label>
+        <select class="form-control" id="Window_Coverings_Bedroom">
+          <option value="">Select</option>
+          <option value="Roller">Roller</option>
+          <option value="1'' Aluminum Blinds">1'' Aluminum Blinds</option>
+          <option value="2'' Faux Blinds">2'' Faux Blinds</option>
+          <option value="California Shutters">California Shutters</option>
+          <option value="Vertical">Vertical</option>
+          <option value="No Window Coverings">No Window Coverings</option>
+          <option value="Drapes">Drapes</option>
+          <option value="Zebra">Zebra</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Bedrooms" class="form-label">Bedrooms</label>
+        <select class="form-control" id="Bedrooms">
+          <option value="">Select</option>
+          <option value="Studio">Studio</option>
+          <option value="1">1</option>
+          <option value="1 + Den">1 + Den</option>
+          <option value="1 + Media">1 + Media</option>
+          <option value="2">2</option>
+          <option value="2 + Den">2 + Den</option>
+          <option value="2 + Media">2 + Media</option>
+          <option value="3">3</option>
+          <option value="3 + Den">3 + Den</option>
+          <option value="4">4</option>
+          <option value="4 + Den">4 + Den</option>
+          <option value="5">5</option>
+          <option value="5 + Den">5 + Den</option>
+          <option value="6">6</option>
+          <option value="6 + Den">6 + Den</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+          <option value="11">11</option>
+          <option value="12">12</option>
+          <option value="13">13</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="Bedroom_Layout" class="form-label">Bedroom Layout</label>
+        <select class="form-control" id="Bedroom_Layout">
+          <option value="">Select</option>
+          <option value="All Interior Rooms (No Windows in room)">All Interior Rooms (No Windows in room)</option>
+          <option value="2nd room is Interior (2nd room has no Windows)">2nd room is Interior (2nd room has no Windows)</option>
+          <option value="No Interior rooms (All rooms have windows)">No Interior rooms (All rooms have windows)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Den_As_Bedroom" class="form-label">Den Usable as Bedroom</label>
+        <select class="form-control" id="Den_As_Bedroom">
+          <option value="">Select</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="No Den">No Den</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="Closet_Type" class="form-label">Closet Type</label>
+        <select class="form-control" id="Closet_Type">
+          <option value="">Select</option>
+          <option value="Regular Closets">Regular Closets</option>
+          <option value="Walk-in (Primary Bedroom Only)">Walk-in (Primary Bedroom Only)</option>
+          <option value="His and Hers (Primary Bedroom Only)">His and Hers (Primary Bedroom Only)</option>
+          <option value="Walk-in (Multiple Rooms)">Walk-in (Multiple Rooms)</option>
+          <option value="His and Hers Walk-in (Master Only)">His and Hers Walk-in (Master Only)</option>
+          <option value="His and Hers (Multiple Rooms)">His and Hers (Multiple Rooms)</option>
+          <option value="No Closets">No Closets</option>
+          <option value="No Closets In Some Rooms">No Closets In Some Rooms</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="En_Suite_Bathrooms" class="form-label">En-Suite Bathrooms</label>
+        <select class="form-control" id="En_Suite_Bathrooms">
+          <option value="">Select</option>
+          <option value="No En-Suite Bathrooms">No En-Suite Bathrooms</option>
+          <option value="Primary Bedroom Only">Primary Bedroom Only</option>
+          <option value="Full Bath in Primary and Jack & Jill in Multiple Rooms">Full Bath in Primary and Jack & Jill in Multiple Rooms</option>
+          <option value="Full Bath in Multiple Rooms">Full Bath in Multiple Rooms</option>
+          <option value="Jack & Jill in Multiple Rooms">Jack & Jill in Multiple Rooms</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="Bathrooms" class="form-label">Bathrooms</label>
+        <select class="form-control" id="Bathrooms">
+          <option value="">Select</option>
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="1.5">1.5</option>
+          <option value="2">2</option>
+          <option value="2.5">2.5</option>
+          <option value="3">3</option>
+          <option value="3.5">3.5</option>
+          <option value="4">4</option>
+          <option value="4.5">4.5</option>
+          <option value="5">5</option>
+          <option value="5.5">5.5</option>
+          <option value="6">6</option>
+          <option value="6.5">6.5</option>
+          <option value="7">7</option>
+          <option value="7.5">7.5</option>
+          <option value="8">8</option>
+          <option value="8.5">8.5</option>
+          <option value="9">9</option>
+          <option value="9.5">9.5</option>
+          <option value="10">10</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Part 5: Shower, Countertops, Appliances, Bedroom Flooring -->
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Countertops_Bathroom" class="form-label">Countertops - Bathroom</label>
+        <select class="form-control" id="Countertops_Bathroom">
+          <option value="">Select</option>
+          <option value="Stone">Stone</option>
+          <option value="Formica">Formica</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="Shower_Type" class="form-label">Shower Type</label>
+        <select class="form-control" id="Shower_Type">
+          <option value="">Select</option>
+          <option value="Standing Shower">Standing Shower</option>
+          <option value="Standing Shower in Multiple Rooms">Standing Shower in Multiple Rooms</option>
+          <option value="Standing Shower (With Seat)">Standing Shower (With Seat)</option>
+          <option value="Standing Shower (With Seat) in Multiple Rooms">Standing Shower (With Seat) in Multiple Rooms</option>
+          <option value="Free Standing Bathtub">Free Standing Bathtub</option>
+          <option value="Free Standing Bathtub & Standing Shower">Free Standing Bathtub & Standing Shower</option>
+          <option value="Free Standing Bathtub & Standing Shower in Multiple Rooms">Free Standing Bathtub & Standing Shower in Multiple Rooms</option>
+          <option value="Bathtub with Shower">Bathtub with Shower</option>
+          <option value="Bathtub in Multiple Rooms with Shower">Bathtub in Multiple Rooms with Shower</option>
+          <option value="Standing Shower & Bathtubs with Shower in Multiple Rooms">Standing Shower & Bathtubs with Shower in Multiple Rooms</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Appliance_Finishes" class="form-label">Appliance Finishes</label>
+        <select class="form-control" id="Appliance_Finishes">
+          <option value="">Select</option>
+          <option value="Black">Black</option>
+          <option value="Paneled">Paneled</option>
+          <option value="Stainless Steel">Stainless Steel</option>
+          <option value="White">White</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="Countertops_Kitchen" class="form-label">Countertops - Kitchen</label>
+        <select class="form-control" id="Countertops_Kitchen">
+          <option value="">Select</option>
+          <option value="Stone">Stone</option>
+          <option value="Formica">Formica</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Flooring_Bedrooms" class="form-label">Flooring - Bedrooms</label>
+        <select class="form-control" id="Flooring_Bedrooms">
+          <option value="">Select</option>
+          <option value="Vinyl">Vinyl</option>
+          <option value="Laminate">Laminate</option>
+          <option value="Carpet">Carpet</option>
+          <option value="Hardwood">Hardwood</option>
+          <option value="Tile">Tile</option>
+          <option value="Concrete">Concrete</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="Balcony_Location" class="form-label">Location of Balcony</label>
+        <select class="form-control" id="Balcony_Location">
+          <option value="">Select</option>
+          <option value="Bathroom">Bathroom</option>
+          <option value="Bedroom">Bedroom</option>
+          <option value="Bedroom and Living Area">Bedroom and Living Area</option>
+          <option value="Both Bedrooms">Both Bedrooms</option>
+          <option value="Both Bedrooms and Living Area">Both Bedrooms and Living Area</option>
+          <option value="Front Hallway">Front Hallway</option>
+          <option value="Front Hallway & Kitchen">Front Hallway & Kitchen</option>
+          <option value="Front Hallway & Living area">Front Hallway & Living area</option>
+          <option value="Living Area">Living Area</option>
+          <option value="No Balcony">No Balcony</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Part 6: Backyard, Parking, Garage and Locker Info -->
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Backyard" class="form-label">Backyard</label>
+        <select class="form-control" id="Backyard">
+          <option value="">Select</option>
+          <option value="Included">Included</option>
+          <option value="Shared">Shared</option>
+          <option value="No Backyard">No Backyard</option>
+          <option value="Not Included">Not Included</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="Backyard_Fenced" class="form-label">Is the Backyard Fenced?</label>
+        <select class="form-control" id="Backyard_Fenced">
+          <option value="">Select</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="No Backyard">No Backyard</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Private_Terrace_Backyard" />
+          <label class="form-check-label" for="Private_Terrace_Backyard">Private Terrace / Backyard</label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="View" class="form-label">View</label>
+        <select class="form-control" id="View">
+          <option value="">Select</option>
+          <option value="Lake and City">Lake and City</option>
+          <option value="Lake, City, and Conservation">Lake, City, and Conservation</option>
+          <option value="City and Conservation">City and Conservation</option>
+          <option value="City">City</option>
+          <option value="Conservation">Conservation</option>
+          <option value="Courtyard/Backyard">Courtyard/Backyard</option>
+          <option value="Lake">Lake</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Parking_Spaces" class="form-label">Number of Parking Spaces</label>
+        <input type="number" class="form-control" id="Parking_Spaces" />
+      </div>
+      <div class="col-md-6">
+        <label for="Parking_Details" class="form-label">Parking Details</label>
+        <select class="form-control" id="Parking_Details">
+          <option value="">Select</option>
+          <option value="No Parking Available">No Parking Available</option>
+          <option value="Building Parking Garage">Building Parking Garage</option>
+          <option value="Parking Garage and Outdoor Parking Lot">Parking Garage and Outdoor Parking Lot</option>
+          <option value="Street Parking">Street Parking</option>
+          <option value="Outdoor Parking Lot">Outdoor Parking Lot</option>
+          <option value="Full Driveway & Garage">Full Driveway & Garage</option>
+          <option value="Full Driveway">Full Driveway</option>
+          <option value="Left Side of Driveway">Left Side of Driveway</option>
+          <option value="Right Side of Driveway">Right Side of Driveway</option>
+          <option value="Left Side of Driveway & Garage">Left Side of Driveway & Garage</option>
+          <option value="Right Side of Driveway & Garage">Right Side of Driveway & Garage</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Parking_Level_Number" class="form-label">Parking Level and Number</label>
+        <input type="text" class="form-control" id="Parking_Level_Number" />
+      </div>
+      <div class="col-md-6">
+        <div class="form-check mt-4">
+          <input type="checkbox" class="form-check-input" id="Private_Garage" />
+          <label class="form-check-label" for="Private_Garage">Private Garage</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Walkout_To_Garage" />
+          <label class="form-check-label" for="Walkout_To_Garage">Walk-out to Garage</label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="Number_of_Storage_Lockers" class="form-label">Number of Storage Lockers</label>
+        <input type="text" class="form-control" id="Number_of_Storage_Lockers" />
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Locker_Storage_Details" class="form-label">Locker/Storage Details</label>
+        <input type="text" class="form-control" id="Locker_Storage_Details" />
+      </div>
+      <div class="col-md-6">
+        <label for="Locker_Level_and_Number" class="form-label">Locker Level and Number</label>
+        <input type="text" class="form-control" id="Locker_Level_and_Number" />
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Part 7: Utilities, Insurance and Unit Address -->
+<div class="card mb-4">
+  <div class="card-body">
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Utilities_Financial_Responsibility" class="form-label">Utilities - Financial Responsibility</label>
+        <select class="form-control" id="Utilities_Financial_Responsibility">
+          <option value="">Select</option>
+          <option>0%</option><option>10%</option><option>15%</option><option>20%</option><option>25%</option>
+          <option>30%</option><option>35%</option><option>40%</option><option>45%</option><option>50%</option>
+          <option>55%</option><option>60%</option><option>65%</option><option>70%</option><option>75%</option>
+          <option>80%</option><option>85%</option><option>90%</option><option>95%</option><option>100%</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="Insurance_Home_Owner" class="form-label">Insurance - Home Owner</label>
+        <select class="form-control" id="Insurance_Home_Owner">
+          <option value="">Select</option>
+          <option>Not Mentioned</option>
+          <option>360 Community Management Ltd</option>
+          <option>Aviva Insurance Company</option>
+          <option>Intact Home Insurance</option>
+          <option>RBC</option>
+          <option>TD Home Insurance</option>
+          <option>Included in maintenance fees</option>
+          <option>Other</option>
+          <!-- You may want to limit or load the full list dynamically if it's large -->
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Insurance_Policy_Number" class="form-label">Insurance Policy Number</label>
+        <input type="text" class="form-control" id="Insurance_Policy_Number" />
+      </div>
+      <div class="col-md-6">
+        <label for="Unit" class="form-label">Unit</label>
+        <input type="text" class="form-control" id="Unit" />
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Street_Name" class="form-label">Street Name</label>
+        <input type="text" class="form-control" id="Street_Name" />
+      </div>
+      <div class="col-md-6">
+        <label for="Street_Number" class="form-label">Street Number</label>
+        <input type="text" class="form-control" id="Street_Number" />
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="U_City" class="form-label">City</label>
+        <input type="text" class="form-control" id="U_City" />
+      </div>
+      <div class="col-md-6">
+        <label for="Province" class="form-label">Province</label>
+        <input type="text" class="form-control" id="Province" />
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Postal_Code" class="form-label">Postal Code</label>
+        <input type="text" class="form-control" id="Postal_Code" />
+      </div>
+      <div class="col-md-6">
+        <label for="Mail_Box_Number" class="form-label">Mail Box Number</label>
+        <input type="text" class="form-control" id="Mail_Box_Number" />
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Country" class="form-label">Country</label>
+        <input type="text" class="form-control" id="Country" value="Canada" />
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Part 8: Utility Providers & Inclusions -->
+<div class="card mb-4">
+  <div class="card-body">
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Electricity_Provider" class="form-label">Electricity Provider</label>
+        <select class="form-control" id="Electricity_Provider">
+          <option value="">Select</option>
+          <option>Hydro One</option>
+          <option>Toronto Hydro</option>
+          <option>Alectra</option>
+          <option>Enbridge</option>
+          <option>Included</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="Water_Provider" class="form-label">Water Provider</label>
+        <select class="form-control" id="Water_Provider">
+          <option value="">Select</option>
+          <option>City of Toronto</option>
+          <option>Peel Water</option>
+          <option>Utilities Kingston</option>
+          <option>Included</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="Gas_Provider" class="form-label">Gas Provider</label>
+        <select class="form-control" id="Gas_Provider">
+          <option value="">Select</option>
+          <option>Enbridge</option>
+          <option>UnionGas</option>
+          <option>Included</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="Hot_Water_Tank_Provider" class="form-label">Hot Water Tank Provider</label>
+        <select class="form-control" id="Hot_Water_Tank_Provider">
+          <option value="">Select</option>
+          <option>Reliance home comfort</option>
+          <option>Enercare</option>
+          <option>Included</option>
+          <!-- Add more options as needed -->
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="AC_Inclusion" />
+          <label class="form-check-label" for="AC_Inclusion">AC - Inclusion</label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Heat_Inclusion" />
+          <label class="form-check-label" for="Heat_Inclusion">Heat - Inclusion</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Internet_Inclusion" />
+          <label class="form-check-label" for="Internet_Inclusion">Internet - Inclusion</label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Cable_Inclusion" />
+          <label class="form-check-label" for="Cable_Inclusion">Cable - Inclusion</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="Phone_Inclusion" />
+          <label class="form-check-label" for="Phone_Inclusion">Phone - Inclusion</label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="Utility_Notes" class="form-label">Utility Notes</label>
+        <textarea class="form-control" id="Utility_Notes" rows="2" placeholder="Any additional notes..."></textarea>
+      </div>
+    </div>
+
+  </div>
+  <!-- Final Part: Create Records Button -->
+<div class="text-end mt-4">
+  <button class="btn btn-success px-4" id="createRecordsBtn">Create Records</button>
+</div>
+</div>
+<script src="script.js"></script>
 </body>
+
 </html>
+
