@@ -1,7 +1,22 @@
 ZOHO.embeddedApp.on("PageLoad", function () {
   console.log("✅ Widget ready");
+  
+
   let scrapedDate = "";
   let listingId = "";
+  let loggedInUserId ="";
+  ZOHO.CRM.CONFIG.getCurrentUser().then(function(userInfo) {
+    loggedInUserId = userInfo.users[0].id;
+    const userEmail = userInfo.users[0].email;
+    const fullName = userInfo.users[0].full_name;
+
+    console.log("✅ Logged-in User ID:", userId);
+    console.log("📧 Email:", userEmail);
+    console.log("👤 Name:", fullName);
+  })
+  .catch(function(err) {
+    console.error("❌ Failed to get user info:", err);
+  });
   // Available Date parsing function
   function parseAvailableDate(text) {
     if (!text || !text.toLowerCase().includes("available")) return "";
@@ -1392,9 +1407,11 @@ function capitalizeWords(str) {
   document.getElementById("pageLoader").style.display = "flex";
 
   try {
-    const response = await fetch("http://127.0.0.1:3002/kijiji-ocr-new?url=" + encodeURIComponent(url));
+    const response = await fetch("https://api.royalyorkpm.com/kijiji-ocr-new?url=" + encodeURIComponent(url));
     const data = await response.json();
     console.log("Fetched data:", data);
+console.log("loggedInUserId",loggedInUserId);
+
 
     const numericPrice = data.price ? Number(data.price.replace(/[$,]/g, "")) : "";
       scrapedDate = extractAvailableDate(data.vipAttributes?.attributes);
@@ -1547,6 +1564,7 @@ function capitalizeWords(str) {
   // Create records in Zoho CRM
   document.getElementById("createRecordsBtn").addEventListener("click", async () => {
   const statuscr = document.getElementById("createRecordsBtn");
+  console.log("loggedInUserId",loggedInUserId);
   // ✅ Show loader and disable fetchDataBtn
   statuscr.disabled = true;
   document.getElementById("pageLoader2").style.display = "flex";
@@ -1562,6 +1580,9 @@ function capitalizeWords(str) {
     URL: document.getElementById("URL").value,
     Available_Date: scrapedDate,
     Ad_ID_New: document.getElementById("Ad_ID_New").value = listingId,
+    Owner: {id:loggedInUserId},
+    
+
   };
 
   const unitData = {
@@ -1639,6 +1660,7 @@ function capitalizeWords(str) {
     Huge_Private_Terrace: document.getElementById("Private_Terrace_Backyard").checked,
     Private_Garage: document.getElementById("Private_Garage").checked,
     Walk_out_to_Garage: document.getElementById("Walkout_To_Garage").checked,
+    Owner:{id:loggedInUserId}
   };
 
   try {
@@ -1656,6 +1678,7 @@ function capitalizeWords(str) {
       Trigger: ["workflow"]
     });
 
+    console.log("Unit created:", unitResp);
     const unitId = unitResp.data[0].details.id;
 
     await ZOHO.CRM.API.updateRecord({
@@ -1665,19 +1688,112 @@ function capitalizeWords(str) {
       APIData: {
         id: leadId,
         Associated_Unit: { id: unitId }
+
       }
     });
 
-    Swal.fire("Success", "Records created and associated successfully!", "success").then(() => {
-  // 👇 Hide loader if it's still shown
+   Swal.fire({
+  icon: "success",
+  title: "✅ Records Created Successfully",
+  html: `
+    <style>
+      .summary-container {
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 14px;
+        margin-top: 16px;
+      }
+      .summary-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .summary-table td {
+        padding: 14px 18px;
+        vertical-align: top;
+        border: 1px solid #e0e0e0;
+      }
+      .summary-header {
+        background-color: #0d6efd;
+        color: #fff;
+        font-weight: bold;
+        width: 140px;
+        text-align: center;
+        white-space: nowrap;
+        border-right: none;
+      }
+      .summary-cell {
+        font-weight: 600;
+        background-color: #f8f9fa;
+      }
+      .summary-cell a {
+        color: #0d6efd;
+        font-weight: 500;
+        text-decoration: underline;
+      }
+      .summary-label {
+        color: #6c757d;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 4px;
+        display: block;
+      }
+    </style>
+
+    <div class="summary-container">
+      <table class="summary-table">
+        <tr>
+          <td class="summary-header">👤 Prospect</td>
+          <td class="summary-cell">
+            <span class="summary-label">Name</span>
+            <a href="https://crm.zoho.com/crm/org680397761/tab/Leads/${leadId}" target="_blank">${leadData.Last_Name || 'N/A'}</a>
+          </td>
+          <td class="summary-cell">
+            <span class="summary-label">Mobile</span>
+            ${leadData.Mobile || 'N/A'}
+          </td>
+          <td class="summary-cell">
+            <span class="summary-label">Price</span>
+            CAD ${leadData.Asking_Price || 'N/A'}
+          </td>
+          <td class="summary-cell">
+            <span class="summary-label">Available Date</span>
+            ${leadData.Available_Date || 'N/A'}
+          </td>
+        </tr>
+        <tr>
+          <td class="summary-header">🏠 Unit</td>
+          <td class="summary-cell">
+            <span class="summary-label">Unit Name</span>
+            <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${unitId}" target="_blank">${unitData.Name || 'N/A'}</a>
+          </td>
+          <td class="summary-cell">
+            <span class="summary-label">Total Area</span>
+            ${unitData.Total_Area_Sq_Ft + " sqft"|| 'N/A'} 
+          </td>
+          <td class="summary-cell">
+            <span class="summary-label">Type</span>
+            ${unitData.Unit_Type || 'N/A'}
+          </td>
+          <td class="summary-cell">
+            <span class="summary-label">Facing</span>
+            ${unitData.Unit_Facing || 'N/A'}
+          </td>
+        </tr>
+      </table>
+    </div>
+  `,
+  width: 750,
+  confirmButtonText: "Done",
+  confirmButtonColor: "#0d6efd"
+}).then(() => {
   document.getElementById("pageLoader2").style.display = "none";
-
-  // 👇 Update button/message if needed
   statuscr.innerText = "✅ Records created.";
-
-  // 👇 Reload the widget/page
-  location.reload();  // ✅ This reloads the widget frame
+  location.reload();
 });
+
+
 
 
   } catch (err) {
