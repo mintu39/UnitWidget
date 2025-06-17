@@ -1662,6 +1662,9 @@ console.log("loggedInUserId",loggedInUserId);
     Walk_out_to_Garage: document.getElementById("Walkout_To_Garage").checked,
     Owner:{id:loggedInUserId}
   };
+  const buildingData = {
+    
+  }
 
   try {
     const leadResp = await ZOHO.CRM.API.insertRecord({
