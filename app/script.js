@@ -1,17 +1,58 @@
-ZOHO.embeddedApp.on("PageLoad", function () {
+var userId = "";
+let data = {};
+let scrapedDate = "";
+let listingId = "";
+let loggedInUserId = "";
+ZOHO.embeddedApp.on("PageLoad", async function () {
   console.log("✅ Widget ready");
+  const leasingSel = document.getElementById("ownerid");
+  ///users data 
 
-  let data = {};
-  let scrapedDate = "";
-  let listingId = "";
-  let loggedInUserId = "";
+  try {
+  const leasingSel = document.getElementById("ownerid"); // Make sure it's defined first
+
+  // Fetch users
+  const resp = await ZOHO.CRM.API.getAllUsers({ Type: "ActiveUsers" });
+  leasingSel.innerHTML = "";
+
+  // Get current user
+  const userInfo = await ZOHO.CRM.CONFIG.getCurrentUser();
+  const loggedInUserId = userInfo.users[0].id;
+
+  if (resp.users?.length) {
+    resp.users.forEach(u => {
+      const opt = document.createElement("option");
+      opt.value = u.id;
+      opt.text = u.full_name || u.email;
+
+      // ✅ Auto-select current user
+      if (u.id === loggedInUserId) {
+        opt.selected = true;
+      }
+
+      leasingSel.appendChild(opt);
+    });
+  } else {
+    leasingSel.innerHTML = "<option>No active users</option>";
+  }
+
+  console.log("✅ Logged-in User ID:", loggedInUserId);
+  console.log("📧 Email:", userInfo.users[0].email);
+  console.log("👤 Name:", userInfo.users[0].full_name);
+
+} catch (err) {
+  console.error("❌ Error loading users or user info:", err);
+  document.getElementById("ownerid").innerHTML = "<option>Error loading users</option>";
+}
+
+
   ZOHO.CRM.CONFIG.getCurrentUser()
     .then(function (userInfo) {
       loggedInUserId = userInfo.users[0].id;
       const userEmail = userInfo.users[0].email;
       const fullName = userInfo.users[0].full_name;
 
-      console.log("✅ Logged-in User ID:", userId);
+      console.log("✅ Logged-in User ID:", loggedInUserId);
       console.log("📧 Email:", userEmail);
       console.log("👤 Name:", fullName);
     })
@@ -368,7 +409,7 @@ ZOHO.embeddedApp.on("PageLoad", function () {
         keywords: ["triplex", "3-storey", "three levels", "three floors"],
       },
       {
-        value: "Shared",
+        value: "1",
         keywords: [
           "shared house",
           "student room",
@@ -1100,6 +1141,7 @@ ZOHO.embeddedApp.on("PageLoad", function () {
 
     return ""; // If no info found
   }
+
   function detectParkingDetails(descriptionArray = [], title = "") {
     const text = (title + " " + descriptionArray.join(" ")).toLowerCase();
 
@@ -2354,12 +2396,7 @@ ZOHO.embeddedApp.on("PageLoad", function () {
 
     return ""; // nothing found
   }
-
-  /* ═══════════════════════════════════════════════════════════════
-   BUILDING-LEVEL CHECKBOXES  ➜  auto-detector
-   ▸ call *after* `data` is fetched                (just like before)
-   ▸ relies only on IDs that are already in your HTML
-════════════════════════════════════════════════════════════════ */
+  //  BUILDING-LEVEL CHECKBOXES  ➜  auto-detector
   function detectBuildingCheckboxes() {
     const text = JSON.stringify(data).toLowerCase();
 
@@ -2571,8 +2608,6 @@ ZOHO.embeddedApp.on("PageLoad", function () {
     };
   }
 
-  /* ═════  USE IT  ═════ */
-
   // Event listener for fetching data
   document
     .getElementById("fetchDataBtn")
@@ -2600,7 +2635,7 @@ ZOHO.embeddedApp.on("PageLoad", function () {
       try {
         const response = await fetch(
           "https://api.royalyorkpm.com/kijiji-ocr-new?url=" +
-            encodeURIComponent(url)
+          encodeURIComponent(url)
         );
         data = await response.json();
         console.log("Fetched data:", data);
@@ -2761,8 +2796,8 @@ ZOHO.embeddedApp.on("PageLoad", function () {
         document.getElementById("Building_Units").value = numberOfUnits || "";
         document.getElementById("Condo_Corp_Number").value =
           condoCorpNumber || "";
-        document.getElementById("Pet_Restrictions").value =
-          petRestrictions || "";
+        // document.getElementById("Pet_Restrictions").value =
+        //   petRestrictions || "";
 
         document.getElementById("Building_Address").value = fullLocation || "";
         document.getElementById("Building_Name").value = fullLocation || "";
@@ -3022,7 +3057,7 @@ ZOHO.embeddedApp.on("PageLoad", function () {
       } catch (err) {
         console.error("❌ Fetch error:", err);
         Swal.fire("Error", "Could not fetch data. See console.", "error");
-        
+
 
         // ❌ Hide loader and show error
         document.getElementById("pageLoader").style.display = "none";
@@ -3038,6 +3073,9 @@ ZOHO.embeddedApp.on("PageLoad", function () {
       const statuscr = document.getElementById("createRecordsBtn");
       console.log("loggedInUserId", loggedInUserId);
       // ✅ Show loader and disable fetchDataBtn
+
+      const aid = leasingSel.value;
+      console.log("📝 Agent selected:", aid);
       statuscr.disabled = true;
       document.getElementById("pageLoader2").style.display = "flex";
       const leadData = {
@@ -3166,142 +3204,198 @@ ZOHO.embeddedApp.on("PageLoad", function () {
           document.getElementById("Walkout_To_Garage").checked,
         Owner: { id: loggedInUserId },
       };
-    const building_data = {
-  /* ───────── General info ───────── */
-  Date_of_Construction: document.getElementById("Construction_Date").value,
-  Developer_Name:        document.getElementById("Developer_Name").value,
-  Concierge_Building_Management_Info:             document.getElementById("Mgmt_Info").value,
-  Property_Management_Contact_Email:            document.getElementById("Mgmt_Email").value,
-  Office_Phone_Number:            document.getElementById("Mgmt_Phone").value,
-  Office_Address:   document.getElementById("Mgmt_Office_Address").value,
+      const building_data = {
+        Date_of_Construction: document.getElementById("Construction_Date").value,
+        Developer_Name: document.getElementById("Developer_Name").value,
+        Concierge_Building_Management_Info: document.getElementById("Mgmt_Info").value,
+        Property_Management_Contact_Email: document.getElementById("Mgmt_Email").value,
+        Office_Phone_Number: document.getElementById("Mgmt_Phone").value,
+        Office_Address: document.getElementById("Mgmt_Office_Address").value,
+        floor_count: document.getElementById("Building_Floors").value,
+        unit_count: document.getElementById("Building_Units").value,
+        Corporation_Number: document.getElementById("Condo_Corp_Number").value,
+        // Pet_Restrictions: document.getElementById("Pet_Restrictions").value,
+        Address: document.getElementById("Building_Address").value,
+        Name: document.getElementById("Building_Name").value,
+        City: document.getElementById("Building_City").value,
+        Province: document.getElementById("Building_Province").value,
+        Postal_Code: document.getElementById("Building_Postal_Code").value,
+        ac_included: document.getElementById("Building_AC_Incl").checked,
+        heat_included: document.getElementById("Building_Heat_Incl").checked,
+        cable_inclusion: document.getElementById("Building_Cable_Incl").checked,
+        internet_inclusion: document.getElementById("Building_Internet_Incl").checked,
+        Water_Filtration_Softener_Rental: document.getElementById("Building_Water_Filtration_Rental").checked,
+        Parking_Garage: document.getElementById("Parking_Garage").checked,
+        Remote_Garage: document.getElementById("Remote_Garage").checked,
+        Visitor_Parking: document.getElementById("Visitor_Parking").checked,
+        Electric_Car_Charging_Stations: document.getElementById("EV_Charging").checked,
+        Car_Wash: document.getElementById("Car_Wash").checked,
+        has_subway_access: document.getElementById("Subway_Access").checked,
+        Laundry_Facilities: document.getElementById("Laundry_Building").checked,
+        has_lobby_lounge: document.getElementById("Lobby_Lounge").checked,
+        Wheelchair_Access: document.getElementById("Wheelchair_Access").checked,
+        Onsite_Staff: document.getElementById("Onsite_Staff").checked,
+        has_security: document.getElementById("Concierge_24_7").checked,
+        has_guest_suites: document.getElementById("Guest_Suites").checked,
+        has_bicycle_storage: document.getElementById("Bicycle_Storage").checked,
+        Elevators: document.getElementById("Elevators").checked,
+        Enter_Phone_System: document.getElementById("Buzzer_System").checked,
+        Security_Onsite: document.getElementById("Security").checked,
+        Keyless_Entry: document.getElementById("Keyless_Entry").checked,
+        Pet_Spa: document.getElementById("Pet_Spa").checked,
+        has_bbq_terrace: document.getElementById("BBQ_Area").checked,
+        has_rooftop_patio: document.getElementById("Rooftop_Patio").checked,
+        has_cabana: document.getElementById("Cabanas").checked,
+        has_tennis_court: document.getElementById("Tennis_Court").checked,
+        Outdoor_Patio: document.getElementById("Outdoor_Patio").checked,
+        has_outdoor_pool: document.getElementById("Outdoor_Pool").checked,
+        Outdoor_Child_Play_Area: document.getElementById("Outdoor_Child_Play_Area").checked,
+        has_fitness_center: document.getElementById("Gym_Fitness").checked,
+        Rec_Room: document.getElementById("Rec_Room").checked,
+        has_billiards_room: document.getElementById("Billiards").checked,
+        has_pool: document.getElementById("Indoor_Pool").checked,
+        has_sauna: document.getElementById("Sauna").checked,
+        Library: document.getElementById("Library").checked,
+        has_squash_court: document.getElementById("Squash").checked,
+        has_bowling_alley: document.getElementById("Bowling").checked,
+        Indoor_Child_Play_Area: document.getElementById("Indoor_Child_Area").checked,
+        has_business_centre: document.getElementById("Meeting_Room").checked,
+        has_yoga_room: document.getElementById("Yoga_Room").checked,
+        has_movie_theater: document.getElementById("Movie_Room").checked,
+        has_game_room: document.getElementById("Games_Room").checked,
+        has_whirlpool: document.getElementById("Whirlpool").checked,
+        has_steam_room: document.getElementById("Steam_Room").checked,
+        has_basketball_court: document.getElementById("Basketball").checked,
+        has_golf_range: document.getElementById("Golf_Range").checked,
+        Piano_Lounge: document.getElementById("Piano_Lounge").checked,
+        Day_Care_Centre: document.getElementById("Daycare").checked,
+        Category: document.getElementById("Building_Category").value,
+        Property_Type: document.getElementById("Building_Type").value
+      };
+try {
+  // 🔁 Reset loaders
+  document.getElementById("pageLoader2").style.display = "flex";
 
-  /* ───────── Basic stats ───────── */
-  floor_count:       document.getElementById("Building_Floors").value,
-  unit_count:        document.getElementById("Building_Units").value,
-  Corporation_Number:     document.getElementById("Condo_Corp_Number").value,
-  Pet_Restrictions:      document.getElementById("Pet_Restrictions").value,
+  // 💡 Step 1: Check for building match
+  let buildingid = null;
+  let existingBuilding = null;
+  const postalCode = document.getElementById("Building_Postal_Code").value?.trim();
+  if (postalCode) {
+    const searchResp = await ZOHO.CRM.API.searchRecord({
+      Entity: "Buildings",
+      Type: "criteria",
+      Query: `(Postal_Code:equals:${postalCode})`
+    });
+    if (searchResp?.data?.length > 0) {
+      existingBuilding = searchResp.data[0];
+      buildingid = existingBuilding.id;
+    }
+  }
 
-  /* ───────── Location ───────── */
-  Address:      document.getElementById("Building_Address").value,
-  Name:         document.getElementById("Building_Name").value,
-  City:         document.getElementById("Building_City").value,
-  Province:     document.getElementById("Building_Province").value,
-  Postal_Code:  document.getElementById("Building_Postal_Code").value,
+  // 💡 Step 2: Check unit duplicate by name
+  const unitName = unitData.Name;
+  const unitDupCheck = await ZOHO.CRM.API.searchRecord({
+    Entity: "Units",
+    Type: "criteria",
+    Query: `(Name:equals:${unitName})`
+  });
+  if (unitDupCheck?.data?.length > 0) {
+    throw {
+      module: "Units",
+      message: "Duplicate Unit Name",
+      details: {
+        id: unitDupCheck.data[0].id,
+        field: "Name"
+      }
+    };
+  }
 
-  /* ───────── Utilities ───────── */
-  ac_included:                 document.getElementById("Building_AC_Incl").checked,
-  heat_included:               document.getElementById("Building_Heat_Incl").checked,
-  cable_inclusion:              document.getElementById("Building_Cable_Incl").checked,
-  internet_inclusion:           document.getElementById("Building_Internet_Incl").checked,
-  Water_Filtration_Softener_Rental: document.getElementById("Building_Water_Filtration_Rental").checked,
+  // 💡 Step 3: Check lead duplicate by Ad ID
+  const adID = leadData.Ad_ID_New;
+  if (adID) {
+    const leadDupCheck = await ZOHO.CRM.API.searchRecord({
+      Entity: "Leads",
+      Type: "criteria",
+      Query: `(Ad_ID_New:equals:${adID})`
+    });
+    if (leadDupCheck?.data?.length > 0) {
+      throw {
+        module: "Leads",
+        message: "Duplicate Ad ID",
+        details: {
+          id: leadDupCheck.data[0].id,
+          field: "Ad_ID_New"
+        }
+      };
+    }
+  }
 
-  /* ───────── Parking / Services ───────── */
-  Parking_Garage:   document.getElementById("Parking_Garage").checked,
-  Remote_Garage:    document.getElementById("Remote_Garage").checked,
-  Visitor_Parking:  document.getElementById("Visitor_Parking").checked,
-  Electric_Car_Charging_Stations:      document.getElementById("EV_Charging").checked,
-  Car_Wash:         document.getElementById("Car_Wash").checked,
+  // ✅ Step 4: Create building if not found
+  if (!buildingid) {
+    const buildingResp = await ZOHO.CRM.API.insertRecord({
+      Entity: "Buildings",
+      APIData: building_data,
+      Trigger: ["workflow"]
+    });
 
-  /* ───────── Access & Concierge ───────── */
-  has_subway_access:     document.getElementById("Subway_Access").checked,
-  Laundry_Facilities:  document.getElementById("Laundry_Building").checked,
-  has_lobby_lounge:      document.getElementById("Lobby_Lounge").checked,
-  Wheelchair_Access: document.getElementById("Wheelchair_Access").checked,
-  Onsite_Staff:      document.getElementById("Onsite_Staff").checked,
-  has_security:    document.getElementById("Concierge_24_7").checked,
+    console.log("Building Response:", buildingResp);
+    if (!buildingResp || buildingResp.data[0].code !== "SUCCESS") throw buildingResp;
+    buildingid = buildingResp.data[0].details.id;
+  }
 
-  /* ───────── Guest & Storage ───────── */
-  has_guest_suites:    document.getElementById("Guest_Suites").checked,
-  has_bicycle_storage: document.getElementById("Bicycle_Storage").checked,
-  Elevators:       document.getElementById("Elevators").checked,
-  Enter_Phone_System:   document.getElementById("Buzzer_System").checked,
-  Security_Onsite:        document.getElementById("Security").checked,
-  Keyless_Entry:   document.getElementById("Keyless_Entry").checked,
+  
+  // ✅ Step 5: Create Lead
+  const leadResp = await ZOHO.CRM.API.insertRecord({
+    Entity: "Leads",
+    APIData: leadData,
+    Trigger: ["workflow"]
+  });
+  if (!leadResp || leadResp.data[0].code !== "SUCCESS") throw leadResp;
+  const leadId = leadResp.data[0].details.id;
 
-  /* ───────── Outdoor Luxury Amenities ───────── */
-  Pet_Spa:                 document.getElementById("Pet_Spa").checked,
-  has_bbq_terrace:                document.getElementById("BBQ_Area").checked,
-  has_rooftop_patio:           document.getElementById("Rooftop_Patio").checked,
-  has_cabana:                 document.getElementById("Cabanas").checked,
-  has_tennis_court:            document.getElementById("Tennis_Court").checked,
-  Outdoor_Patio:           document.getElementById("Outdoor_Patio").checked,
-  has_outdoor_pool:            document.getElementById("Outdoor_Pool").checked,
-  Outdoor_Child_Play_Area: document.getElementById("Outdoor_Child_Play_Area").checked,
-
-  /* ───────── Indoor Amenities ───────── */
-  has_fitness_center:      document.getElementById("Gym_Fitness").checked,
-  Rec_Room:         document.getElementById("Rec_Room").checked,
-  has_billiards_room:        document.getElementById("Billiards").checked,
-  has_pool:      document.getElementById("Indoor_Pool").checked,
-  has_sauna:            document.getElementById("Sauna").checked,
-  Library:          document.getElementById("Library").checked,
-  has_squash_court:           document.getElementById("Squash").checked,
-  has_bowling_alley:          document.getElementById("Bowling").checked,
-  Indoor_Child_Play_Area:document.getElementById("Indoor_Child_Area").checked,
-  has_business_centre:     document.getElementById("Meeting_Room").checked,
-  has_yoga_room:        document.getElementById("Yoga_Room").checked,
-  has_movie_theater:       document.getElementById("Movie_Room").checked,
-  has_game_room:       document.getElementById("Games_Room").checked,
-  has_whirlpool:        document.getElementById("Whirlpool").checked,
-  has_steam_room:       document.getElementById("Steam_Room").checked,
-  has_basketball_court:       document.getElementById("Basketball").checked,
-  has_golf_range:       document.getElementById("Golf_Range").checked,
-  Piano_Lounge:     document.getElementById("Piano_Lounge").checked,
-  Day_Care_Centre:          document.getElementById("Daycare").checked,
-
-  /* ───────── Classification ───────── */
-  Category: document.getElementById("Building_Category").value,
-  Property_Type:     document.getElementById("Building_Type").value
-};
+  // ✅ Step 6: Create Unit
+  const unitResp = await ZOHO.CRM.API.insertRecord({
+    Entity: "Units",
+    APIData: unitData,
+    Trigger: ["workflow"]
+  });
+  if (!unitResp || unitResp.data[0].code !== "SUCCESS") throw unitResp;
+  const unitId = unitResp.data[0].details.id;
 
 
-      try {
-        const leadResp = await ZOHO.CRM.API.insertRecord({
-          Entity: "Leads",
-          APIData: leadData,
-          Trigger: ["workflow"],
-        });
+  
+  
 
-        const leadId = leadResp.data[0].details.id;
+  // ✅ Step 7: Update Lead
+  const updateLeadResp = await ZOHO.CRM.API.updateRecord({
+    Entity: "Leads",
+    RecordID: leadId,
+    Trigger: ["workflow"],
+    APIData: {
+      id: leadId,
+      Associated_Unit: { id: unitId },
+      Owner: { id: aid }
+    }
+  });
+  if (!updateLeadResp || updateLeadResp.data[0].code !== "SUCCESS") throw updateLeadResp;
 
-        const unitResp = await ZOHO.CRM.API.insertRecord({
-          Entity: "Units",
-          APIData: unitData,
-          Trigger: ["workflow"],
-        });
+  // ✅ Step 8: Update Unit
+  const updateUnitResp = await ZOHO.CRM.API.updateRecord({
+    Entity: "Units",
+    RecordID: unitId,
+    Trigger: ["workflow"],
+    APIData: {
+      id: unitId,
+      Associated_Building: { id: buildingid }
+    }
+  });
+  if (!updateUnitResp || updateUnitResp.data[0].code !== "SUCCESS") throw updateUnitResp;
 
-        const buildingResp =await ZOHO.CRM.API.insertRecord({
-          Entity: "Buildings",
-          APIData: building_data,
-          Trigger: ["workflow"],
-        });
-
-        console.log("Unit created:", unitResp);
-        const unitId = unitResp.data[0].details.id;
-        const buildingid = buildingResp.data[0].details.id;
-        await ZOHO.CRM.API.updateRecord({
-          Entity: "Leads",
-          RecordID: leadId,
-          Trigger: ["workflow"],
-          APIData: {
-            id: leadId,
-            Associated_Unit: { id: unitId },
-          },
-        });
-
-         await ZOHO.CRM.API.updateRecord({
-          Entity: "Units",
-          RecordID: unitId,
-          Trigger: ["workflow"],
-          APIData: {
-            id: unitId,
-            Associated_Building: { id: buildingid },
-          },
-        });
-        Swal.fire({
-          icon: "success",
-          title: "✅ Records Created Successfully",
-          html: `
+  // 🎉 Success summary popup
+  Swal.fire({
+  icon: "success",
+  title: "✅ Records Created Successfully",
+  html: `
     <style>
       .summary-container {
         font-family: 'Segoe UI', sans-serif;
@@ -3326,8 +3420,6 @@ ZOHO.embeddedApp.on("PageLoad", function () {
         font-weight: bold;
         width: 140px;
         text-align: center;
-        white-space: nowrap;
-        border-right: none;
       }
       .summary-cell {
         font-weight: 600;
@@ -3346,96 +3438,111 @@ ZOHO.embeddedApp.on("PageLoad", function () {
         display: block;
       }
     </style>
-
     <div class="summary-container">
       <table class="summary-table">
         <tr>
           <td class="summary-header">👤 Prospect</td>
           <td class="summary-cell">
             <span class="summary-label">Name</span>
-            <a href="https://crm.zoho.com/crm/org680397761/tab/Leads/${leadId}" target="_blank">${
-            leadData.Last_Name || "N/A"
-          }</a>
+            <a href="https://crm.zoho.com/crm/org680397761/tab/Leads/${leadId}" target="_blank">${leadData.Last_Name || "N/A"}</a>
           </td>
-          <td class="summary-cell">
-            <span class="summary-label">Mobile</span>
-            ${leadData.Mobile || "N/A"}
-          </td>
-          <td class="summary-cell">
-            <span class="summary-label">Price</span>
-            CAD ${leadData.Asking_Price || "N/A"}
-          </td>
-          <td class="summary-cell">
-            <span class="summary-label">Available Date</span>
-            ${leadData.Available_Date || "N/A"}
-          </td>
+          <td class="summary-cell"><span class="summary-label">Mobile</span>${leadData.Mobile || "N/A"}</td>
+          <td class="summary-cell"><span class="summary-label">Price</span>CAD ${leadData.Asking_Price || "N/A"}</td>
+          <td class="summary-cell"><span class="summary-label">Available Date</span>${leadData.Available_Date || "N/A"}</td>
         </tr>
         <tr>
           <td class="summary-header">🏠 Unit</td>
           <td class="summary-cell">
             <span class="summary-label">Unit Name</span>
-            <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${unitId}" target="_blank">${
-            unitData.Name || "N/A"
-          }</a>
+            <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${unitId}" target="_blank">${unitData.Name || "N/A"}</a>
           </td>
-          <td class="summary-cell">
-            <span class="summary-label">Total Area</span>
-            ${unitData.Total_Area_Sq_Ft + " sqft" || "N/A"} 
-          </td>
-          <td class="summary-cell">
-            <span class="summary-label">Type</span>
-            ${unitData.Unit_Type || "N/A"}
-          </td>
-          <td class="summary-cell">
-            <span class="summary-label">Facing</span>
-            ${unitData.Unit_Facing || "N/A"}
-          </td>
+          <td class="summary-cell"><span class="summary-label">Total Area</span>${unitData.Total_Area_Sq_Ft + " sqft" || "N/A"}</td>
+          <td class="summary-cell"><span class="summary-label">Type</span>${unitData.Unit_Type || "N/A"}</td>
+          <td class="summary-cell"><span class="summary-label">Facing</span>${unitData.Unit_Facing || "N/A"}</td>
         </tr>
-
         <tr>
           <td class="summary-header">🏢 Building</td>
           <td class="summary-cell">
             <span class="summary-label">Building Name</span>
-            <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${buildingid}" target="_blank">${
-            building_data.Name || "N/A"
-          }</a>
+            <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${buildingid}" target="_blank">${existingBuilding?.Name || building_data.Name || "N/A"}</a>
           </td>
-          <td class="summary-cell">
-            <span class="summary-label">Type</span>
-            ${building_data.buildingType  || "N/A"} 
-          </td>
-          <td class="summary-cell">
-            <span class="summary-label">Category</span>
-            ${building_data.Category || "N/A"}
-          </td>
-          <td class="summary-cell">
-            <span class="summary-label">City</span>
-            ${building_data.City || "N/A"}
-          </td>
+          <td class="summary-cell"><span class="summary-label">Type</span>${building_data.buildingType || "N/A"}</td>
+          <td class="summary-cell"><span class="summary-label">Category</span>${building_data.Category || "N/A"}</td>
+          <td class="summary-cell"><span class="summary-label">City</span>${building_data.City || "N/A"}</td>
         </tr>
-        
       </table>
     </div>
   `,
-          width: 750,
-          confirmButtonText: "Done",
-          confirmButtonColor: "#0d6efd",
-        }).then(() => {
-          document.getElementById("pageLoader2").style.display = "none";
-          statuscr.innerText = "✅ Records created.";
-          location.reload();
-        });
-      } catch (err) {
-        document.getElementById("pageLoader2").style.display = "none";
-        console.error("❌ Record creation or linking failed:", err);
-        Swal.fire("Error", "Operation failed. Check console.", "error");
-        location.reload();
-      } finally {
-        // ✅ Always hide the loader at the end
-        document.getElementById("pageLoader").style.display = "none";
-        document.getElementById("pageLoader2").style.display = "none";
-        location.reload();
-      }
+  width: 750,
+  confirmButtonText: "Done",
+  confirmButtonColor: "#0d6efd"
+}).then(() => {
+  location.reload();
+});
+
+
+} catch (err) {
+  document.getElementById("pageLoader2").style.display = "none";
+  console.error("❌ Full Error Object:", err);
+
+  let title = "❌ Operation Failed";
+  let html = `<p>Something went wrong. Please review the message below.</p>`;
+
+  // Duplicate record handler
+  if (err?.module && err?.details?.id) {
+    const moduleName = err.module;
+    const field = err.details.field || "Field";
+    const id = err.details.id;
+
+    const moduleLinks = {
+      Units: `https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${id}`,
+      Leads: `https://crm.zoho.com/crm/org680397761/tab/Leads/${id}`,
+      Buildings: `https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${id}`
+    };
+
+    title = "🚫 Duplicate Entry Detected";
+    html = `
+      <p><strong>Module:</strong> ${moduleName}</p>
+      <p><strong>Field:</strong> ${field}</p>
+      <p><strong>Message:</strong> ${err.message || "Duplicate record."}</p>
+      <p><strong>Existing Record:</strong> <a href="${moduleLinks[moduleName]}" target="_blank">🔗 View Record</a></p>
+    `;
+  } 
+  // Unexpected errors like 400, validation issues
+  else if (err?.data?.[0]?.message) {
+    const message = err.data[0].message;
+    const reason = err.data[0]?.details?.[0]?.api_name || "Unknown Field";
+    title = "⚠️ API Validation Error";
+    html = `
+      <p><strong>Error Message:</strong> ${message}</p>
+      <p><strong>Problem Field:</strong> ${reason}</p>
+    `;
+  } 
+  // Fallback
+  else {
+    html = `
+      <p>An unexpected error occurred.</p>
+      <p><code>${err?.message || JSON.stringify(err)}</code></p>
+    `;
+  }
+
+  // Show in popup
+  Swal.fire({
+    icon: "error",
+    title: title,
+    html: html,
+    confirmButtonText: "Close",
+    confirmButtonColor: "#d33"
+  }).then(() => {
+  location.reload();
+});
+}
+ finally {
+  document.getElementById("pageLoader").style.display = "none";
+  document.getElementById("pageLoader2").style.display = "none";
+}
+
+
     });
 });
 ZOHO.embeddedApp.init();
