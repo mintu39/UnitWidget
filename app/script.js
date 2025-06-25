@@ -254,29 +254,8 @@ function detectNumberOfFloors() {
 
     return "";
   }
-   // Detect backyard access based on description
-  function detectBackyard() {
-    const text = JSON.stringify(data).toLowerCase();;
+  
 
-    if (text.includes("private backyard") || text.includes("private yard")) {
-      return "Included";
-    }
-    if (
-      text.includes("shared backyard") ||
-      text.includes("shared green space")
-    ) {
-      return "Shared";
-    }
-    if (
-      text.includes("no backyard access") ||
-      text.includes("no access to backyard") ||
-      text.includes("no yard access")
-    ) {
-      return "No Backyard";
-    }
-
-    return "Not Included";
-  }
   // Detect backyard fenced status based on description and backyard value
   function detectBackyardFenced() {
     const text = JSON.stringify(data).toLowerCase();
@@ -523,6 +502,168 @@ function detectNumberOfFloors() {
     if (hasSnow) return "Snow Removal: Included";
     return "Not Included";
   }
+  // detect View based on description
+    function detectView(descriptionArray = []) {
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+
+    const hasLake = text.includes("lake view") || text.includes("lake views");
+    const hasCity = text.includes("city view") || text.includes("city views");
+    const hasConservation = text.includes("conservation area");
+    const hasBackyard =
+      text.includes("backyard view") ||
+      text.includes("courtyard") ||
+      text.includes("overlooks backyard");
+
+    if (hasLake && hasCity && hasConservation)
+      return "Lake, City, and Conservation";
+    if (hasLake && hasCity) return "Lake and City";
+    if (hasCity && hasConservation) return "City and Conservation";
+    if (hasLake) return "Lake";
+    if (hasCity) return "City";
+    if (hasConservation) return "Conservation";
+    if (hasBackyard) return "Courtyard/Backyard";
+
+    return "";
+  }
+  // detect private terrace
+  function detectPrivateTerraceOrBackyard(descriptionArray = [], backyardValue = "") {
+  // If Backyard is explicitly marked as Included
+  if (backyardValue === "Included") {
+    return true; // equivalent to "selected"
+  }
+
+  // Otherwise detect based on keywords
+  const text = (descriptionArray || []).join(" ").toLowerCase();
+
+  return (
+    text.includes("private terrace") ||
+    text.includes("private backyard") ||
+    text.includes("exclusive yard")
+  );
+}
+// detect backyard no backyard.
+function detectBackyard() {
+  const text = JSON.stringify(data).toLowerCase();
+
+  if (text.includes("private backyard") || text.includes("private yard")) {
+    return "Included";
+  }
+  if (
+    text.includes("shared backyard") ||
+    text.includes("shared green space")
+  ) {
+    return "Shared";
+  }
+  if (
+    text.includes("no backyard access") ||
+    text.includes("no access to backyard") ||
+    text.includes("no yard access")
+  ) {
+    return "No Backyard";
+  }
+
+  return "Not Included";
+}
+// detect balcony location.
+function detectBalconyLocation(descriptionArray = [], balconyType = "") {
+  // Rule override for specific balcony type
+  if (balconyType.toLowerCase() === "front porch") {
+    return "Front Hallway";
+  }
+
+  const text = (descriptionArray || []).join(" ").toLowerCase();
+
+  const mapping = [
+    {
+      value: "Bedroom and Living Area",
+      keywords: [
+        "balcony in bedroom and living room",
+        "balcony off bedroom and living room",
+      ],
+    },
+    {
+      value: "Both Bedrooms and Living Area",
+      keywords: [
+        "both bedrooms and living room",
+        "balcony from both bedrooms and living",
+      ],
+    },
+    {
+      value: "Both Bedrooms",
+      keywords: ["balcony from both bedrooms", "balcony off both bedrooms"],
+    },
+    {
+      value: "Front Hallway & Living area",
+      keywords: [
+        "balcony in front hallway and living room",
+        "balcony off front hallway and living",
+      ],
+    },
+    {
+      value: "Front Hallway & Kitchen",
+      keywords: [
+        "balcony in front hallway and kitchen",
+        "balcony off front hallway and kitchen",
+      ],
+    },
+    {
+      value: "Front Hallway",
+      keywords: [
+        "balcony in front hallway",
+        "balcony off hallway",
+        "hallway balcony",
+      ],
+    },
+    {
+      value: "Living Area",
+      keywords: [
+        "balcony from living room",
+        "living room access to balcony",
+        "balcony off living room",
+      ],
+    },
+    {
+      value: "Bedroom",
+      keywords: ["balcony off bedroom", "balcony in bedroom"],
+    },
+    {
+      value: "Bathroom",
+      keywords: ["balcony in bathroom", "bathroom access to balcony"],
+    },
+  ];
+
+  for (const item of mapping) {
+    for (const keyword of item.keywords) {
+      if (text.includes(keyword)) return item.value;
+    }
+  }
+
+  return "No Balcony";
+}
+//
+function detectMaxOccupants(bedroomValue = "") {
+  if (!bedroomValue || typeof bedroomValue !== "string") return "";
+
+  const value = bedroomValue.toLowerCase().trim();
+
+  // Handle "Studio"
+  if (value === "studio") {
+    return 2;
+  }
+
+  // Match numeric part (e.g., "2", "3 + Den", "4 bedrooms", etc.)
+  const match = value.match(/^(\d+)/);
+  if (match) {
+    const bedrooms = parseInt(match[1], 10);
+    return bedrooms * 2;
+  }
+
+  return ""; // No valid bedroom count found
+}
+
+
+
+
   // Detect entrance type based on title and description
   function detectEntranceType(descriptionArray = []) {
     const text = (descriptionArray || [].join(" ")).toLowerCase();
@@ -571,13 +712,7 @@ function detectNumberOfFloors() {
     return "N/A - No basement";
   }
   // Detect maximum occupants based on description
-  function detectMaxOccupants(descriptionArray) {
-    const combined = (descriptionArray || []).join(" ").toLowerCase();
-    const match = combined.match(
-      /(?:maximum|max|ideal for|up to)?\s*(\d{1,2})\s*(people|occupants)/i
-    );
-    return match ? parseInt(match[1]) : "";
-  }
+ 
 
   // Detect property condition based on description
   function detectPropertyCondition(descriptionArray) {
@@ -1194,110 +1329,11 @@ function detectNumberOfFloors() {
 
     return ""; // Default if nothing found
   }
-  // Detect balcony location based on description
-  function detectBalconyLocation(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-
-    const mapping = [
-      {
-        value: "Bedroom and Living Area",
-        keywords: [
-          "balcony in bedroom and living room",
-          "balcony off bedroom and living room",
-        ],
-      },
-      {
-        value: "Both Bedrooms and Living Area",
-        keywords: [
-          "both bedrooms and living room",
-          "balcony from both bedrooms and living",
-        ],
-      },
-      {
-        value: "Both Bedrooms",
-        keywords: ["balcony from both bedrooms", "balcony off both bedrooms"],
-      },
-      {
-        value: "Front Hallway & Living area",
-        keywords: [
-          "balcony in front hallway and living room",
-          "balcony off front hallway and living",
-        ],
-      },
-      {
-        value: "Front Hallway & Kitchen",
-        keywords: [
-          "balcony in front hallway and kitchen",
-          "balcony off front hallway and kitchen",
-        ],
-      },
-      {
-        value: "Front Hallway",
-        keywords: [
-          "balcony in front hallway",
-          "balcony off hallway",
-          "hallway balcony",
-        ],
-      },
-      {
-        value: "Living Area",
-        keywords: [
-          "balcony from living room",
-          "living room access to balcony",
-          "balcony off living room",
-        ],
-      },
-      {
-        value: "Bedroom",
-        keywords: ["balcony off bedroom", "balcony in bedroom"],
-      },
-      {
-        value: "Bathroom",
-        keywords: ["balcony in bathroom", "bathroom access to balcony"],
-      },
-    ];
-
-    for (const item of mapping) {
-      for (const keyword of item.keywords) {
-        if (text.includes(keyword)) return item.value;
-      }
-    }
-
-    return "No Balcony";
-  }
+  
  
-  // Detect if the property has a private terrace or backyard
-  function detectPrivateTerraceOrBackyard(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-    return (
-      text.includes("private terrace") ||
-      text.includes("private backyard") ||
-      text.includes("exclusive yard")
-    );
-  }
+
   // Detect view type based on description
-  function detectView(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
 
-    const hasLake = text.includes("lake view") || text.includes("lake views");
-    const hasCity = text.includes("city view") || text.includes("city views");
-    const hasConservation = text.includes("conservation area");
-    const hasBackyard =
-      text.includes("backyard view") ||
-      text.includes("courtyard") ||
-      text.includes("overlooks backyard");
-
-    if (hasLake && hasCity && hasConservation)
-      return "Lake, City, and Conservation";
-    if (hasLake && hasCity) return "Lake and City";
-    if (hasCity && hasConservation) return "City and Conservation";
-    if (hasLake) return "Lake";
-    if (hasCity) return "City";
-    if (hasConservation) return "Conservation";
-    if (hasBackyard) return "Courtyard/Backyard";
-
-    return "";
-  }
   
 
 
