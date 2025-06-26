@@ -277,21 +277,28 @@ function detectNumberOfFloors() {
     // Default if nothing is mentioned
     return "No";
   }
-// Extract last renovated year from description
-  function extractLastRenovatedYear() {
+  // detect backyard no backyard.
+function detectBackyard() {
   const text = JSON.stringify(data).toLowerCase();
-  // Match phrases followed by a 4-digit year
-  const matches = [text.matchAll(
-    /(renovated in|last renovated|updated in|new bathroom in)[^\d]*(\d{4})/g
-  )];
 
-  if (matches.length === 0) return "";
+  if (text.includes("private backyard") || text.includes("private yard")) {
+    return "Included";
+  }
+  if (
+    text.includes("shared backyard") ||
+    text.includes("shared green space")
+  ) {
+    return "Shared";
+  }
+  if (
+    text.includes("no backyard access") ||
+    text.includes("no access to backyard") ||
+    text.includes("no yard access")
+  ) {
+    return "No Backyard";
+  }
 
-  // Extract years and return the most recent one
-  const years = matches.map(match => parseInt(match[2], 10));
-  const latestYear = Math.max(...years);
-
-  return latestYear.toString();
+  return "Not Included";
 }
   // Extract parking spaces from vipPrimary and text content
   function extractParkingSpaces(vipPrimary = [], title = "", description = []) {
@@ -401,161 +408,27 @@ function detectNumberOfFloors() {
 function detectUnitName() {
   return data?.location || "";
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // Extract parking level and number from description
-  function extractParkingLevelNumber() {
-    const text = JSON.stringify(data).toLowerCase();
-
-    // Pattern: Level P1, spot 124
-    const match1 = text.match(/level\s*(p\d+)[^\d]*(\d{1,4})/i);
-    if (match1) return `${match1[1].toUpperCase()} - ${match1[2]}`;
-
-    // Pattern: Parking space B3
-    const match2 = text.match(/parking\s*(space)?\s*([a-z]?\d{1,4})/i);
-    if (match2) return match2[2].toUpperCase();
-
-    // Pattern: underground parking on P2, stall 52
-    const match3 = text.match(/p(\d+)[^\d]*(stall|space)?\s*(\d{1,4})/i);
-    if (match3) return `P${match3[1]} - ${match3[3]}`;
-
+ // Detect property condition based on description
+  function detectPropertyCondition(descriptionArray) {
+    const combined = (descriptionArray || []).join(" ").toLowerCase();
+    if (combined.includes("brand new") || combined.includes("never lived in")) {
+      return "Brand New";
+    } else if (
+      combined.includes("renovated") ||
+      combined.includes("upgraded")
+    ) {
+      return "Newly Renovated";
+    } else if (combined.includes("moderate") || combined.includes("fair")) {
+      return "Moderate";
+    } else if (
+      combined.includes("needs work") ||
+      combined.includes("fixer upper")
+    ) {
+      return "Needs Renovations";
+    }
     return "";
   }
-
-  // Detect furnished status based on description
-  function detectFurnished(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-
-    if (text.includes("unfurnished") || text.includes("not furnished")) {
-      return "No";
-    }
-    if (text.includes("partially furnished")) {
-      return "Partially Furnished";
-    }
-    if (
-      text.includes("furnishing available at extra cost") ||
-      text.includes("additional fee") ||
-      text.includes("extra cost")
-    ) {
-      return "Optional - Extra Cost";
-    }
-    if (text.includes("optional") && text.includes("furnish")) {
-      return "Optional - No Cost";
-    }
-    if (text.includes("fully furnished") || text.includes("furnished")) {
-      return "Fully Furnished";
-    }
-    return "No";
-  }
-  // Detect basement type based on title and description
-  function detectBasementIncluded(title = "", descriptionArray = []) {
-    const text = (
-      title +
-      " " +
-      (descriptionArray || []).join(" ")
-    ).toLowerCase();
-
-    if (
-      text.includes("basement unit") ||
-      text.includes("this is the basement")
-    ) {
-      return "This is the basement";
-    }
-    if (
-      text.includes("separate basement") ||
-      text.includes("basement access") ||
-      text.includes("private basement")
-    ) {
-      return "Separate Unit";
-    }
-    if (text.includes("finished basement")) {
-      return "Finished";
-    }
-    if (
-      text.includes("partially finished basement") ||
-      text.includes("half finished basement")
-    ) {
-      return "Half-finished";
-    }
-    if (text.includes("unfinished basement")) {
-      return "Unfinished";
-    }
-    return "N/A - Basement does not exist";
-  }
-  // detect View based on description
-    function detectView(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-
-    const hasLake = text.includes("lake view") || text.includes("lake views");
-    const hasCity = text.includes("city view") || text.includes("city views");
-    const hasConservation = text.includes("conservation area");
-    const hasBackyard =
-      text.includes("backyard view") ||
-      text.includes("courtyard") ||
-      text.includes("overlooks backyard");
-
-    if (hasLake && hasCity && hasConservation)
-      return "Lake, City, and Conservation";
-    if (hasLake && hasCity) return "Lake and City";
-    if (hasCity && hasConservation) return "City and Conservation";
-    if (hasLake) return "Lake";
-    if (hasCity) return "City";
-    if (hasConservation) return "Conservation";
-    if (hasBackyard) return "Courtyard/Backyard";
-
-    return "";
-  }
-  // detect private terrace
-  function detectPrivateTerraceOrBackyard(descriptionArray = [], backyardValue = "") {
-  // If Backyard is explicitly marked as Included
-  if (backyardValue === "Included") {
-    return true; // equivalent to "selected"
-  }
-
-  // Otherwise detect based on keywords
-  const text = (descriptionArray || []).join(" ").toLowerCase();
-
-  return (
-    text.includes("private terrace") ||
-    text.includes("private backyard") ||
-    text.includes("exclusive yard")
-  );
-}
-// detect backyard no backyard.
-function detectBackyard() {
-  const text = JSON.stringify(data).toLowerCase();
-
-  if (text.includes("private backyard") || text.includes("private yard")) {
-    return "Included";
-  }
-  if (
-    text.includes("shared backyard") ||
-    text.includes("shared green space")
-  ) {
-    return "Shared";
-  }
-  if (
-    text.includes("no backyard access") ||
-    text.includes("no access to backyard") ||
-    text.includes("no yard access")
-  ) {
-    return "No Backyard";
-  }
-
-  return "Not Included";
-}
-// detect balcony location.
+  // detect balcony location.
 function detectBalconyLocation(descriptionArray = [], balconyType = "") {
   // Rule override for specific balcony type
   if (balconyType.toLowerCase() === "front porch") {
@@ -632,6 +505,106 @@ function detectBalconyLocation(descriptionArray = [], balconyType = "") {
   return "No Balcony";
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+  // Extract parking level and number from description
+  function extractParkingLevelNumber() {
+    const text = JSON.stringify(data).toLowerCase();
+
+    // Pattern: Level P1, spot 124
+    const match1 = text.match(/level\s*(p\d+)[^\d]*(\d{1,4})/i);
+    if (match1) return `${match1[1].toUpperCase()} - ${match1[2]}`;
+
+    // Pattern: Parking space B3
+    const match2 = text.match(/parking\s*(space)?\s*([a-z]?\d{1,4})/i);
+    if (match2) return match2[2].toUpperCase();
+
+    // Pattern: underground parking on P2, stall 52
+    const match3 = text.match(/p(\d+)[^\d]*(stall|space)?\s*(\d{1,4})/i);
+    if (match3) return `P${match3[1]} - ${match3[3]}`;
+
+    return "";
+  }
+
+  // Detect furnished status based on description
+  function detectFurnished(descriptionArray = []) {
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+
+    if (text.includes("unfurnished") || text.includes("not furnished")) {
+      return "No";
+    }
+    if (text.includes("partially furnished")) {
+      return "Partially Furnished";
+    }
+    if (
+      text.includes("furnishing available at extra cost") ||
+      text.includes("additional fee") ||
+      text.includes("extra cost")
+    ) {
+      return "Optional - Extra Cost";
+    }
+    if (text.includes("optional") && text.includes("furnish")) {
+      return "Optional - No Cost";
+    }
+    if (text.includes("fully furnished") || text.includes("furnished")) {
+      return "Fully Furnished";
+    }
+    return "No";
+  }
+ 
+
+  // detect View based on description
+    function detectView(descriptionArray = []) {
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+
+    const hasLake = text.includes("lake view") || text.includes("lake views");
+    const hasCity = text.includes("city view") || text.includes("city views");
+    const hasConservation = text.includes("conservation area");
+    const hasBackyard =
+      text.includes("backyard view") ||
+      text.includes("courtyard") ||
+      text.includes("overlooks backyard");
+
+    if (hasLake && hasCity && hasConservation)
+      return "Lake, City, and Conservation";
+    if (hasLake && hasCity) return "Lake and City";
+    if (hasCity && hasConservation) return "City and Conservation";
+    if (hasLake) return "Lake";
+    if (hasCity) return "City";
+    if (hasConservation) return "Conservation";
+    if (hasBackyard) return "Courtyard/Backyard";
+
+    return "";
+  }
+  // detect private terrace
+  function detectPrivateTerraceOrBackyard(descriptionArray = [], backyardValue = "") {
+  // If Backyard is explicitly marked as Included
+  if (backyardValue === "Included") {
+    return true; // equivalent to "selected"
+  }
+
+  // Otherwise detect based on keywords
+  const text = (descriptionArray || []).join(" ").toLowerCase();
+
+  return (
+    text.includes("private terrace") ||
+    text.includes("private backyard") ||
+    text.includes("exclusive yard")
+  );
+}
+
+
+
   // Detect entrance type based on title and description
   function detectEntranceType(descriptionArray = []) {
     const text = (descriptionArray || [].join(" ")).toLowerCase();
@@ -679,27 +652,7 @@ function detectBalconyLocation(descriptionArray = [], balconyType = "") {
 
     return "N/A - No basement";
   }
-  // Detect property condition based on description
-  function detectPropertyCondition(descriptionArray) {
-    const combined = (descriptionArray || []).join(" ").toLowerCase();
-    if (combined.includes("brand new") || combined.includes("never lived in")) {
-      return "Brand New";
-    } else if (
-      combined.includes("renovated") ||
-      combined.includes("upgraded")
-    ) {
-      return "Newly Renovated";
-    } else if (combined.includes("moderate") || combined.includes("fair")) {
-      return "Moderate";
-    } else if (
-      combined.includes("needs work") ||
-      combined.includes("fixer upper")
-    ) {
-      return "Needs Renovations";
-    }
-    return "";
-  }
-  // Detect number of levels based on title and description
+ // Detect number of levels based on title and description
   function detectNumberOfLevels(descriptionArray = [], title = "") {
     const text = (
       title +
@@ -759,20 +712,8 @@ function detectBalconyLocation(descriptionArray = [], balconyType = "") {
 
     return "";
   }
-  // Extract basement details from description
-  function extractBasementDetails(descriptionArray = []) {
-    const basementKeywords = [
-      "basement",
-      "lower level",
-      "shared laundry",
-      "separate entrance",
-      "in basement",
-    ];
-    const matches = (descriptionArray || []).filter((line) =>
-      basementKeywords.some((keyword) => line.toLowerCase().includes(keyword))
-    );
-    return matches.join("\\n");
-  }
+
+
   // Detect unit facing direction based on description
   function detectUnitFacing(descriptionArray = []) {
     const directions = [
@@ -2632,13 +2573,13 @@ const timeout = setTimeout(() => controller.abort(), 120000); // 120 sec
         document.getElementById("Backyard").value = backyard;
         const backyardFenced = detectBackyardFenced();
         document.getElementById("Backyard_Fenced").value = backyardFenced;
-        const Lastyearrenovated = extractLastRenovatedYear() || "";
-        document.getElementById("Year_Last_Renovated").value = Lastyearrenovated;
+       
         const Parkingspacs = extractParkingSpaces() || 0;
         document.getElementById("Parking_Spaces").value = Parkingspacs;
         const parkingDetails = detectParkingDetails() || "";
         document.getElementById("Parking_Details").value = parkingDetails;
         const unitName =detectUnitName() || "";
+        const propertyCondition = detectPropertyCondition(data.description);
 
 //function for conditions ::
 
@@ -2679,20 +2620,29 @@ function detectUnitNumber(unitType, unitName) {
   return trimmed;
 }
 // Function to correct unit name
-function correctUnitName(unitType, unitName) {
+function correctUnitName(unitType, unitName, location = "") {
   if (!unitName || typeof unitName !== "string") return "";
 
   const trimmed = unitName.trim();
 
-  if (unitType === "Basement" && !trimmed.startsWith("2-")) {
-    return "2-" + trimmed;
+  // Check if unitName contains any digit
+  const hasNumber = /\d/.test(trimmed);
+
+  if (hasNumber) {
+    if (unitType === "Basement" && !trimmed.startsWith("2-")) {
+      return "2-" + trimmed;
+    }
+
+    if (unitType === "Multi Unit - Above Ground" && !trimmed.startsWith("1-")) {
+      return "1-" + trimmed;
+    }
+
+    return trimmed;
   }
 
-  if (unitType === "Multi Unit - Above Ground" && !trimmed.startsWith("1-")) {
-    return "1-" + trimmed;
-  }
-
-  return trimmed;
+  // If no number in unit name, fallback to formatted location
+  const fallback = location ? `Not Listed – ${location.trim()}` : "Not Listed";
+  return fallback;
 }
 // Detect lawn and snow care services based on description
   function detectLawnAndSnowCare(descriptionArray = [], unitType = "") {
@@ -2728,6 +2678,132 @@ function mapUnitTypeToBuildingType(unitType = "") {
   const normalized = unitType.toLowerCase().trim();
   return mapping[normalized] || "";
 }
+ // Detect basement type based on title and description
+function detectBasementIncluded(title = "", descriptionArray = [], unitType = "") {
+  const type = unitType.toLowerCase();
+
+  if (type === "basement") {
+    return "This is the basement";
+  }
+
+  if (type === "multi unit - above ground") {
+    return "Separate Unit";
+  }
+
+  if (type === "condominium" || type === "unit - apartment building") {
+    return "N/A - Basement does not exist";
+  }
+
+  const text = (title + " " + (descriptionArray || []).join(" ")).toLowerCase();
+
+  if (
+    text.includes("basement unit") ||
+    text.includes("this is the basement")
+  ) {
+    return "This is the basement";
+  }
+  if (
+    text.includes("separate basement") ||
+    text.includes("basement access") ||
+    text.includes("private basement")
+  ) {
+    return "Separate Unit";
+  }
+  if (text.includes("finished basement")) {
+    return "Finished";
+  }
+  if (
+    text.includes("partially finished basement") ||
+    text.includes("half finished basement")
+  ) {
+    return "Half-finished";
+  }
+  if (text.includes("unfinished basement")) {
+    return "Unfinished";
+  }
+
+  return "N/A - Basement does not exist";
+}
+  // Extract basement details from description
+function extractBasementDetails(descriptionArray = [], unitType = "") {
+  const type = unitType.toLowerCase();
+
+  if (type === "basement") {
+    return "This is the basement";
+  }
+
+  if (type === "multi unit - above ground") {
+    return "Separate Unit";
+  }
+
+  if (type === "condominium" || type === "unit - apartment building") {
+    return "N/A - Basement does not exist";
+  }
+
+  const basementKeywords = [
+    "basement",
+    "lower level",
+    "shared laundry",
+    "separate entrance",
+    "in basement",
+  ];
+
+  const matches = (descriptionArray || []).filter((line) =>
+    basementKeywords.some((keyword) => line.toLowerCase().includes(keyword))
+  );
+
+  return matches.join("\\n");
+}
+// check for upgraded bathroom
+function checkUpgradedBathroom(propertyCondition = "") {
+  return propertyCondition === "Newly Renovated";
+}
+// Extract last renovated year from description
+function extractLastRenovatedYear(propertyCondition = "") {
+  // If the property is brand new, return the current year
+  if (propertyCondition.toLowerCase() === "brand new" || propertyCondition.toLowerCase() === "brand new - never lived in") {
+    return new Date().getFullYear().toString();
+  }
+
+  const text = JSON.stringify(data).toLowerCase();
+
+  // Match phrases followed by a 4-digit year
+  const matches = [...text.matchAll(
+    /(renovated in|last renovated|updated in|new bathroom in)[^\d]*(\d{4})/g
+  )];
+
+  if (matches.length === 0) return "";
+
+  // Extract years and return the most recent one
+  const years = matches.map(match => parseInt(match[2], 10));
+  const latestYear = Math.max(...years);
+
+  return latestYear.toString();
+}
+function detectPrivateTerraceOrBackyardFromBackyardValue(backyardValue = "") {
+  return backyardValue === "Included";
+}
+function detectViewFromUnitType(unitType = "") {
+  const type = unitType.toLowerCase();
+
+  const typesWithCourtyardView = [
+    "house",
+    "multi unit - above ground",
+    "stacked townhouse",
+    "townhouse",
+    "basement"
+  ];
+
+  if (typesWithCourtyardView.includes(type)) {
+    return "Courtyard/Backyard";
+  }
+
+  return ""; // No override
+}
+
+
+
+
 
 
 
@@ -2739,6 +2815,16 @@ function mapUnitTypeToBuildingType(unitType = "") {
         document.getElementById("Unit_number").value = Unitnumber;
         const lawnSnowCare = detectLawnAndSnowCare(data.description || []);
         const buildingType = mapUnitTypeToBuildingType(unitType);
+        const basement = detectBasementIncluded( data.title || "", data.description || [], data.unitType || "" );
+        const basementDetails = extractBasementDetails(data.description || [], data.unitType || "");
+        const upgradedBathroom = checkUpgradedBathroom(propertyCondition);
+        const upgradedKitchen = checkUpgradedBathroom(propertyCondition);
+        const lastYearRenovated = extractLastRenovatedYear(propertyCondition) || "";
+         document.getElementById("Year_Last_Renovated").value = Lastyearrenovated;
+         const Sunlight = true;
+         const privateTerraceOrBackyard = detectPrivateTerraceOrBackyardFromBackyardValue(backyard);
+         const view = detectViewFromUnitType(data.unitType || "");
+         const numericPrice = data.price ? Number(data.price.replace(/[$,]/g, "")) : "";
 
 
 
@@ -2749,29 +2835,25 @@ function mapUnitTypeToBuildingType(unitType = "") {
 
 
 
-
-        const numericPrice = data.price ? Number(data.price.replace(/[$,]/g, "")) : "";
+        
         
         const sqFt = extractSqFt(data.vipAttributes?.primary);
         
         const furnished = detectFurnished(data.description || []);
-        const basement = detectBasementIncluded(
-          data.title || "",
-          data.description || []
-        );
+
         const maximumOccupants = detectMaxOccupants(data.description);
         
         const entranceType = detectEntranceType(
           data.title || "",
           data.description || []
         );
-        const propertyCondition = detectPropertyCondition(data.description);
+        
         const numberOfLevels = detectNumberOfLevels(
           data.description,
           data.title
         );
         const unitFacing = detectUnitFacing(data.description);
-        const basementDetails = extractBasementDetails(data.description || []);
+        
         const features = detectCheckboxFeatures(
           data.description || [],
           data.vipAttributes?.attributes || []
