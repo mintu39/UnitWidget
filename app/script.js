@@ -5,11 +5,8 @@ let listingId = "";
 let loggedInUserId = "";
 ZOHO.embeddedApp.on("PageLoad", async function () {
   console.log("✅ Widget ready");
-
-  //Hide Fetch button
   const leasingSel = document.getElementById("ownerid");
   ///users data 
-
   try {
     const leasingSel = document.getElementById("ownerid"); // Make sure it's defined first
 
@@ -46,8 +43,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     console.error("❌ Error loading users or user info:", err);
     document.getElementById("ownerid").innerHTML = "<option>Error loading users</option>";
   }
-
-
   ZOHO.CRM.CONFIG.getCurrentUser()
     .then(function (userInfo) {
       loggedInUserId = userInfo.users[0].id;
@@ -73,16 +68,16 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return nameParts.length > 1 ? nameParts.slice(1).join(" ") : fullName.trim();
   }
   // Helper to parse date from the string
-function parseAvailableDate(text) {
+  function parseAvailableDate(text) {
     const dateMatch = text.match(/available\s*(from)?\s*(.*)/i);
     if (dateMatch && dateMatch[2]) {
-        const parsed = new Date(dateMatch[2].trim());
-        return isNaN(parsed.getTime()) ? null : parsed;
+      const parsed = new Date(dateMatch[2].trim());
+      return isNaN(parsed.getTime()) ? null : parsed;
     }
     return null;
-}
-// Helper to normalize the date
-function normalizeAvailableDate(dateObj) {
+  }
+  // Helper to normalize the date
+  function normalizeAvailableDate(dateObj) {
     if (!dateObj) return "";
 
     const today = new Date();
@@ -94,24 +89,24 @@ function normalizeAvailableDate(dateObj) {
 
     // Return as YYYY-MM-DD in local time
     return effectiveDate.toLocaleDateString("en-CA");
-}
+  }
   // Available Date parsing function
   function extractAvailableDate(attributes) {
     if (!attributes || !Array.isArray(attributes)) return "";
 
     for (let attr of attributes) {
-        if (attr.values && Array.isArray(attr.values)) {
-            for (let val of attr.values) {
-                if (typeof val === "string" && val.toLowerCase().includes("available")) {
-                    const parsedDate = parseAvailableDate(val);
-                    return normalizeAvailableDate(parsedDate);
-                }
-            }
+      if (attr.values && Array.isArray(attr.values)) {
+        for (let val of attr.values) {
+          if (typeof val === "string" && val.toLowerCase().includes("available")) {
+            const parsedDate = parseAvailableDate(val);
+            return normalizeAvailableDate(parsedDate);
+          }
         }
+      }
     }
 
     return "";
-}
+  }
   // Detect unit type based on title and description
   function detectUnitTypeFromTitleAndDescription(
     title = "",
@@ -204,7 +199,7 @@ function normalizeAvailableDate(dateObj) {
           "all-inclusive student room",
         ],
       },
-      
+
     ];
 
     for (let entry of typeMap) {
@@ -224,7 +219,7 @@ function normalizeAvailableDate(dateObj) {
     return parts.length >= 2 ? parts[1].trim() : address;
   }
   // Detect number of floors based on description
-function detectNumberOfFloors() {
+  function detectNumberOfFloors() {
     const text = JSON.stringify(data).toLowerCase();
 
     // explicit digits: "3-storey", "4 level", "5 floors", "top floor (3rd)"
@@ -241,7 +236,7 @@ function detectNumberOfFloors() {
 
     return "";
   }
-// Detect number of units based on description
+  // Detect number of units based on description
   function detectNumberOfUnits() {
     const text = JSON.stringify(data).toLowerCase();
 
@@ -278,28 +273,28 @@ function detectNumberOfFloors() {
     return "No";
   }
   // detect backyard no backyard.
-function detectBackyard() {
-  const text = JSON.stringify(data).toLowerCase();
+  function detectBackyard() {
+    const text = JSON.stringify(data).toLowerCase();
 
-  if (text.includes("private backyard") || text.includes("private yard")) {
-    return "Included";
-  }
-  if (
-    text.includes("shared backyard") ||
-    text.includes("shared green space")
-  ) {
-    return "Shared";
-  }
-  if (
-    text.includes("no backyard access") ||
-    text.includes("no access to backyard") ||
-    text.includes("no yard access")
-  ) {
-    return "No Backyard";
-  }
+    if (text.includes("private backyard") || text.includes("private yard")) {
+      return "Included";
+    }
+    if (
+      text.includes("shared backyard") ||
+      text.includes("shared green space")
+    ) {
+      return "Shared";
+    }
+    if (
+      text.includes("no backyard access") ||
+      text.includes("no access to backyard") ||
+      text.includes("no yard access")
+    ) {
+      return "No Backyard";
+    }
 
-  return "Not Included";
-}
+    return "Not Included";
+  }
   // Extract parking spaces from vipPrimary and text content
   function extractParkingSpaces(vipPrimary = [], title = "", description = []) {
     const combinedText = (
@@ -327,7 +322,7 @@ function detectBackyard() {
 
     return ""; // If no info found
   }
-// Detect parking details based on description and title
+  // Detect parking details based on description and title
   function detectParkingDetails(descriptionArray = [], title = "") {
     const text = (title + " " + descriptionArray.join(" ")).toLowerCase();
 
@@ -387,28 +382,28 @@ function detectBackyard() {
 
     return ""; // Default if no matches
   }
- //extract square footage from vipPrimary
+  //extract square footage from vipPrimary
   function extractSqFt(vipPrimary) {
-  if (!vipPrimary || !Array.isArray(vipPrimary)) return "";
+    if (!vipPrimary || !Array.isArray(vipPrimary)) return "";
 
-  const matchItem = vipPrimary.find((x) =>
-    /\b\d{1,3}(,\d{3})?\s*(sq\s?ft|sqft)\b/i.test(x)
-  );
-  if (!matchItem) return "";
+    const matchItem = vipPrimary.find((x) =>
+      /\b\d{1,3}(,\d{3})?\s*(sq\s?ft|sqft)\b/i.test(x)
+    );
+    if (!matchItem) return "";
 
-  const match = matchItem.match(/\d{1,3}(,\d{3})?/);
-  if (!match) return "";
+    const match = matchItem.match(/\d{1,3}(,\d{3})?/);
+    if (!match) return "";
 
-  const sqft = parseInt(match[0].replace(/,/g, ""));
-  
-  // Round to nearest 10
-  return Math.round(sqft / 10) * 10;
-}
-/// Detect unit name based on location or description
-function detectUnitName() {
-  return data?.location || "";
-}
- // Detect property condition based on description
+    const sqft = parseInt(match[0].replace(/,/g, ""));
+
+    // Round to nearest 10
+    return Math.round(sqft / 10) * 10;
+  }
+  /// Detect unit name based on location or description
+  function detectUnitName() {
+    return data?.location || "";
+  }
+  // Detect property condition based on description
   function detectPropertyCondition(descriptionArray) {
     const combined = (descriptionArray || []).join(" ").toLowerCase();
     if (combined.includes("brand new") || combined.includes("never lived in")) {
@@ -429,81 +424,999 @@ function detectUnitName() {
     return "";
   }
   // detect balcony location.
-function detectBalconyLocation(descriptionArray = [], balconyType = "") {
-  // Rule override for specific balcony type
-  if (balconyType.toLowerCase() === "front porch") {
-    return "Front Hallway";
-  }
-
-  const text = (descriptionArray || []).join(" ").toLowerCase();
-
-  const mapping = [
-    {
-      value: "Bedroom and Living Area",
-      keywords: [
-        "balcony in bedroom and living room",
-        "balcony off bedroom and living room",
-      ],
-    },
-    {
-      value: "Both Bedrooms and Living Area",
-      keywords: [
-        "both bedrooms and living room",
-        "balcony from both bedrooms and living",
-      ],
-    },
-    {
-      value: "Both Bedrooms",
-      keywords: ["balcony from both bedrooms", "balcony off both bedrooms"],
-    },
-    {
-      value: "Front Hallway & Living area",
-      keywords: [
-        "balcony in front hallway and living room",
-        "balcony off front hallway and living",
-      ],
-    },
-    {
-      value: "Front Hallway & Kitchen",
-      keywords: [
-        "balcony in front hallway and kitchen",
-        "balcony off front hallway and kitchen",
-      ],
-    },
-    {
-      value: "Front Hallway",
-      keywords: [
-        "balcony in front hallway",
-        "balcony off hallway",
-        "hallway balcony",
-      ],
-    },
-    {
-      value: "Living Area",
-      keywords: [
-        "balcony from living room",
-        "living room access to balcony",
-        "balcony off living room",
-      ],
-    },
-    {
-      value: "Bedroom",
-      keywords: ["balcony off bedroom", "balcony in bedroom"],
-    },
-    {
-      value: "Bathroom",
-      keywords: ["balcony in bathroom", "bathroom access to balcony"],
-    },
-  ];
-
-  for (const item of mapping) {
-    for (const keyword of item.keywords) {
-      if (text.includes(keyword)) return item.value;
+  function detectBalconyLocation(descriptionArray = [], balconyType = "") {
+    // Rule override for specific balcony type
+    if (balconyType.toLowerCase() === "front porch") {
+      return "Front Hallway";
     }
+
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+
+    const mapping = [
+      {
+        value: "Bedroom and Living Area",
+        keywords: [
+          "balcony in bedroom and living room",
+          "balcony off bedroom and living room",
+        ],
+      },
+      {
+        value: "Both Bedrooms and Living Area",
+        keywords: [
+          "both bedrooms and living room",
+          "balcony from both bedrooms and living",
+        ],
+      },
+      {
+        value: "Both Bedrooms",
+        keywords: ["balcony from both bedrooms", "balcony off both bedrooms"],
+      },
+      {
+        value: "Front Hallway & Living area",
+        keywords: [
+          "balcony in front hallway and living room",
+          "balcony off front hallway and living",
+        ],
+      },
+      {
+        value: "Front Hallway & Kitchen",
+        keywords: [
+          "balcony in front hallway and kitchen",
+          "balcony off front hallway and kitchen",
+        ],
+      },
+      {
+        value: "Front Hallway",
+        keywords: [
+          "balcony in front hallway",
+          "balcony off hallway",
+          "hallway balcony",
+        ],
+      },
+      {
+        value: "Living Area",
+        keywords: [
+          "balcony from living room",
+          "living room access to balcony",
+          "balcony off living room",
+        ],
+      },
+      {
+        value: "Bedroom",
+        keywords: ["balcony off bedroom", "balcony in bedroom"],
+      },
+      {
+        value: "Bathroom",
+        keywords: ["balcony in bathroom", "bathroom access to balcony"],
+      },
+    ];
+
+    for (const item of mapping) {
+      for (const keyword of item.keywords) {
+        if (text.includes(keyword)) return item.value;
+      }
+    }
+
+    return "No Balcony";
+  }
+  // Electricity provider detection based on description
+  function detectElectricityProvider(descriptionArray = []) {
+    const providers = {
+      arthurs: "Arthurs Fuel",
+      thorold: "City of Thorold",
+      essex: "Essex Powerline",
+      halton: "Halton Hills Hydro",
+      pemi: "Pemi Provident",
+      "utilities kingston": "Utilities Kingston",
+      willmthydro: "Willmthydro",
+      wyse: "Wyse",
+      "4k": "4K",
+      alectra: "Alectra",
+      algoma: "Algoma Power",
+      bradford: "Bradford West Gwillimbury",
+      brampton: "Brampton Hydro",
+      brantford: "Brantford Hydro",
+      burlington: "Burlington Hydro",
+      "niagara power": "Canadian Niagara Power Inc.",
+      carma: "Carma",
+      kitchener: "City of Kitchener",
+      "clean cut": "Clean Cut Energy",
+      cricket: "Cricket Energy",
+      "crown crest": "Crown Crest Capital",
+      "direct energy": "Direct Energy",
+      durham: "Durham Hydro",
+      "earth power": "Earth Power",
+      elexicon: "Elexicon Energy",
+      whitby: "Elexicon Energy Whitby",
+      enbridge: "Enbridge",
+      enercare: "Enercare",
+      "energy +": "Energy + Inc.",
+      enersource: "Enersource",
+      enova: "Enova",
+      enpower: "EnPower Group",
+      entegrus: "Entegrus Powelines",
+      enwin: "Enwin",
+      erth: "ERTH Power",
+      fibre: "FibreStream",
+      flexcon: "Flexcon",
+      "fort erie": "Fort Erie - Canadian Niagara Power",
+      granbridge: "Grandbridge Energy",
+      grimsby: "Grimsby power",
+      guelph: "Guelph Hydro",
+      holton: "Holton Hydro",
+      "hydro one": "Hydro One",
+      ottawa: "Hydro Ottawa",
+      innpower: "InnPower",
+      kw: "KW Hydro",
+      london: "London Hydro",
+      mersey: "Mersey",
+      metergy: "Metergy Solutions",
+      "nd energy": "ND Energy",
+      newmarket: "Newmarket-Tay Power Distribution",
+      "niagara peninsula": "Niagara Peninsula Energy",
+      oakville: "Oakville Hydro",
+      oshawa: "Oshawa Power",
+      "power stream": "Power Stream",
+      priority: "Priority",
+      provident: "Provident",
+      reliance: "Reliance Home Comfort",
+      spectra: "Spectra",
+      "toronto hydro": "Toronto Hydro",
+      "toronto water": "Toronto Water",
+      tillsonburg: "Town of Tillsonburg",
+      "union gas": "Union Gas",
+      veridian: "Veridian",
+      wasaga: "Wasaga Distribution Inc",
+      "waterloo north": "Waterloo North Hydro",
+      welland: "Welland Hydro",
+      "wyse meter": "Wyse Meter",
+    };
+
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+
+    for (const key in providers) {
+      if (text.includes(key)) {
+        return providers[key];
+      }
+    }
+
+    return "";
+  }
+  // Detect water provider based on description
+  function detectWaterProvider(descriptionArray = []) {
+    const providers = [
+      "Arthurs Fuel",
+      "City of Oakville",
+      "City of Oshawa",
+      "City of Pickering",
+      "City of Tecumseh",
+      "Edoes",
+      "Ersolutions",
+      "Peel Water",
+      "Utilities Kingston",
+      "Wyse",
+      "4K",
+      "Alectra",
+      "Aquaman Bulk Water Supply",
+      "Bradford West Gwillimbury",
+      "Brantford Utilities",
+      "Burlington Hydro",
+      "Carma",
+      "City of Barrie",
+      "City of Brantford",
+      "City of Burlington",
+      "City of Cambridge",
+      "City of Guelph",
+      "City of Kitchener",
+      "City of London",
+      "City of Niagara Falls",
+      "City of Orillia",
+      "City of Ottawa",
+      "City of Port Colborne",
+      "City of Richmond hill",
+      "City of St. Catharines",
+      "City of Thorold",
+      "City of Toronto",
+      "City of Vaughan",
+      "City of Waterloo",
+      "City of Whitby",
+      "Clean Cut Energy",
+      "Cricket Energy",
+      "Crown Crest Capital",
+      "Durham Region",
+      "Earth Power",
+      "Elexicon Energy",
+      "Enbridge",
+      "Enersource",
+      "Enova",
+      "Entegrus Powerlines",
+      "Enwin",
+      "ERTH Power",
+      "Essa Township",
+      "Essex power lines",
+      "Fernsby",
+      "Fort Erie - Water and Waste Services",
+      "Granbridge Energy",
+      "Guelph Hydro",
+      "Haldimand County",
+      "Haldimand County Water and Wastewater",
+      "Hydro One",
+      "Included",
+      "InnPower",
+      "King City",
+      "Kitchener Utilities",
+      "Lakershore Power Line",
+      "Linc",
+      "London Hydro",
+      "Mersey",
+      "Metergy Solutions",
+      "Middlesex center county",
+      "Municipality of Strathroy",
+      "ND Energy",
+      "Newmarket Hydro",
+      "Newmarket Tay Power Distribution",
+      "Newmarket-Tay Power Distribution",
+      "Oakville Hydro",
+      "Ontario Power",
+      "Peel Region",
+      "Power Stream",
+      "Priority",
+      "Provident",
+      "Reliance home comfort",
+      "Spectra",
+      "Springwater Region",
+      "The City of Georgina",
+      "To Be Determined (TBD)",
+      "Town of Aurora Water Department",
+      "Town of Bradford West Gwillimbury",
+      "Town of East Gwillimbury",
+      "Town of Fort Erie",
+      "Town of Georgina",
+      "Town of Grimsby",
+      "Town of New Tecumseth",
+      "Town of Pelham",
+      "Town of Stouffville",
+      "Town of Tillsonburg",
+      "Township of Springwater",
+      "Township of Woolwich",
+      "Veridian",
+      "Wasaga Distribution Inc",
+      "Wastewater",
+      "Waterloo North Hydro",
+      "Welland Municipality",
+      "Welland Water",
+      "Welland Water/Wastewater",
+      "Wyse Meter",
+      "York Region",
+    ];
+
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+
+    for (const provider of providers) {
+      if (text.includes(provider.toLowerCase())) {
+        return provider;
+      }
+    }
+
+    return "Not Mentioned";
+  }
+  // Detect gas provider based on description
+  function detectGasProvider(descriptionArray = []) {
+    const providers = [
+      "Arthurs Fuel",
+      "City Of Waterloo",
+      "Oakville Hydro",
+      "Utilities Kingston",
+      "4K",
+      "Alectra",
+      "Bradford West Gwillimbury",
+      "Carma",
+      "City of Kitchener",
+      "Clean Cut Energy",
+      "Cricket Energy",
+      "Crown Crest Capital",
+      "Direct Energy",
+      "Earth Power",
+      "Elexicon Energy",
+      "Enbridge",
+      "Enercare",
+      "Enersource",
+      "Enova",
+      "ERTH Power",
+      "Hydro One",
+      "Included",
+      "Kitchener Utilities",
+      "London Hydro",
+      "Mersey",
+      "Metergy Solutions",
+      "N/A",
+      "Newmarket Tay Power Distribution",
+      "Newmarket-Tay Power Distribution",
+      "Ontario Power",
+      "Power Stream",
+      "Priority",
+      "Propan",
+      "Provident",
+      "Reliance home comfort",
+      "TBD",
+      "Toronto Hydro",
+      "Toronto Water",
+      "Town of Tillsonburg",
+      "UnionGas",
+      "Waterloo North Hydro",
+    ];
+
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+
+    for (const provider of providers) {
+      if (text.includes(provider.toLowerCase())) {
+        return provider;
+      }
+    }
+
+    // Specific matches for official provider names
+    if (text.includes("enbridge gas") || text.includes("union gas"))
+      return "Enbridge";
+    if (text.includes("epcor")) return "EPCOR";
+    if (text.includes("kitchener utilities")) return "Kitchener Utilities";
+    if (text.includes("utilities kingston")) return "Utilities Kingston";
+
+    return "Not Mentioned";
+  }
+  // Detect hot water tank provider based on description
+  function detectHotWaterTankProvider(descriptionArray = []) {
+    const providers = [
+      "Arthurs Fuel",
+      "Evolve",
+      "GSW",
+      "Rinnai",
+      "Utilities Kingston",
+      "4K",
+      "4K Energy",
+      "Aire One",
+      "Alectra",
+      "Allianz",
+      "Bradford West Gwillimbury",
+      "Carma",
+      "City of Kitchener",
+      "City of Pickering",
+      "Clean Cut Energy",
+      "Cricket Comfort",
+      "Cricket Energy",
+      "Cricket Home Comfort",
+      "Crown Crest Capital",
+      "Direct Energy",
+      "Earth Power",
+      "Eco Star Home Services Co.",
+      "Elevate",
+      "Elexicon Energy",
+      "En saving Inc",
+      "Enbridge",
+      "Enercare",
+      "Enersource",
+      "Enova",
+      "Enpure",
+      "Enresource",
+      "ERTH Power",
+      "Genesis Home Services",
+      "Gian Inc",
+      "Giant",
+      "Green Planet",
+      "HCSI Home Comfort",
+      "Homecorp",
+      "Htp",
+      "Hydro One",
+      "Included",
+      "Kirin Air Systems Inc.",
+      "Kitchener Utilities",
+      "LaSalle Town",
+      "LIMCAN",
+      "London Hydro",
+      "Mersey",
+      "Metergy Solutions",
+      "Midland",
+      "Morenergy",
+      "N/A",
+      "National Home Services",
+      "Newmarket Tay Power Distribution",
+      "Newmarket-Tay Power Distribution",
+      "Oakville Hydro",
+      "Ontario Power",
+      "Power Stream",
+      "Priority",
+      "Provident",
+      "Radiant",
+      "Region of Peel",
+      "Reliance home comfort",
+      "Rheem Guardian System",
+      "Sandpiper",
+      "Simply Green",
+      "Superflue",
+      "Tankless Water Heater",
+      "TBD",
+      "To be Determined (TBD)",
+      "Toronto Hydro",
+      "Toronto Water",
+      "Town of Stouffville",
+      "Town of Tillsonburg",
+      "UnionGas",
+      "Vista",
+      "Waterloo North Hydro",
+    ];
+
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+
+    for (const provider of providers) {
+      if (text.includes(provider.toLowerCase())) {
+        return provider;
+      }
+    }
+
+    // Match specific keywords
+    if (text.includes("reliance")) return "Reliance home comfort";
+    if (text.includes("enercare")) return "Enercare";
+    if (text.includes("enbridge rentals")) return "Enbridge";
+    if (text.includes("direct energy")) return "Direct Energy";
+    if (text.includes("national home services"))
+      return "National Home Services";
+    if (text.includes("home trust")) return "Home Trust";
+    if (text.includes("just energy")) return "Just Energy";
+
+    return "Not Mentioned";
+  }
+  // Detect corner unit based on description
+  function detectCornerUnit(descriptionArray = []) {
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+    return text.includes("corner unit");
+  }
+  // Detect central vacuum based on description
+  function detectCentralVacuum(descriptionArray = []) {
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+    return text.includes("central vacuum");
+  }
+  // Detect penthouse based on description
+  function detectPenthouse(descriptionArray = []) {
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+    return text.includes("penthouse") || text.includes("top floor");
+  }
+  // Detect Common Area Fireplace based on description
+  function detectFireplaceCommonArea(descriptionArray = []) {
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+    return (
+      text.includes("fireplace") ||
+      text.includes("living room fireplace")
+    );
+  }
+  // Detect Fireplace in Bedroom based on description
+  function detectFireplaceBedroom(descriptionArray = []) {
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+    return text.includes("fireplace in bedroom");
+  }
+  // Detect upgraded bathrooms based on description
+  function detectUpgradedBathrooms(descriptionArray = []) {
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+    return text.includes("upgraded bathroom") || text.includes("modern bath");
+  }
+  // Detect upgraded kitchen based on description
+  function detectUpgradedKitchen(descriptionArray = []) {
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+    return text.includes("renovated kitchen") || text.includes("modern kitchen");
+  }
+  // Detect backsplash in kitchen based on description
+  function detectBacksplashKitchen(descriptionArray = []) {
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+    return (
+      text.includes("backsplash") ||
+      text.includes("tile wall behind stove") ||
+      text.includes("tile wall behind sink")
+    );
+  }
+  // Detect dishwasher included based on description and attributes
+  function detectDishwasherIncluded(descriptionArray = [], attributes = []) {
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+
+    const appliances = attributes
+      .filter((attr) => attr.label?.toLowerCase() === "appliances")
+      .flatMap((attr) => attr.values || [])
+      .map((val) => val.toLowerCase());
+
+    return (
+      appliances.includes("dishwasher") ||
+      text.includes("dishwasher included") ||
+      text.includes("built-in dishwasher")
+    );
   }
 
-  return "No Balcony";
+  function detectBuilding_AC_Incl() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("air conditioning included") ||
+      text.includes("central ac") ||
+      text.includes("cooling included") ||
+      text.includes("a/c provided") ||
+      text.includes("no extra for ac")
+    );
+  }
+
+  function detectBuilding_Heat_Incl() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("heating included") ||
+      text.includes("free heat") ||
+      text.includes("radiator heating") ||
+      text.includes("baseboard heating") ||
+      text.includes("no extra cost for heat")
+    );
+  }
+
+  function detectBuilding_Cable_Incl() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("cable included") ||
+      text.includes("rogers tv") ||
+      text.includes("tv package") ||
+      text.includes("free cable") ||
+      text.includes("bell fibe")
+    );
+  }
+
+  function detectBuilding_Internet_Incl() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("wi-fi included") ||
+      text.includes("internet provided") ||
+      text.includes("free high-speed") ||
+      text.includes("unlimited data") ||
+      text.includes("bell/rogers internet")
+    );
+  }
+
+  function detectBuilding_Water_Filtration_Rental() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("water softener") ||
+      text.includes("reverse osmosis") ||
+      text.includes("culligan") ||
+      text.includes("filter rental") ||
+      text.includes("water purification")
+    );
+  }
+  function detectRemote_Garage() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("remote included") ||
+      text.includes("garage fob") ||
+      text.includes("opener") ||
+      text.includes("automatic garage") ||
+      text.includes("remote access")
+    );
+  }
+function detectParking_Garage() {
+  const text = JSON.stringify(data).toLowerCase();
+
+  const remoteGarageSelected =
+    text.includes("remote included") ||
+    text.includes("garage fob") ||
+    text.includes("opener") ||
+    text.includes("automatic garage") ||
+    text.includes("remote access");
+
+  return (
+    text.includes("underground parking") ||
+    text.includes("garage included") ||
+    text.includes("secure parking") ||
+    text.includes("indoor parking") ||
+    text.includes("heated garage") ||
+    remoteGarageSelected
+  );
 }
+  function detectVisitor_Parking() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("guest parking") ||
+      text.includes("visitor spots") ||
+      text.includes("visitors welcome") ||
+      text.includes("free visitor parking")
+    );
+  }
+
+  function detectEV_Charging() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("electric vehicle charger") ||
+      text.includes("ev station") ||
+      text.includes("tesla charger") ||
+      text.includes("ev ready")
+    );
+  }
+
+  function detectCar_Wash() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("car wash bay") ||
+      text.includes("onsite car wash") ||
+      text.includes("vehicle wash")
+    );
+  }
+  function detectSubway_Access() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("steps to subway") ||
+      text.includes("subway access") ||
+      text.includes("near ttc") ||
+      text.includes("connected to station") ||
+      text.includes("direct underground access")
+    );
+  }
+
+  function detectLaundry_Building() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("in-suite laundry") ||
+      text.includes("shared laundry") ||
+      text.includes("washer/dryer included") ||
+      text.includes("onsite laundry") ||
+      text.includes("coin laundry") ||
+      text.includes("laundry room")
+    );
+  }
+
+  function detectLobby_Lounge() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("grand lobby") ||
+      text.includes("lounge area") ||
+      text.includes("reception") ||
+      text.includes("common lounge") ||
+      text.includes("waiting area")
+    );
+  }
+
+  function detectWheelchair_Access() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("accessible") ||
+      text.includes("wheelchair friendly") ||
+      text.includes("barrier free") ||
+      text.includes("elevator access") ||
+      text.includes("mobility-friendly")
+    );
+  }
+
+  function detectOnsite_Staff() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("building staff") ||
+      text.includes("live-in super") ||
+      text.includes("property manager onsite") ||
+      text.includes("janitor") ||
+      text.includes("caretaker")
+    );
+  }
+
+  function detectConcierge_24_7() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("concierge") ||
+      text.includes("doorman") ||
+      text.includes("front desk") ||
+      text.includes("lobby security") ||
+      text.includes("reception 24/7")
+    );
+  }
+  function detectGuest_Suites() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("guest rooms") ||
+      text.includes("visitor suites") ||
+      text.includes("guest accommodation") ||
+      text.includes("temporary suite")
+    );
+  }
+  function detectBicycle_Storage() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("bike lockers") ||
+      text.includes("bicycle room") ||
+      text.includes("cycling storage") ||
+      text.includes("bike parking")
+    );
+  }
+
+  function detectElevators() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("elevator") ||
+      text.includes("lift") ||
+      text.includes("two elevators") ||
+      text.includes("service elevator")
+    );
+  }
+
+  function detectBuzzer_System() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("buzzer") ||
+      text.includes("intercom") ||
+      text.includes("phone entry") ||
+      text.includes("enterphone") ||
+      text.includes("access system")
+    );
+  }
+
+  function detectSecurity() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("security guard") ||
+      text.includes("24hr monitoring") ||
+      text.includes("surveillance") ||
+      text.includes("onsite security")
+    );
+  }
+
+  function detectKeyless_Entry() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("fob access") ||
+      text.includes("smart lock") ||
+      text.includes("keyless") ||
+      text.includes("touchpad lock")
+    );
+  }
+  function detectPet_Spa() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("dog wash") ||
+      text.includes("pet grooming station") ||
+      text.includes("pet spa") ||
+      text.includes("pet shower")
+    );
+  }
+function detectBBQ_Area() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("bbq terrace") ||
+      text.includes("grill area") ||
+      text.includes("barbecue") ||
+      text.includes("rooftop bbq")
+    );
+  }
+  function detectRooftop_Patio() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("sky terrace") ||
+      text.includes("rooftop lounge") ||
+      text.includes("terrace") ||
+      text.includes("top floor patio")
+    );
+  }
+
+  function detectCabanas() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("poolside cabanas") ||
+      text.includes("cabanas") ||
+      text.includes("shaded seating")
+    );
+  }
+
+  function detectTennis_Court() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("tennis") ||
+      text.includes("outdoor court") ||
+      text.includes("recreation court")
+    );
+  }
+
+  function detectOutdoor_Patio() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("backyard") ||
+      text.includes("outdoor space") ||
+      text.includes("garden terrace") ||
+      text.includes("open patio")
+    );
+  }
+
+  function detectOutdoor_Pool() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("outdoor swimming") ||
+      text.includes("pool") ||
+      text.includes("sunbathing area")
+    );
+  }
+
+  function detectOutdoor_Child_Play_Area() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("playground") ||
+      text.includes("kids zone") ||
+      text.includes("tot lot") ||
+      text.includes("children’s park")
+    );
+  }
+  function detectGym_Fitness() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("gym") ||
+      text.includes("fitness center") ||
+      text.includes("exercise room") ||
+      text.includes("cardio") ||
+      text.includes("weights")
+    );
+  }
+
+  function detectRec_Room() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("recreation area") ||
+      text.includes("game room") ||
+      text.includes("activity room")
+    );
+  }
+
+  function detectBilliards() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("billiards") ||
+      text.includes("pool table") ||
+      text.includes("snooker")
+    );
+  }
+
+  function detectIndoor_Pool() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("heated indoor pool") ||
+      text.includes("indoor swimming") ||
+      text.includes("lap pool")
+    );
+  }
+
+  function detectSauna() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("dry sauna") ||
+      text.includes("infrared sauna") ||
+      text.includes("steam + sauna")
+    );
+  }
+
+  function detectLibrary() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("library") ||
+      text.includes("reading room") ||
+      text.includes("study lounge")
+    );
+  }
+
+  function detectSquash() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("squash") ||
+      text.includes("racketball") ||
+      text.includes("indoor court")
+    );
+  }
+
+  function detectBowling() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("bowling alley") ||
+      text.includes("lanes") ||
+      text.includes("ten pin")
+    );
+  }
+
+  function detectIndoor_Child_Area() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("kids room") ||
+      text.includes("indoor play") ||
+      text.includes("children’s zone")
+    );
+  }
+
+  function detectMeeting_Room() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("conference room") ||
+      text.includes("boardroom") ||
+      text.includes("meeting space")
+    );
+  }
+  function detectYoga_Room() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("yoga") ||
+      text.includes("pilates") ||
+      text.includes("meditation studio")
+    );
+  }
+
+  function detectMovie_Room() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("cinema") ||
+      text.includes("media room") ||
+      text.includes("theatre")
+    );
+  }
+
+  function detectGames_Room() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("games lounge") ||
+      text.includes("arcade") ||
+      text.includes("foosball")
+    );
+  }
+
+  function detectWhirlpool() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("hot tub") ||
+      text.includes("jacuzzi") ||
+      text.includes("spa tub")
+    );
+  }
+
+  function detectSteam_Room() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("steam bath") ||
+      text.includes("steam room")
+    );
+  }
+
+  function detectBasketball() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("basketball court") ||
+      text.includes("hoop") ||
+      text.includes("indoor court")
+    );
+  }
+
+  function detectGolf_Range() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("golf simulator") ||
+      text.includes("putting green") ||
+      text.includes("mini golf")
+    );
+  }
+
+  function detectPiano_Lounge() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("piano") ||
+      text.includes("music room") ||
+      text.includes("live music area")
+    );
+  }
+
+  function detectDaycare() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("childcare") ||
+      text.includes("preschool") ||
+      text.includes("day care") ||
+      text.includes("licensed daycare")
+    );
+  }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -561,10 +1474,9 @@ function detectBalconyLocation(descriptionArray = [], balconyType = "") {
     }
     return "No";
   }
- 
 
   // detect View based on description
-    function detectView(descriptionArray = []) {
+  function detectView(descriptionArray = []) {
     const text = (descriptionArray || []).join(" ").toLowerCase();
 
     const hasLake = text.includes("lake view") || text.includes("lake views");
@@ -588,23 +1500,20 @@ function detectBalconyLocation(descriptionArray = [], balconyType = "") {
   }
   // detect private terrace
   function detectPrivateTerraceOrBackyard(descriptionArray = [], backyardValue = "") {
-  // If Backyard is explicitly marked as Included
-  if (backyardValue === "Included") {
-    return true; // equivalent to "selected"
+    // If Backyard is explicitly marked as Included
+    if (backyardValue === "Included") {
+      return true; // equivalent to "selected"
+    }
+
+    // Otherwise detect based on keywords
+    const text = (descriptionArray || []).join(" ").toLowerCase();
+
+    return (
+      text.includes("private terrace") ||
+      text.includes("private backyard") ||
+      text.includes("exclusive yard")
+    );
   }
-
-  // Otherwise detect based on keywords
-  const text = (descriptionArray || []).join(" ").toLowerCase();
-
-  return (
-    text.includes("private terrace") ||
-    text.includes("private backyard") ||
-    text.includes("exclusive yard")
-  );
-}
-
-
-
   // Detect entrance type based on title and description
   function detectEntranceType(descriptionArray = []) {
     const text = (descriptionArray || [].join(" ")).toLowerCase();
@@ -652,7 +1561,7 @@ function detectBalconyLocation(descriptionArray = [], balconyType = "") {
 
     return "N/A - No basement";
   }
- // Detect number of levels based on title and description
+  // Detect number of levels based on title and description
   function detectNumberOfLevels(descriptionArray = [], title = "") {
     const text = (
       title +
@@ -712,8 +1621,6 @@ function detectBalconyLocation(descriptionArray = [], balconyType = "") {
 
     return "";
   }
-
-
   // Detect unit facing direction based on description
   function detectUnitFacing(descriptionArray = []) {
     const directions = [
@@ -736,40 +1643,6 @@ function detectBalconyLocation(descriptionArray = [], balconyType = "") {
     }
 
     return "";
-  }
-  // Detect checkbox features from description
-  function detectCheckboxFeatures(descriptionArray = [], attributes = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-
-    const appliances = attributes
-      .filter((attr) => attr.label && attr.label.toLowerCase() === "appliances")
-      .flatMap((attr) => attr.values || [])
-      .map((val) => val.toLowerCase());
-
-    return {
-      Corner_Unit: text.includes("corner unit"),
-      Central_Vacuum: text.includes("central vacuum"),
-      Penthouse: text.includes("penthouse") || text.includes("top floor"),
-      Natural_Sunlight:
-        text.includes("natural light") ||
-        text.includes("sunlight") ||
-        text.includes("bright"),
-      Fireplace_Common_Area:
-        text.includes("fireplace") || text.includes("living room fireplace"),
-      Fireplace_Bedroom: text.includes("fireplace in bedroom"),
-      Upgraded_Bathrooms:
-        text.includes("upgraded bathroom") || text.includes("modern bath"),
-      Backsplash_Kitchen:
-        text.includes("backsplash") ||
-        text.includes("tile wall behind stove") ||
-        text.includes("tile wall behind sink"),
-      Upgraded_Kitchen:
-        text.includes("renovated kitchen") || text.includes("modern kitchen"),
-      Dishwasher_Included:
-        appliances.includes("dishwasher") ||
-        text.includes("dishwasher included") ||
-        text.includes("built-in dishwasher"),
-    };
   }
   // Detect flooring type in common area based on description
   function detectFlooringCommonArea(descriptionArray = []) {
@@ -1235,7 +2108,6 @@ function detectBalconyLocation(descriptionArray = [], balconyType = "") {
 
     return ""; // Default if nothing found
   }
-  
   // Detect if the unit has a private garage or personal garage
   function detectPrivateGarage(descriptionArray = []) {
     const text = (descriptionArray || []).join(" ").toLowerCase();
@@ -1596,472 +2468,7 @@ function detectBalconyLocation(descriptionArray = [], balconyType = "") {
     const match = text.match(/(?:mailbox|mb#|box)\s*([a-z0-9]+)/i);
     return match ? match[1] : "";
   }
-  // Electricity provider detection based on description
-  function detectElectricityProvider(descriptionArray = []) {
-    const providers = {
-      arthurs: "Arthurs Fuel",
-      thorold: "City of Thorold",
-      essex: "Essex Powerline",
-      halton: "Halton Hills Hydro",
-      pemi: "Pemi Provident",
-      "utilities kingston": "Utilities Kingston",
-      willmthydro: "Willmthydro",
-      wyse: "Wyse",
-      "4k": "4K",
-      alectra: "Alectra",
-      algoma: "Algoma Power",
-      bradford: "Bradford West Gwillimbury",
-      brampton: "Brampton Hydro",
-      brantford: "Brantford Hydro",
-      burlington: "Burlington Hydro",
-      "niagara power": "Canadian Niagara Power Inc.",
-      carma: "Carma",
-      kitchener: "City of Kitchener",
-      "clean cut": "Clean Cut Energy",
-      cricket: "Cricket Energy",
-      "crown crest": "Crown Crest Capital",
-      "direct energy": "Direct Energy",
-      durham: "Durham Hydro",
-      "earth power": "Earth Power",
-      elexicon: "Elexicon Energy",
-      whitby: "Elexicon Energy Whitby",
-      enbridge: "Enbridge",
-      enercare: "Enercare",
-      "energy +": "Energy + Inc.",
-      enersource: "Enersource",
-      enova: "Enova",
-      enpower: "EnPower Group",
-      entegrus: "Entegrus Powelines",
-      enwin: "Enwin",
-      erth: "ERTH Power",
-      fibre: "FibreStream",
-      flexcon: "Flexcon",
-      "fort erie": "Fort Erie - Canadian Niagara Power",
-      granbridge: "Grandbridge Energy",
-      grimsby: "Grimsby power",
-      guelph: "Guelph Hydro",
-      holton: "Holton Hydro",
-      "hydro one": "Hydro One",
-      ottawa: "Hydro Ottawa",
-      innpower: "InnPower",
-      kw: "KW Hydro",
-      london: "London Hydro",
-      mersey: "Mersey",
-      metergy: "Metergy Solutions",
-      "nd energy": "ND Energy",
-      newmarket: "Newmarket-Tay Power Distribution",
-      "niagara peninsula": "Niagara Peninsula Energy",
-      oakville: "Oakville Hydro",
-      oshawa: "Oshawa Power",
-      "power stream": "Power Stream",
-      priority: "Priority",
-      provident: "Provident",
-      reliance: "Reliance Home Comfort",
-      spectra: "Spectra",
-      "toronto hydro": "Toronto Hydro",
-      "toronto water": "Toronto Water",
-      tillsonburg: "Town of Tillsonburg",
-      "union gas": "Union Gas",
-      veridian: "Veridian",
-      wasaga: "Wasaga Distribution Inc",
-      "waterloo north": "Waterloo North Hydro",
-      welland: "Welland Hydro",
-      "wyse meter": "Wyse Meter",
-    };
 
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-
-    for (const key in providers) {
-      if (text.includes(key)) {
-        return providers[key];
-      }
-    }
-
-    return "";
-  }
-  // Detect water provider based on description
-  function detectWaterProvider(descriptionArray = []) {
-    const providers = [
-      "Arthurs Fuel",
-      "City of Oakville",
-      "City of Oshawa",
-      "City of Pickering",
-      "City of Tecumseh",
-      "Edoes",
-      "Ersolutions",
-      "Peel Water",
-      "Utilities Kingston",
-      "Wyse",
-      "4K",
-      "Alectra",
-      "Aquaman Bulk Water Supply",
-      "Bradford West Gwillimbury",
-      "Brantford Utilities",
-      "Burlington Hydro",
-      "Carma",
-      "City of Barrie",
-      "City of Brantford",
-      "City of Burlington",
-      "City of Cambridge",
-      "City of Guelph",
-      "City of Kitchener",
-      "City of London",
-      "City of Niagara Falls",
-      "City of Orillia",
-      "City of Ottawa",
-      "City of Port Colborne",
-      "City of Richmond hill",
-      "City of St. Catharines",
-      "City of Thorold",
-      "City of Toronto",
-      "City of Vaughan",
-      "City of Waterloo",
-      "City of Whitby",
-      "Clean Cut Energy",
-      "Cricket Energy",
-      "Crown Crest Capital",
-      "Durham Region",
-      "Earth Power",
-      "Elexicon Energy",
-      "Enbridge",
-      "Enersource",
-      "Enova",
-      "Entegrus Powerlines",
-      "Enwin",
-      "ERTH Power",
-      "Essa Township",
-      "Essex power lines",
-      "Fernsby",
-      "Fort Erie - Water and Waste Services",
-      "Granbridge Energy",
-      "Guelph Hydro",
-      "Haldimand County",
-      "Haldimand County Water and Wastewater",
-      "Hydro One",
-      "Included",
-      "InnPower",
-      "King City",
-      "Kitchener Utilities",
-      "Lakershore Power Line",
-      "Linc",
-      "London Hydro",
-      "Mersey",
-      "Metergy Solutions",
-      "Middlesex center county",
-      "Municipality of Strathroy",
-      "ND Energy",
-      "Newmarket Hydro",
-      "Newmarket Tay Power Distribution",
-      "Newmarket-Tay Power Distribution",
-      "Oakville Hydro",
-      "Ontario Power",
-      "Peel Region",
-      "Power Stream",
-      "Priority",
-      "Provident",
-      "Reliance home comfort",
-      "Spectra",
-      "Springwater Region",
-      "The City of Georgina",
-      "To Be Determined (TBD)",
-      "Town of Aurora Water Department",
-      "Town of Bradford West Gwillimbury",
-      "Town of East Gwillimbury",
-      "Town of Fort Erie",
-      "Town of Georgina",
-      "Town of Grimsby",
-      "Town of New Tecumseth",
-      "Town of Pelham",
-      "Town of Stouffville",
-      "Town of Tillsonburg",
-      "Township of Springwater",
-      "Township of Woolwich",
-      "Veridian",
-      "Wasaga Distribution Inc",
-      "Wastewater",
-      "Waterloo North Hydro",
-      "Welland Municipality",
-      "Welland Water",
-      "Welland Water/Wastewater",
-      "Wyse Meter",
-      "York Region",
-    ];
-
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-
-    for (const provider of providers) {
-      if (text.includes(provider.toLowerCase())) {
-        return provider;
-      }
-    }
-
-    return "Not Mentioned";
-  }
-  // Detect gas provider based on description
-  function detectGasProvider(descriptionArray = []) {
-    const providers = [
-      "Arthurs Fuel",
-      "City Of Waterloo",
-      "Oakville Hydro",
-      "Utilities Kingston",
-      "4K",
-      "Alectra",
-      "Bradford West Gwillimbury",
-      "Carma",
-      "City of Kitchener",
-      "Clean Cut Energy",
-      "Cricket Energy",
-      "Crown Crest Capital",
-      "Direct Energy",
-      "Earth Power",
-      "Elexicon Energy",
-      "Enbridge",
-      "Enercare",
-      "Enersource",
-      "Enova",
-      "ERTH Power",
-      "Hydro One",
-      "Included",
-      "Kitchener Utilities",
-      "London Hydro",
-      "Mersey",
-      "Metergy Solutions",
-      "N/A",
-      "Newmarket Tay Power Distribution",
-      "Newmarket-Tay Power Distribution",
-      "Ontario Power",
-      "Power Stream",
-      "Priority",
-      "Propan",
-      "Provident",
-      "Reliance home comfort",
-      "TBD",
-      "Toronto Hydro",
-      "Toronto Water",
-      "Town of Tillsonburg",
-      "UnionGas",
-      "Waterloo North Hydro",
-    ];
-
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-
-    for (const provider of providers) {
-      if (text.includes(provider.toLowerCase())) {
-        return provider;
-      }
-    }
-
-    // Specific matches for official provider names
-    if (text.includes("enbridge gas") || text.includes("union gas"))
-      return "Enbridge";
-    if (text.includes("epcor")) return "EPCOR";
-    if (text.includes("kitchener utilities")) return "Kitchener Utilities";
-    if (text.includes("utilities kingston")) return "Utilities Kingston";
-
-    return "Not Mentioned";
-  }
-  // Detect hot water tank provider based on description
-  function detectHotWaterTankProvider(descriptionArray = []) {
-    const providers = [
-      "Arthurs Fuel",
-      "Evolve",
-      "GSW",
-      "Rinnai",
-      "Utilities Kingston",
-      "4K",
-      "4K Energy",
-      "Aire One",
-      "Alectra",
-      "Allianz",
-      "Bradford West Gwillimbury",
-      "Carma",
-      "City of Kitchener",
-      "City of Pickering",
-      "Clean Cut Energy",
-      "Cricket Comfort",
-      "Cricket Energy",
-      "Cricket Home Comfort",
-      "Crown Crest Capital",
-      "Direct Energy",
-      "Earth Power",
-      "Eco Star Home Services Co.",
-      "Elevate",
-      "Elexicon Energy",
-      "En saving Inc",
-      "Enbridge",
-      "Enercare",
-      "Enersource",
-      "Enova",
-      "Enpure",
-      "Enresource",
-      "ERTH Power",
-      "Genesis Home Services",
-      "Gian Inc",
-      "Giant",
-      "Green Planet",
-      "HCSI Home Comfort",
-      "Homecorp",
-      "Htp",
-      "Hydro One",
-      "Included",
-      "Kirin Air Systems Inc.",
-      "Kitchener Utilities",
-      "LaSalle Town",
-      "LIMCAN",
-      "London Hydro",
-      "Mersey",
-      "Metergy Solutions",
-      "Midland",
-      "Morenergy",
-      "N/A",
-      "National Home Services",
-      "Newmarket Tay Power Distribution",
-      "Newmarket-Tay Power Distribution",
-      "Oakville Hydro",
-      "Ontario Power",
-      "Power Stream",
-      "Priority",
-      "Provident",
-      "Radiant",
-      "Region of Peel",
-      "Reliance home comfort",
-      "Rheem Guardian System",
-      "Sandpiper",
-      "Simply Green",
-      "Superflue",
-      "Tankless Water Heater",
-      "TBD",
-      "To be Determined (TBD)",
-      "Toronto Hydro",
-      "Toronto Water",
-      "Town of Stouffville",
-      "Town of Tillsonburg",
-      "UnionGas",
-      "Vista",
-      "Waterloo North Hydro",
-    ];
-
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-
-    for (const provider of providers) {
-      if (text.includes(provider.toLowerCase())) {
-        return provider;
-      }
-    }
-
-    // Match specific keywords
-    if (text.includes("reliance")) return "Reliance home comfort";
-    if (text.includes("enercare")) return "Enercare";
-    if (text.includes("enbridge rentals")) return "Enbridge";
-    if (text.includes("direct energy")) return "Direct Energy";
-    if (text.includes("national home services"))
-      return "National Home Services";
-    if (text.includes("home trust")) return "Home Trust";
-    if (text.includes("just energy")) return "Just Energy";
-
-    return "Not Mentioned";
-  }
-  // Detect hot water tank provider based on description
-  function detectHotWaterTankProvider(descriptionArray = []) {
-    const providers = [
-      "Arthurs Fuel",
-      "Evolve",
-      "GSW",
-      "Rinnai",
-      "Utilities Kingston",
-      "4K",
-      "4K Energy",
-      "Aire One",
-      "Alectra",
-      "Allianz",
-      "Bradford West Gwillimbury",
-      "Carma",
-      "City of Kitchener",
-      "City of Pickering",
-      "Clean Cut Energy",
-      "Cricket Comfort",
-      "Cricket Energy",
-      "Cricket Home Comfort",
-      "Crown Crest Capital",
-      "Direct Energy",
-      "Earth Power",
-      "Eco Star Home Services Co.",
-      "Elevate",
-      "Elexicon Energy",
-      "En saving Inc",
-      "Enbridge",
-      "Enercare",
-      "Enersource",
-      "Enova",
-      "Enpure",
-      "Enresource",
-      "ERTH Power",
-      "Genesis Home Services",
-      "Gian Inc",
-      "Giant",
-      "Green Planet",
-      "HCSI Home Comfort",
-      "Homecorp",
-      "Htp",
-      "Hydro One",
-      "Included",
-      "Kirin Air Systems Inc.",
-      "Kitchener Utilities",
-      "LaSalle Town",
-      "LIMCAN",
-      "London Hydro",
-      "Mersey",
-      "Metergy Solutions",
-      "Midland",
-      "Morenergy",
-      "N/A",
-      "National Home Services",
-      "Newmarket Tay Power Distribution",
-      "Newmarket-Tay Power Distribution",
-      "Oakville Hydro",
-      "Ontario Power",
-      "Power Stream",
-      "Priority",
-      "Provident",
-      "Radiant",
-      "Region of Peel",
-      "Reliance home comfort",
-      "Rheem Guardian System",
-      "Sandpiper",
-      "Simply Green",
-      "Superflue",
-      "Tankless Water Heater",
-      "TBD",
-      "To be Determined (TBD)",
-      "Toronto Hydro",
-      "Toronto Water",
-      "Town of Stouffville",
-      "Town of Tillsonburg",
-      "UnionGas",
-      "Vista",
-      "Waterloo North Hydro",
-    ];
-
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-
-    for (const provider of providers) {
-      if (text.includes(provider.toLowerCase())) {
-        return provider;
-      }
-    }
-
-    // Match specific keywords
-    if (text.includes("reliance")) return "Reliance home comfort";
-    if (text.includes("enercare")) return "Enercare";
-    if (text.includes("enbridge rentals")) return "Enbridge";
-    if (text.includes("direct energy")) return "Direct Energy";
-    if (text.includes("national home services"))
-      return "National Home Services";
-    if (text.includes("home trust")) return "Home Trust";
-    if (text.includes("just energy")) return "Just Energy";
-
-    return "Not Mentioned";
-  }
   // Detect utility inclusions based on description
   function detectUtilityInclusions(descriptionArray = [], attributes = []) {
     const combinedText = (descriptionArray || []).join(" ").toLowerCase();
@@ -2297,985 +2704,882 @@ function detectBalconyLocation(descriptionArray = [], balconyType = "") {
 
     return ""; // nothing found
   }
-  //  BUILDING-LEVEL CHECKBOXES  ➜  auto-detector
-  function detectBuildingCheckboxes() {
-    const text = JSON.stringify(data).toLowerCase();
 
-    /* helper to see if any keyword appears */
-    const has = (kwArr) => kwArr.some((kw) => text.includes(kw));
-
-    return {
-      /* ––– UTILITIES INCLUDED ––– */
-      Building_AC_Incl: has([
-        "air conditioning included",
-        "central ac",
-        "cooling included",
-        "a/c provided",
-        "no extra for ac",
-      ]),
-      Building_Heat_Incl: has([
-        "heating included",
-        "free heat",
-        "radiator heating",
-        "baseboard heating",
-        "no extra cost for heat",
-      ]),
-      Building_Cable_Incl: has([
-        "cable included",
-        "rogers tv",
-        "tv package",
-        "free cable",
-        "bell fibe",
-      ]),
-      Building_Internet_Incl: has([
-        "wi-fi included",
-        "internet provided",
-        "free high-speed",
-        "unlimited data",
-        "bell/rogers internet",
-      ]),
-      Building_Water_Filtration_Rental: has([
-        "water softener",
-        "reverse osmosis",
-        "culligan",
-        "filter rental",
-        "water purification",
-      ]),
-
-      /* ––– PARKING / AMENITIES ––– */
-      Parking_Garage: has([
-        "underground parking",
-        "garage included",
-        "secure parking",
-        "indoor parking",
-        "heated garage",
-      ]),
-      Remote_Garage: has([
-        "remote included",
-        "garage fob",
-        "opener",
-        "automatic garage",
-        "remote access",
-      ]),
-      Visitor_Parking: has([
-        "guest parking",
-        "visitor spots",
-        "visitors welcome",
-        "free visitor parking",
-      ]),
-      EV_Charging: has([
-        "electric vehicle charger",
-        "ev station",
-        "tesla charger",
-        "ev ready",
-      ]),
-      Car_Wash: has(["car wash bay", "onsite car wash", "vehicle wash"]),
-
-      /* ––– BUILDING ACCESS & CONCIERGE ––– */
-      Subway_Access: has([
-        "steps to subway",
-        "subway access",
-        "near ttc",
-        "connected to station",
-        "direct underground access",
-      ]),
-      Laundry_Building: has([
-        "in-suite laundry",
-        "shared laundry",
-        "washer/dryer included",
-        "onsite laundry",
-        "coin laundry",
-        "laundry room",
-      ]),
-      Lobby_Lounge: has([
-        "grand lobby",
-        "lounge area",
-        "reception",
-        "common lounge",
-        "waiting area",
-      ]),
-      Wheelchair_Access: has([
-        "accessible",
-        "wheelchair friendly",
-        "barrier free",
-        "elevator access",
-        "mobility-friendly",
-      ]),
-      Onsite_Staff: has([
-        "building staff",
-        "live-in super",
-        "property manager onsite",
-        "janitor",
-        "caretaker",
-      ]),
-      Concierge_24_7: has([
-        "concierge",
-        "doorman",
-        "front desk",
-        "lobby security",
-        "reception 24/7",
-      ]),
-
-      /* ––– GUEST & STORAGE ––– */
-      Guest_Suites: has([
-        "guest rooms",
-        "visitor suites",
-        "guest accommodation",
-        "temporary suite",
-      ]),
-      Bicycle_Storage: has([
-        "bike lockers",
-        "bicycle room",
-        "cycling storage",
-        "bike parking",
-      ]),
-      Elevators: has(["elevator", "lift", "two elevators", "service elevator"]),
-      Buzzer_System: has([
-        "buzzer",
-        "intercom",
-        "phone entry",
-        "enterphone",
-        "access system",
-      ]),
-      Security: has([
-        "security guard",
-        "24hr monitoring",
-        "surveillance",
-        "onsite security",
-      ]),
-      Keyless_Entry: has([
-        "fob access",
-        "smart lock",
-        "keyless",
-        "touchpad lock",
-      ]),
-
-      /* ––– OUTDOOR LUXURY AMENITIES ––– */
-      Pet_Spa: has([
-        "dog wash",
-        "pet grooming station",
-        "pet spa",
-        "pet shower",
-      ]),
-      BBQ_Area: has(["bbq terrace", "grill area", "barbecue", "rooftop bbq"]),
-      Rooftop_Patio: has([
-        "sky terrace",
-        "rooftop lounge",
-        "terrace",
-        "top floor patio",
-      ]),
-      Cabanas: has(["poolside cabanas", "cabanas", "shaded seating"]),
-      Tennis_Court: has(["tennis", "outdoor court", "recreation court"]),
-      Outdoor_Patio: has([
-        "backyard",
-        "outdoor space",
-        "garden terrace",
-        "open patio",
-      ]),
-      Outdoor_Pool: has(["outdoor swimming", "pool", "sunbathing area"]),
-      Outdoor_Child_Play_Area: has([
-        "playground",
-        "kids zone",
-        "tot lot",
-        "children’s park",
-      ]),
-
-      /* ––– INDOOR AMENITIES ––– */
-      Gym_Fitness: has([
-        "gym",
-        "fitness center",
-        "exercise room",
-        "cardio",
-        "weights",
-      ]),
-      Rec_Room: has(["recreation area", "game room", "activity room"]),
-      Billiards: has(["billiards", "pool table", "snooker"]),
-      Indoor_Pool: has(["heated indoor pool", "indoor swimming", "lap pool"]),
-      Sauna: has(["dry sauna", "infrared sauna", "steam + sauna"]),
-      Library: has(["library", "reading room", "study lounge"]),
-      Squash: has(["squash", "racketball", "indoor court"]),
-      Bowling: has(["bowling alley", "lanes", "ten pin"]),
-      Indoor_Child_Area: has(["kids room", "indoor play", "children’s zone"]),
-      Meeting_Room: has(["conference room", "boardroom", "meeting space"]),
-      Yoga_Room: has(["yoga", "pilates", "meditation studio"]),
-      Movie_Room: has(["cinema", "media room", "theatre"]),
-      Games_Room: has(["games lounge", "arcade", "foosball"]),
-      Whirlpool: has(["hot tub", "jacuzzi", "spa tub"]),
-      Steam_Room: has(["steam bath", "steam room"]),
-      Basketball: has(["basketball court", "hoop", "indoor court"]),
-      Golf_Range: has(["golf simulator", "putting green", "mini golf"]),
-      Piano_Lounge: has(["piano", "music room", "live music area"]),
-      Daycare: has(["childcare", "preschool", "day care", "licensed daycare"]),
-    };
-  }
 
   // Event listener for fetching data
   document.getElementById("fetchDataBtn").addEventListener("click", async () => {
-      const url = document.getElementById("unitUrl").value;
-      const match = url.match(/\/(\d+)(?:\/)?$/);
-      const statusfc = document.getElementById("fetchDataBtn");
+    const url = document.getElementById("unitUrl").value;
+    const match = url.match(/\/(\d+)(?:\/)?$/);
+    const statusfc = document.getElementById("fetchDataBtn");
 
-      if (!url) {
-        Swal.fire("Enter URL", "Please enter a Kijiji listing URL.", "warning");
-        return;
+    if (!url) {
+      Swal.fire("Enter URL", "Please enter a Kijiji listing URL.", "warning");
+      return;
+    }
+
+    if (match) {
+      listingId = match[1];
+      console.log(listingId);
+    } else {
+      console.log("No ID found in URL");
+    }
+
+    // Show loader and disable button
+    statusfc.disabled = true;
+    document.getElementById("pageLoader").style.display = "flex";
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120000); // 120 sec
+    try {
+      const response = await fetch("https://api.royalyorkpm.com/kijiji-ocr-new?url=" + encodeURIComponent(url), {
+        signal: controller.signal
+      });
+      clearTimeout(timeout); // Clear the timeout on success
+      data = await response.json();
+      const StringData = JSON.stringify(data).toLowerCase();
+      console.log("StringData", StringData);
+      console.log("loggedInUserId", loggedInUserId);
+
+      //25th June start New - 
+      const obj = { firstName: data.firstName || "", };
+      const fullName = obj.firstName || "";
+      const FirstName = extractFirstName(fullName);
+      document.getElementById("First_Name").value = FirstName;
+      const LastName = extractLastName(fullName);
+      document.getElementById("Last_Name").value = LastName;
+      scrapedDate = extractAvailableDate(data.vipAttributes?.attributes);
+      document.getElementById("Available_Date").value = scrapedDate;
+      const Mobile = data.phone || "";
+      document.getElementById("Mobile").value = Mobile;
+      const unitType = detectUnitTypeFromTitleAndDescription(data.title, data.description);
+      document.getElementById("Unit_Type").value = unitType;
+      const city = extractCityFromAddress(data.location);
+      document.getElementById("City").value = city;
+      const Province = extractProvince(data.location);
+      document.getElementById("Province").value = Province;
+      const PostalCode = extractPostalCode(data.location);
+      document.getElementById("Postal_Code").value = PostalCode;
+      const bedrooms = extractBedroomsSmart(data.vipAttributes?.primary || [], data.title || "", data.description || []);
+      document.getElementById("Bedrooms").value = bedrooms;
+      const bathrooms = extractBathroomsSmart(data.vipAttributes?.primary || [], data.title || "", data.description || []);
+      document.getElementById("Bathrooms").value = bathrooms;
+      const numberOfFloors = detectNumberOfFloors() || 0;
+      document.getElementById("number_of_floors").value = numberOfFloors;
+      const numberOfUnits = detectNumberOfUnits() || 0;
+      document.getElementById("number_of_units").value = numberOfUnits;
+      const backyard = detectBackyard();
+      document.getElementById("Backyard").value = backyard;
+      const backyardFenced = detectBackyardFenced();
+      document.getElementById("Backyard_Fenced").value = backyardFenced;
+      const Parkingspacs = extractParkingSpaces() || 0;
+      document.getElementById("Parking_Spaces").value = Parkingspacs;
+      const parkingDetails = detectParkingDetails() || "";
+      document.getElementById("Parking_Details").value = parkingDetails;
+      const unitName = detectUnitName() || "";
+      const propertyCondition = detectPropertyCondition(data.description);
+      const electricityProvider = detectElectricityProvider(data.description || []);
+      const waterProvider = detectWaterProvider(data.description || []);
+      const gasProvider = detectGasProvider(data.description || []);
+      const hotWaterTankProvider = detectHotWaterTankProvider(data.description || []);
+      const Corner_Unit = detectCornerUnit(data.description || []);
+      const Central_Vacuum = detectCentralVacuum(data.description || []);
+      const Penthouse = detectPenthouse(data.description || []);
+      const Natural_Sunlight = detectNaturalSunlight(data.description || []);
+      const Fireplace_Common_Area = detectFireplaceCommonArea(data.description || []);
+      const Fireplace_Bedroom = detectFireplaceBedroom(data.description || []);
+      const Upgraded_Bathrooms = detectUpgradedBathrooms(data.description || []);
+      const Backsplash_Kitchen = detectBacksplashKitchen(data.description || []);
+      const Upgraded_Kitchen = detectUpgradedKitchen(data.description || []);
+      const Dishwasher_Included = detectDishwasherIncluded(data.description || [], data.attributes || []);
+      const Building_AC_Incl = detectBuilding_AC_Incl();
+      const Building_Heat_Incl = detectBuilding_Heat_Incl();
+      const Building_Cable_Incl = detectBuilding_Cable_Incl();
+      const Building_Internet_Incl = detectBuilding_Internet_Incl();
+      const Building_Water_Filtration_Rental = detectBuilding_Water_Filtration_Rental();
+      const Parking_Garage = detectParking_Garage();
+      const Remote_Garage = detectRemote_Garage();
+      const Visitor_Parking = detectVisitor_Parking();
+      const EV_Charging = detectEV_Charging();
+      const Car_Wash = detectCar_Wash();
+      const Subway_Access = detectSubway_Access();
+      const Laundry_Building = detectLaundry_Building();
+      const Lobby_Lounge = detectLobby_Lounge();
+      const Wheelchair_Access = detectWheelchair_Access();
+      const Onsite_Staff = detectOnsite_Staff();
+      const Concierge_24_7 = detectConcierge_24_7();
+      const Guest_Suites = detectGuest_Suites();
+      const Bicycle_Storage = detectBicycle_Storage();
+      const Elevators = detectElevators();
+      const Buzzer_System = detectBuzzer_System();
+      const Security = detectSecurity();
+      const Keyless_Entry = detectKeyless_Entry();
+      const Pet_Spa = detectPet_Spa();
+      const BBQ_Area = detectBBQ_Area();
+      const Rooftop_Patio = detectRooftop_Patio();
+      const Cabanas = detectCabanas();
+      const Tennis_Court = detectTennis_Court();
+      const Outdoor_Patio = detectOutdoor_Patio();
+      const Outdoor_Pool = detectOutdoor_Pool();
+      const Outdoor_Child_Play_Area = detectOutdoor_Child_Play_Area();
+      const Gym_Fitness = detectGym_Fitness();
+      const Rec_Room = detectRec_Room();
+      const Billiards = detectBilliards();
+      const Indoor_Pool = detectIndoor_Pool();
+      const Sauna = detectSauna();
+      const Library = detectLibrary();
+      const Squash = detectSquash();
+      const Bowling = detectBowling();
+      const Indoor_Child_Area = detectIndoor_Child_Area();
+      const Meeting_Room = detectMeeting_Room();
+      const Yoga_Room = detectYoga_Room();
+      const Movie_Room = detectMovie_Room();
+      const Games_Room = detectGames_Room();
+      const Whirlpool = detectWhirlpool();
+      const Steam_Room = detectSteam_Room();
+      const Basketball = detectBasketball();
+      const Golf_Range = detectGolf_Range();
+      const Piano_Lounge = detectPiano_Lounge();
+      const Daycare = detectDaycare();
+
+
+
+      //function for conditions ::
+
+      // Detect maximum occupants based on bedroom value
+      function detectMaxOccupants(bedroomValue = "") {
+        if (!bedroomValue || typeof bedroomValue !== "string") return "";
+
+        const value = bedroomValue.toLowerCase().trim();
+
+        // Handle "Studio"
+        if (value === "studio") {
+          return 2;
+        }
+
+        // Match numeric part (e.g., "2", "3 + Den", "4 bedrooms", etc.)
+        const match = value.match(/^(\d+)/);
+        if (match) {
+          const bedrooms = parseInt(match[1], 10);
+          return bedrooms * 2;
+        }
+
+        return ""; // No valid bedroom count found
+      }
+      // Function to detect unit number 
+      function detectUnitNumber(unitType, unitName) {
+        if (!unitName || typeof unitName !== "string") return "";
+
+        const trimmed = unitName.trim();
+
+        if (unitType === "Basement" && !trimmed.startsWith("2-")) {
+          return "2-" + trimmed;
+        }
+
+        if (unitType === "Multi Unit - Above Ground" && !trimmed.startsWith("1-")) {
+          return "1-" + trimmed;
+        }
+
+        return trimmed;
+      }
+      // Function to correct unit name
+      function correctUnitName(unitType, unitName, location = "") {
+        if (!unitName || typeof unitName !== "string") return "";
+
+        const trimmed = unitName.trim();
+
+        // Check if unitName contains any digit
+        const hasNumber = /\d/.test(trimmed);
+
+        if (hasNumber) {
+          if (unitType === "Basement" && !trimmed.startsWith("2-")) {
+            return "2-" + trimmed;
+          }
+
+          if (unitType === "Multi Unit - Above Ground" && !trimmed.startsWith("1-")) {
+            return "1-" + trimmed;
+          }
+
+          return trimmed;
+        }
+
+        // If no number in unit name, fallback to formatted location
+        const fallback = location ? `Not Listed – ${location.trim()}` : "Not Listed";
+        return fallback;
+      }
+      // Detect lawn and snow care services based on description
+      function detectLawnAndSnowCare(descriptionArray = [], unitType = "") {
+        const text = (descriptionArray || []).join(" ").toLowerCase();
+        unitType = unitType.toLowerCase();
+
+        // Auto-include for specific unit types
+        if (unitType === "condominium" || unitType === "unit - apartment building") {
+          return "Lawn and Snow Removal: Included";
+        }
+
+        const hasLawn = /lawn care|grass cutting/.test(text);
+        const hasSnow = /snow removal|snow clearing|snow cleared/.test(text);
+
+        if (hasLawn && hasSnow) return "Lawn and Snow Removal: Included";
+        if (hasLawn) return "Lawn Care: Included";
+        if (hasSnow) return "Snow Removal: Included";
+
+        return "Not Included";
+      }
+      // building type mapping based on unit type
+      function mapUnitTypeToBuildingType(unitType = "") {
+        const mapping = {
+          "condominium": "Condominium",
+          "unit - apartment building": "Apartment Building",
+          "single unit house": "Single Unit House",
+          "multi unit - above ground": "Multi Unit House",
+          "stacked townhouse": "Condo Townhouse",
+          "student room": "Multi Unit House",
+          "basement": "Multi Unit House"
+        };
+
+        const normalized = unitType.toLowerCase().trim();
+        return mapping[normalized] || "";
+      }
+      // Detect basement type based on title and description
+      function detectBasementIncluded(title = "", descriptionArray = [], unitType = "") {
+        const type = unitType.toLowerCase();
+
+        if (type === "basement") {
+          return "This is the basement";
+        }
+
+        if (type === "multi unit - above ground") {
+          return "Separate Unit";
+        }
+
+        if (type === "condominium" || type === "unit - apartment building") {
+          return "N/A - Basement does not exist";
+        }
+
+        const text = (title + " " + (descriptionArray || []).join(" ")).toLowerCase();
+
+        if (
+          text.includes("basement unit") ||
+          text.includes("this is the basement")
+        ) {
+          return "This is the basement";
+        }
+        if (
+          text.includes("separate basement") ||
+          text.includes("basement access") ||
+          text.includes("private basement")
+        ) {
+          return "Separate Unit";
+        }
+        if (text.includes("finished basement")) {
+          return "Finished";
+        }
+        if (
+          text.includes("partially finished basement") ||
+          text.includes("half finished basement")
+        ) {
+          return "Half-finished";
+        }
+        if (text.includes("unfinished basement")) {
+          return "Unfinished";
+        }
+
+        return "N/A - Basement does not exist";
+      }
+      // Extract basement details from description
+      function extractBasementDetails(descriptionArray = [], unitType = "") {
+        const type = unitType.toLowerCase();
+
+        if (type === "basement") {
+          return "This is the basement";
+        }
+
+        if (type === "multi unit - above ground") {
+          return "Separate Unit";
+        }
+
+        if (type === "condominium" || type === "unit - apartment building") {
+          return "N/A - Basement does not exist";
+        }
+
+        const basementKeywords = [
+          "basement",
+          "lower level",
+          "shared laundry",
+          "separate entrance",
+          "in basement",
+        ];
+
+        const matches = (descriptionArray || []).filter((line) =>
+          basementKeywords.some((keyword) => line.toLowerCase().includes(keyword))
+        );
+
+        return matches.join("\\n");
+      }
+      // check for upgraded bathroom
+      function checkUpgradedBathroom(propertyCondition = "") {
+        return propertyCondition === "Newly Renovated";
+      }
+      // Extract last renovated year from description
+      function extractLastRenovatedYear(propertyCondition = "") {
+        // If the property is brand new, return the current year
+        if (propertyCondition.toLowerCase() === "brand new" || propertyCondition.toLowerCase() === "brand new - never lived in") {
+          return new Date().getFullYear().toString();
+        }
+
+        const text = JSON.stringify(data).toLowerCase();
+
+        // Match phrases followed by a 4-digit year
+        const matches = [...text.matchAll(
+          /(renovated in|last renovated|updated in|new bathroom in)[^\d]*(\d{4})/g
+        )];
+
+        if (matches.length === 0) return "";
+
+        // Extract years and return the most recent one
+        const years = matches.map(match => parseInt(match[2], 10));
+        const latestYear = Math.max(...years);
+
+        return latestYear.toString();
+      }
+      function detectPrivateTerraceOrBackyardFromBackyardValue(backyardValue = "") {
+        return backyardValue === "Included";
+      }
+      // Detect view based on unit type
+      function detectViewFromUnitType(unitType = "") {
+        const type = unitType.toLowerCase();
+
+        const typesWithCourtyardView = [
+          "house",
+          "multi unit - above ground",
+          "stacked townhouse",
+          "townhouse",
+          "basement"
+        ];
+
+        if (typesWithCourtyardView.includes(type)) {
+          return "Courtyard/Backyard";
+        }
+
+        return ""; // No override
+      }
+      // Detect if the property is verified by RYPM
+      function detectVerifiedByRYPM({
+        propertyCondition = "",
+        electricityProvider = "",
+        gasProvider = "",
+        hotWaterTankProvider = "",
+        waterProvider = ""
+      } = {}) {
+        const isVerified = propertyCondition.trim() !== "";
+
+        return {
+          verifiedByRYPM: isVerified ? "Yes" : "",
+          electricityProvider: isVerified && !electricityProvider ? "To be Determined (TBD)" : electricityProvider,
+          gasProvider: isVerified && !gasProvider ? "To be Determined (TBD)" : gasProvider,
+          hotWaterTankProvider: isVerified && !hotWaterTankProvider ? "To be Determined (TBD)" : hotWaterTankProvider,
+          waterProvider: isVerified && !waterProvider ? "To be Determined (TBD)" : waterProvider
+        };
+      }
+      function detectBBQ_Area_Synced() {
+        if (Outdoor_Patio) return true;
+
+        const text = JSON.stringify(data).toLowerCase();
+        return (
+          text.includes("bbq terrace") ||
+          text.includes("grill area") ||
+          text.includes("barbecue") ||
+          text.includes("rooftop bbq")
+        );
+      }
+      function detectOutdoor_Patio_Synced() {
+        if (BBQ_Area) return true;
+
+        const text = JSON.stringify(data).toLowerCase();
+        return (
+          text.includes("backyard") ||
+          text.includes("outdoor space") ||
+          text.includes("garden terrace") ||
+          text.includes("open patio")
+        );
       }
 
-      if (match) {
-        listingId = match[1];
-        console.log(listingId);
-      } else {
-        console.log("No ID found in URL");
-      }
 
-      // Show loader and disable button
-      statusfc.disabled = true;
-      document.getElementById("pageLoader").style.display = "flex";
-const controller = new AbortController();
-const timeout = setTimeout(() => controller.abort(), 120000); // 120 sec
-      try {
-        const response = await fetch("https://api.royalyorkpm.com/kijiji-ocr-new?url=" + encodeURIComponent(url), {
-    signal: controller.signal
+
+
+
+
+
+
+
+
+      //Condition const here updated ones
+      const UnitName = correctUnitName(unitType, Address);
+      document.getElementById("Unit_name").value = UnitName || "";
+      const Unitnumber = detectUnitNumber(unitType, Address);
+      document.getElementById("Unit_number").value = Unitnumber;
+      const lawnSnowCare = detectLawnAndSnowCare(data.description || []);
+      const buildingType = mapUnitTypeToBuildingType(unitType);
+      const basement = detectBasementIncluded(data.title || "", data.description || [], data.unitType || "");
+      const basementDetails = extractBasementDetails(data.description || [], data.unitType || "");
+      const upgradedBathroom = checkUpgradedBathroom(propertyCondition);
+      const upgradedKitchen = checkUpgradedBathroom(propertyCondition);
+      const lastYearRenovated = extractLastRenovatedYear(propertyCondition) || "";
+      document.getElementById("Year_Last_Renovated").value = Lastyearrenovated;
+      const Sunlight = true;
+      const privateTerraceOrBackyard = detectPrivateTerraceOrBackyardFromBackyardValue(backyard);
+      const view = detectViewFromUnitType(data.unitType || "");
+      const numericPrice = data.price ? Number(data.price.replace(/[$,]/g, "")) : "";
+      const result = detectVerifiedByRYPM({
+        propertyCondition: detectPropertyCondition(data.description || []),
+        electricityProvider: detectElectricityProvider(data.description || []),
+        gasProvider: detectGasProvider(data.description || []),
+        hotWaterTankProvider: detectHotWaterTankProvider(data.description || []),
+        waterProvider: detectWaterProvider(data.description || [])
+      });
+      const BBQ_Area_Final = detectBBQ_Area_Synced();
+      const Outdoor_Patio_Final = detectOutdoor_Patio_Synced();
+
+
+
+
+
+
+
+
+
+
+
+
+
+      const sqFt = extractSqFt(data.vipAttributes?.primary);
+
+      const furnished = detectFurnished(data.description || []);
+
+      const maximumOccupants = detectMaxOccupants(data.description);
+
+      const entranceType = detectEntranceType(
+        data.title || "",
+        data.description || []
+      );
+
+      const numberOfLevels = detectNumberOfLevels(
+        data.description,
+        data.title
+      );
+      const unitFacing = detectUnitFacing(data.description);
+
+
+      const flooringCommonArea = detectFlooringCommonArea(
+        data.description || []
+      );
+      const ceilingHeight = detectCeilingHeight(data.description || []);
+      const windowCoveringsCommon = detectWindowCoverings(
+        data.description || []
+      );
+      const windowCoveringsBedroom = detectWindowCoverings(
+        data.description || []
+      );
+      const bedroomLayout = detectBedroomLayout(data.description || []);
+      const denAsBedroom = detectDenAsBedroom(data.description || []);
+      const closetType = detectClosetType(data.description || []);
+      const enSuiteBathrooms = detectEnSuiteBathrooms(data.description || []);
+      const bathroomCountertop = detectBathroomCountertop(
+        data.description || []
+      );
+      const showerType = detectShowerType(data.description || []);
+      const applianceFinish = detectApplianceFinish(data.description || []);
+      const kitchenCountertops = detectKitchenCountertops(
+        data.description || []
+      );
+      const flooringBedrooms = detectBedroomFlooring(data.description || []);
+      const balconyLocation = detectBalconyLocation(data.description || []);
+      const isPrivateTerrace = detectPrivateTerraceOrBackyard(
+        data.description || []
+      );
+      const viewValue = detectView(data.description || []);
+
+      const numberOfLockers = extractStorageUnits(data.description || []);
+      const lockerDetails = extractLockerStorageDetails(
+        data.description || []
+      );
+      const lockerLevelAndNumber = extractLockerLevelAndNumber(
+        data.description || []
+      );
+      const utilityShare = extractUtilityResponsibility(
+        data.description || []
+      );
+      const insuranceCompany = detectHomeInsurance(data.description || []);
+      const insurancePolicyNumber = extractInsurancePolicyNumber(
+        data.description || []
+      );
+
+      const utilityInclusions = detectUtilityInclusions(
+        data.description || [],
+        data.vipAttributes?.attributes || []
+      );
+      const utilityNotes = extractUtilityNotes(data.description || []);
+      const buildingCategory = detectBuildingCategoryFromText(
+        data.title,
+        data.description
+      );
+      const fullLocation = extractLocationString();
+
+      const condoCorpNumber = extractCondoCorpNumber();
+      const petRestrictions = detectPetRestrictions();
+      const mgmtInfo = detectBuildingMgmtInfo();
+      const mgmtEmail = extractMgmtEmail();
+      const mgmtPhone = extractMgmtPhone();
+      const officeAddress = extractOfficeAddress();
+      const developerName = detectDeveloperName();
+      const dateOfConstructionISO = detectDateOfConstruction();
+
+
+      // ✅ Hide loader and update button status
+      document.getElementById("pageLoader").style.display = "none";
+      Swal.fire("Success", "All Details fectched successfully!", "success");
+      statusfc.innerText = "✅ Data fetched.";
+    }
+
+    catch (err) {
+      console.error("❌ Fetch error:", err);
+      Swal.fire("Error", "Could not fetch data. See console.", "error");
+
+
+      // ❌ Hide loader and show error
+      document.getElementById("pageLoader").style.display = "none";
+      statusfc.innerText = "❌ Error fetching data.";
+      location.reload();
+    }
   });
-  clearTimeout(timeout); // Clear the timeout on success
-        data = await response.json();
-        const StringData = JSON.stringify(data).toLowerCase();
-        console.log("StringData", StringData);
-        console.log("loggedInUserId", loggedInUserId);
-
-        //25th June start New - 
-        const obj = { firstName: data.firstName || "", };
-        const fullName = obj.firstName || "";
-        const FirstName = extractFirstName(fullName);
-        document.getElementById("First_Name").value = FirstName;
-        const LastName = extractLastName(fullName);
-        document.getElementById("Last_Name").value = LastName;
-        scrapedDate = extractAvailableDate(data.vipAttributes?.attributes);
-        document.getElementById("Available_Date").value = scrapedDate;
-        const Mobile=data.phone || "";
-        document.getElementById("Mobile").value = Mobile;
-        const unitType = detectUnitTypeFromTitleAndDescription(data.title,data.description);
-        document.getElementById("Unit_Type").value = unitType;
-        const city = extractCityFromAddress(data.location);
-        document.getElementById("City").value = city;
-        const Province = extractProvince(data.location);
-        document.getElementById("Province").value = Province;
-        const PostalCode = extractPostalCode(data.location);
-        document.getElementById("Postal_Code").value = PostalCode;
-        const bedrooms = extractBedroomsSmart(data.vipAttributes?.primary || [],data.title || "",data.description || []);
-        document.getElementById("Bedrooms").value = bedrooms;
-        const bathrooms = extractBathroomsSmart(data.vipAttributes?.primary || [],data.title || "",data.description || []);
-        document.getElementById("Bathrooms").value = bathrooms;
-        const numberOfFloors = detectNumberOfFloors() || 0;
-        document.getElementById("number_of_floors").value = numberOfFloors;
-        const numberOfUnits = detectNumberOfUnits() || 0; 
-        document.getElementById("number_of_units").value = numberOfUnits;
-        const backyard = detectBackyard();
-        document.getElementById("Backyard").value = backyard;
-        const backyardFenced = detectBackyardFenced();
-        document.getElementById("Backyard_Fenced").value = backyardFenced;
-       
-        const Parkingspacs = extractParkingSpaces() || 0;
-        document.getElementById("Parking_Spaces").value = Parkingspacs;
-        const parkingDetails = detectParkingDetails() || "";
-        document.getElementById("Parking_Details").value = parkingDetails;
-        const unitName =detectUnitName() || "";
-        const propertyCondition = detectPropertyCondition(data.description);
-
-//function for conditions ::
-
-// Detect maximum occupants based on bedroom value
-function detectMaxOccupants(bedroomValue = "") {
-  if (!bedroomValue || typeof bedroomValue !== "string") return "";
-
-  const value = bedroomValue.toLowerCase().trim();
-
-  // Handle "Studio"
-  if (value === "studio") {
-    return 2;
-  }
-
-  // Match numeric part (e.g., "2", "3 + Den", "4 bedrooms", etc.)
-  const match = value.match(/^(\d+)/);
-  if (match) {
-    const bedrooms = parseInt(match[1], 10);
-    return bedrooms * 2;
-  }
-
-  return ""; // No valid bedroom count found
-}
-// Function to detect unit number 
-function detectUnitNumber(unitType, unitName) {
-  if (!unitName || typeof unitName !== "string") return "";
-
-  const trimmed = unitName.trim();
-
-  if (unitType === "Basement" && !trimmed.startsWith("2-")) {
-    return "2-" + trimmed;
-  }
-
-  if (unitType === "Multi Unit - Above Ground" && !trimmed.startsWith("1-")) {
-    return "1-" + trimmed;
-  }
-
-  return trimmed;
-}
-// Function to correct unit name
-function correctUnitName(unitType, unitName, location = "") {
-  if (!unitName || typeof unitName !== "string") return "";
-
-  const trimmed = unitName.trim();
-
-  // Check if unitName contains any digit
-  const hasNumber = /\d/.test(trimmed);
-
-  if (hasNumber) {
-    if (unitType === "Basement" && !trimmed.startsWith("2-")) {
-      return "2-" + trimmed;
-    }
-
-    if (unitType === "Multi Unit - Above Ground" && !trimmed.startsWith("1-")) {
-      return "1-" + trimmed;
-    }
-
-    return trimmed;
-  }
-
-  // If no number in unit name, fallback to formatted location
-  const fallback = location ? `Not Listed – ${location.trim()}` : "Not Listed";
-  return fallback;
-}
-// Detect lawn and snow care services based on description
-  function detectLawnAndSnowCare(descriptionArray = [], unitType = "") {
-  const text = (descriptionArray || []).join(" ").toLowerCase();
-  unitType = unitType.toLowerCase();
-
-  // Auto-include for specific unit types
-  if (unitType === "condominium" || unitType === "unit - apartment building") {
-    return "Lawn and Snow Removal: Included";
-  }
-
-  const hasLawn = /lawn care|grass cutting/.test(text);
-  const hasSnow = /snow removal|snow clearing|snow cleared/.test(text);
-
-  if (hasLawn && hasSnow) return "Lawn and Snow Removal: Included";
-  if (hasLawn) return "Lawn Care: Included";
-  if (hasSnow) return "Snow Removal: Included";
-
-  return "Not Included";
-}
-// building type mapping based on unit type
-function mapUnitTypeToBuildingType(unitType = "") {
-  const mapping = {
-    "condominium": "Condominium",
-    "unit - apartment building": "Apartment Building",
-    "single unit house": "Single Unit House",
-    "multi unit - above ground": "Multi Unit House",
-    "stacked townhouse": "Condo Townhouse",
-    "student room": "Multi Unit House",
-    "basement": "Multi Unit House"
-  };
-
-  const normalized = unitType.toLowerCase().trim();
-  return mapping[normalized] || "";
-}
- // Detect basement type based on title and description
-function detectBasementIncluded(title = "", descriptionArray = [], unitType = "") {
-  const type = unitType.toLowerCase();
-
-  if (type === "basement") {
-    return "This is the basement";
-  }
-
-  if (type === "multi unit - above ground") {
-    return "Separate Unit";
-  }
-
-  if (type === "condominium" || type === "unit - apartment building") {
-    return "N/A - Basement does not exist";
-  }
-
-  const text = (title + " " + (descriptionArray || []).join(" ")).toLowerCase();
-
-  if (
-    text.includes("basement unit") ||
-    text.includes("this is the basement")
-  ) {
-    return "This is the basement";
-  }
-  if (
-    text.includes("separate basement") ||
-    text.includes("basement access") ||
-    text.includes("private basement")
-  ) {
-    return "Separate Unit";
-  }
-  if (text.includes("finished basement")) {
-    return "Finished";
-  }
-  if (
-    text.includes("partially finished basement") ||
-    text.includes("half finished basement")
-  ) {
-    return "Half-finished";
-  }
-  if (text.includes("unfinished basement")) {
-    return "Unfinished";
-  }
-
-  return "N/A - Basement does not exist";
-}
-  // Extract basement details from description
-function extractBasementDetails(descriptionArray = [], unitType = "") {
-  const type = unitType.toLowerCase();
-
-  if (type === "basement") {
-    return "This is the basement";
-  }
-
-  if (type === "multi unit - above ground") {
-    return "Separate Unit";
-  }
-
-  if (type === "condominium" || type === "unit - apartment building") {
-    return "N/A - Basement does not exist";
-  }
-
-  const basementKeywords = [
-    "basement",
-    "lower level",
-    "shared laundry",
-    "separate entrance",
-    "in basement",
-  ];
-
-  const matches = (descriptionArray || []).filter((line) =>
-    basementKeywords.some((keyword) => line.toLowerCase().includes(keyword))
-  );
-
-  return matches.join("\\n");
-}
-// check for upgraded bathroom
-function checkUpgradedBathroom(propertyCondition = "") {
-  return propertyCondition === "Newly Renovated";
-}
-// Extract last renovated year from description
-function extractLastRenovatedYear(propertyCondition = "") {
-  // If the property is brand new, return the current year
-  if (propertyCondition.toLowerCase() === "brand new" || propertyCondition.toLowerCase() === "brand new - never lived in") {
-    return new Date().getFullYear().toString();
-  }
-
-  const text = JSON.stringify(data).toLowerCase();
-
-  // Match phrases followed by a 4-digit year
-  const matches = [...text.matchAll(
-    /(renovated in|last renovated|updated in|new bathroom in)[^\d]*(\d{4})/g
-  )];
-
-  if (matches.length === 0) return "";
-
-  // Extract years and return the most recent one
-  const years = matches.map(match => parseInt(match[2], 10));
-  const latestYear = Math.max(...years);
-
-  return latestYear.toString();
-}
-function detectPrivateTerraceOrBackyardFromBackyardValue(backyardValue = "") {
-  return backyardValue === "Included";
-}
-function detectViewFromUnitType(unitType = "") {
-  const type = unitType.toLowerCase();
-
-  const typesWithCourtyardView = [
-    "house",
-    "multi unit - above ground",
-    "stacked townhouse",
-    "townhouse",
-    "basement"
-  ];
-
-  if (typesWithCourtyardView.includes(type)) {
-    return "Courtyard/Backyard";
-  }
-
-  return ""; // No override
-}
-
-
-
-
-
-
-
-
-//Condition const here updated ones
-        const UnitName = correctUnitName(unitType, Address);
-        document.getElementById("Unit_name").value = UnitName || "";
-        const Unitnumber= detectUnitNumber(unitType, Address);
-        document.getElementById("Unit_number").value = Unitnumber;
-        const lawnSnowCare = detectLawnAndSnowCare(data.description || []);
-        const buildingType = mapUnitTypeToBuildingType(unitType);
-        const basement = detectBasementIncluded( data.title || "", data.description || [], data.unitType || "" );
-        const basementDetails = extractBasementDetails(data.description || [], data.unitType || "");
-        const upgradedBathroom = checkUpgradedBathroom(propertyCondition);
-        const upgradedKitchen = checkUpgradedBathroom(propertyCondition);
-        const lastYearRenovated = extractLastRenovatedYear(propertyCondition) || "";
-         document.getElementById("Year_Last_Renovated").value = Lastyearrenovated;
-         const Sunlight = true;
-         const privateTerraceOrBackyard = detectPrivateTerraceOrBackyardFromBackyardValue(backyard);
-         const view = detectViewFromUnitType(data.unitType || "");
-         const numericPrice = data.price ? Number(data.price.replace(/[$,]/g, "")) : "";
-
-
-
-
-
-
-
-
-
-
-        
-        
-        const sqFt = extractSqFt(data.vipAttributes?.primary);
-        
-        const furnished = detectFurnished(data.description || []);
-
-        const maximumOccupants = detectMaxOccupants(data.description);
-        
-        const entranceType = detectEntranceType(
-          data.title || "",
-          data.description || []
-        );
-        
-        const numberOfLevels = detectNumberOfLevels(
-          data.description,
-          data.title
-        );
-        const unitFacing = detectUnitFacing(data.description);
-        
-        const features = detectCheckboxFeatures(
-          data.description || [],
-          data.vipAttributes?.attributes || []
-        );
-        const flooringCommonArea = detectFlooringCommonArea(
-          data.description || []
-        );
-        const ceilingHeight = detectCeilingHeight(data.description || []);
-        const windowCoveringsCommon = detectWindowCoverings(
-          data.description || []
-        );
-        const windowCoveringsBedroom = detectWindowCoverings(
-          data.description || []
-        );
-        const bedroomLayout = detectBedroomLayout(data.description || []);
-        const denAsBedroom = detectDenAsBedroom(data.description || []);
-        const closetType = detectClosetType(data.description || []);
-        const enSuiteBathrooms = detectEnSuiteBathrooms(data.description || []);
-        const bathroomCountertop = detectBathroomCountertop(
-          data.description || []
-        );
-        const showerType = detectShowerType(data.description || []);
-        const applianceFinish = detectApplianceFinish(data.description || []);
-        const kitchenCountertops = detectKitchenCountertops(
-          data.description || []
-        );
-        const flooringBedrooms = detectBedroomFlooring(data.description || []);
-        const balconyLocation = detectBalconyLocation(data.description || []);
-        const isPrivateTerrace = detectPrivateTerraceOrBackyard(
-          data.description || []
-        );
-        const viewValue = detectView(data.description || []);
-        
-        const numberOfLockers = extractStorageUnits(data.description || []);
-        const lockerDetails = extractLockerStorageDetails(
-          data.description || []
-        );
-        const lockerLevelAndNumber = extractLockerLevelAndNumber(
-          data.description || []
-        );
-        const utilityShare = extractUtilityResponsibility(
-          data.description || []
-        );
-        const insuranceCompany = detectHomeInsurance(data.description || []);
-        const insurancePolicyNumber = extractInsurancePolicyNumber(
-          data.description || []
-        );
-        const electricityProvider = detectElectricityProvider(
-          data.description || []
-        );
-        const waterProvider = detectWaterProvider(data.description || []);
-        const gasProvider = detectGasProvider(data.description || []);
-        const hotWaterTankProvider = detectHotWaterTankProvider(
-          data.description || []
-        );
-        const utilityInclusions = detectUtilityInclusions(
-          data.description || [],
-          data.vipAttributes?.attributes || []
-        );
-        const utilityNotes = extractUtilityNotes(data.description || []);
-        const buildingCategory = detectBuildingCategoryFromText(
-          data.title,
-          data.description
-        );
-        const fullLocation = extractLocationString();
-        
-        const condoCorpNumber = extractCondoCorpNumber(); 
-        const petRestrictions = detectPetRestrictions(); 
-        const mgmtInfo = detectBuildingMgmtInfo();
-        const mgmtEmail = extractMgmtEmail();
-        const mgmtPhone = extractMgmtPhone();
-        const officeAddress = extractOfficeAddress();
-        const developerName = detectDeveloperName();
-        const dateOfConstructionISO = detectDateOfConstruction();
-        
-
-        // ✅ Hide loader and update button status
-        document.getElementById("pageLoader").style.display = "none";
-        Swal.fire("Success", "All Details fectched successfully!", "success");
-        statusfc.innerText = "✅ Data fetched.";
-      } 
-  
-      catch (err) {
-        console.error("❌ Fetch error:", err);
-        Swal.fire("Error", "Could not fetch data. See console.", "error");
-
-
-        // ❌ Hide loader and show error
-        document.getElementById("pageLoader").style.display = "none";
-        statusfc.innerText = "❌ Error fetching data.";
-        location.reload();
-      }
-    });
   // Event listener for creating records
   // Create records in Zoho CRM
   document.getElementById("createRecordsBtn").addEventListener("click", async () => {
-      const statuscr = document.getElementById("createRecordsBtn");
-      console.log("loggedInUserId", loggedInUserId);
-      // ✅ Show loader and disable fetchDataBtn
+    const statuscr = document.getElementById("createRecordsBtn");
+    console.log("loggedInUserId", loggedInUserId);
+    // ✅ Show loader and disable fetchDataBtn
 
-      const aid = leasingSel.value;
-      console.log("📝 Agent selected:", aid);
-      statuscr.disabled = true;
+    const aid = leasingSel.value;
+    console.log("📝 Agent selected:", aid);
+    statuscr.disabled = true;
+    document.getElementById("pageLoader2").style.display = "flex";
+    const leadData = {
+      Last_Name: document.getElementById("Last_Name").value,
+      Mobile: document.getElementById("Mobile").value,
+      Phone: document.getElementById("Phone").value,
+      Email: document.getElementById("Email").value,
+      City: document.getElementById("City").value,
+      Lead_Source: document.getElementById("Lead_Source").value,
+      Asking_Price: document.getElementById("Asking_Price").value,
+      Lead_Priority_Level: document.getElementById("Lead_Priority_Level")
+        .value,
+      URL: document.getElementById("URL").value,
+      Available_Date: scrapedDate,
+      Ad_ID_New: (document.getElementById("Ad_ID_New").value = listingId),
+      Owner: { id: loggedInUserId },
+    };
+
+    const unitData = {
+      Name: document.getElementById("Interested_Unit_Title").value,
+      Unit_Type: document.getElementById("Unit_Type").value,
+      Total_Area_Sq_Ft:
+        parseInt(document.getElementById("Approximate_Sq_Ft").value) || null,
+      Max_Occupants:
+        parseInt(document.getElementById("Maximum_Occupants").value) || null,
+      Property_Condition: document.getElementById("Property_Condition").value,
+      Year_Built:
+        parseInt(document.getElementById("Year_Last_Renovated").value) ||
+        null,
+      Number_of_Floors: document.getElementById("Number_of_Levels").value,
+      Unit_Facing: document.getElementById("Unit_Facing").value,
+      Lawn_and_Snow_Care: document.getElementById("Lawn_Snow_Care").value,
+      Basement_Entrance: document.getElementById("Entrance_Type").value,
+      Furnished: document.getElementById("Furnished").value,
+      Basement_Included: document.getElementById("Basement_Included").value,
+      Basement_Details: document.getElementById("Basement_Details").value,
+      Earliest_Move_in_Date: scrapedDate,
+      Flooring_Common_Area:
+        document.getElementById("flooringCommonArea").value,
+      Ceiling_Hight: document.getElementById("Ceiling_Height").value,
+      Window_Coverings: document.getElementById("Window_Coverings_Common")
+        .value,
+      Window_Coverings_Common_Area: document.getElementById(
+        "Window_Coverings_Bedroom"
+      ).value,
+      Bedrooms: document.getElementById("Bedrooms").value,
+      Bedroom_Layout: document.getElementById("Bedroom_Layout").value,
+      Den_can_be_used_as_a_bedroom:
+        document.getElementById("Den_As_Bedroom").value,
+      Closets: document.getElementById("Closet_Type").value,
+      En_Suite_Bathrooms: document.getElementById("En_Suite_Bathrooms").value,
+      Bathrooms: document.getElementById("Bathrooms").value,
+      Countertops_Bathroom: document.getElementById("Countertops_Bathroom")
+        .value,
+      Shower_Type: document.getElementById("Shower_Type").value,
+      Appliances: document.getElementById("Appliance_Finishes").value,
+      Countertops: document.getElementById("Countertops_Kitchen").value,
+      Flooring_in_Bedrooms:
+        document.getElementById("Flooring_Bedrooms").value,
+      Location_of_Balcony: document.getElementById("Balcony_Location").value,
+      Backyard: document.getElementById("Backyard").value,
+      Is_the_backyard_fenced:
+        document.getElementById("Backyard_Fenced").value,
+      Number_of_Parking_Spaces:
+        parseInt(document.getElementById("Parking_Spaces").value) || 0,
+      Parking_Details: document.getElementById("Parking_Details").value,
+      parking_level_num: document.getElementById("Parking_Level_Number")
+        .value,
+      View: document.getElementById("View").value,
+      Number_of_Lockers:
+        parseInt(
+          document.getElementById("Number_of_Storage_Lockers").value
+        ) || null,
+      Storage_Details:
+        document.getElementById("Locker_Storage_Details").value || "",
+      locker_level_and_number:
+        document.getElementById("Locker_Level_and_Number").value || "",
+      How_are_utilities_split:
+        document.getElementById("Utilities_Financial_Responsibility").value ||
+        "",
+      Insurance_Home_Owner:
+        document.getElementById("Insurance_Home_Owner").value || "",
+      Insurance_Home_Owners:
+        document.getElementById("Insurance_Home_Owner").value || "",
+      Insurance_Policy_Number:
+        document.getElementById("Insurance_Policy_Number").value || "",
+      Address_Line_2: document.getElementById("Unit").value || "",
+      Street_Number: document.getElementById("Street_Number").value || "",
+      Address: document.getElementById("Street_Name").value || "",
+      City: document.getElementById("City").value || "",
+      Province: document.getElementById("Province").value || "",
+      Postal_Code: document.getElementById("Postal_Code").value || "",
+      Mail_Box_Number: document.getElementById("Mail_Box_Number").value || "",
+      Bank_Account: document.getElementById("Country").value || "Canada",
+      Hydro_Provider:
+        document.getElementById("Electricity_Provider").value || "",
+      Water_Provider: document.getElementById("Water_Provider").value || "",
+      Gas_Provider: document.getElementById("Gas_Provider").value || "",
+      Hot_Water_Tank_Provider:
+        document.getElementById("Hot_Water_Tank_Provider").value || "",
+      AC_Inclusion: document.getElementById("AC_Inclusion").checked,
+      Heat_Inclusion: document.getElementById("Heat_Inclusion").checked,
+      Internet_Inclusion:
+        document.getElementById("Internet_Inclusion").checked,
+      Cable_Inclusion: document.getElementById("Cable_Inclusion").checked,
+      Phone_Inclusion: document.getElementById("Phone_Inclusion").checked,
+      Utility_Notes: document.getElementById("Utility_Notes").value || "",
+      Corner_Unit: document.getElementById("Corner_Unit").checked,
+      Central_Vaccum: document.getElementById("Central_Vacuum").checked,
+      Penthouse: document.getElementById("Penthouse").checked,
+      Tons_of_Natural_Light:
+        document.getElementById("Natural_Sunlight").checked,
+      Fireplace: document.getElementById("Fireplace_Common_Area").checked,
+      Fireplace_Bedroom: document.getElementById("Fireplace_Bedroom").checked,
+      Upgraded_Bathrooms:
+        document.getElementById("Upgraded_Bathrooms").checked,
+      Upgraded_Back_Splash:
+        document.getElementById("Backsplash_Kitchen").checked,
+      Upgraded_Kitchen: document.getElementById("Upgraded_Kitchen").checked,
+      Dishwasher: document.getElementById("Dishwasher_Included").checked,
+      Huge_Private_Terrace: document.getElementById(
+        "Private_Terrace_Backyard"
+      ).checked,
+      Private_Garage: document.getElementById("Private_Garage").checked,
+      Walk_out_to_Garage:
+        document.getElementById("Walkout_To_Garage").checked,
+      Owner: { id: loggedInUserId },
+    };
+    const building_data = {
+      Date_of_Construction: document.getElementById("Construction_Date").value,
+      Developer_Name: document.getElementById("Developer_Name").value,
+      Concierge_Building_Management_Info: document.getElementById("Mgmt_Info").value,
+      Property_Management_Contact_Email: document.getElementById("Mgmt_Email").value,
+      Office_Phone_Number: document.getElementById("Mgmt_Phone").value,
+      Office_Address: document.getElementById("Mgmt_Office_Address").value,
+      floor_count: document.getElementById("Building_Floors").value,
+      unit_count: document.getElementById("Building_Units").value,
+      Corporation_Number: document.getElementById("Condo_Corp_Number").value,
+      // Pet_Restrictions: document.getElementById("Pet_Restrictions").value,
+      Address: document.getElementById("Building_Address").value,
+      Name: document.getElementById("Building_Name").value,
+      City: document.getElementById("Building_City").value,
+      Province: document.getElementById("Building_Province").value,
+      Postal_Code: document.getElementById("Building_Postal_Code").value,
+      ac_included: document.getElementById("Building_AC_Incl").checked,
+      heat_included: document.getElementById("Building_Heat_Incl").checked,
+      cable_inclusion: document.getElementById("Building_Cable_Incl").checked,
+      internet_inclusion: document.getElementById("Building_Internet_Incl").checked,
+      Water_Filtration_Softener_Rental: document.getElementById("Building_Water_Filtration_Rental").checked,
+      Parking_Garage: document.getElementById("Parking_Garage").checked,
+      Remote_Garage: document.getElementById("Remote_Garage").checked,
+      Visitor_Parking: document.getElementById("Visitor_Parking").checked,
+      Electric_Car_Charging_Stations: document.getElementById("EV_Charging").checked,
+      Car_Wash: document.getElementById("Car_Wash").checked,
+      has_subway_access: document.getElementById("Subway_Access").checked,
+      Laundry_Facilities: document.getElementById("Laundry_Building").checked,
+      has_lobby_lounge: document.getElementById("Lobby_Lounge").checked,
+      Wheelchair_Access: document.getElementById("Wheelchair_Access").checked,
+      Onsite_Staff: document.getElementById("Onsite_Staff").checked,
+      has_security: document.getElementById("Concierge_24_7").checked,
+      has_guest_suites: document.getElementById("Guest_Suites").checked,
+      has_bicycle_storage: document.getElementById("Bicycle_Storage").checked,
+      Elevators: document.getElementById("Elevators").checked,
+      Enter_Phone_System: document.getElementById("Buzzer_System").checked,
+      Security_Onsite: document.getElementById("Security").checked,
+      Keyless_Entry: document.getElementById("Keyless_Entry").checked,
+      Pet_Spa: document.getElementById("Pet_Spa").checked,
+      has_bbq_terrace: document.getElementById("BBQ_Area").checked,
+      has_rooftop_patio: document.getElementById("Rooftop_Patio").checked,
+      has_cabana: document.getElementById("Cabanas").checked,
+      has_tennis_court: document.getElementById("Tennis_Court").checked,
+      Outdoor_Patio: document.getElementById("Outdoor_Patio").checked,
+      has_outdoor_pool: document.getElementById("Outdoor_Pool").checked,
+      Outdoor_Child_Play_Area: document.getElementById("Outdoor_Child_Play_Area").checked,
+      has_fitness_center: document.getElementById("Gym_Fitness").checked,
+      Rec_Room: document.getElementById("Rec_Room").checked,
+      has_billiards_room: document.getElementById("Billiards").checked,
+      has_pool: document.getElementById("Indoor_Pool").checked,
+      has_sauna: document.getElementById("Sauna").checked,
+      Library: document.getElementById("Library").checked,
+      has_squash_court: document.getElementById("Squash").checked,
+      has_bowling_alley: document.getElementById("Bowling").checked,
+      Indoor_Child_Play_Area: document.getElementById("Indoor_Child_Area").checked,
+      has_business_centre: document.getElementById("Meeting_Room").checked,
+      has_yoga_room: document.getElementById("Yoga_Room").checked,
+      has_movie_theater: document.getElementById("Movie_Room").checked,
+      has_game_room: document.getElementById("Games_Room").checked,
+      has_whirlpool: document.getElementById("Whirlpool").checked,
+      has_steam_room: document.getElementById("Steam_Room").checked,
+      has_basketball_court: document.getElementById("Basketball").checked,
+      has_golf_range: document.getElementById("Golf_Range").checked,
+      Piano_Lounge: document.getElementById("Piano_Lounge").checked,
+      Day_Care_Centre: document.getElementById("Daycare").checked,
+      Category: document.getElementById("Building_Category").value,
+      Property_Type: document.getElementById("Building_Type").value
+    };
+    try {
+      // 🔁 Reset loaders
       document.getElementById("pageLoader2").style.display = "flex";
-      const leadData = {
-        Last_Name: document.getElementById("Last_Name").value,
-        Mobile: document.getElementById("Mobile").value,
-        Phone: document.getElementById("Phone").value,
-        Email: document.getElementById("Email").value,
-        City: document.getElementById("City").value,
-        Lead_Source: document.getElementById("Lead_Source").value,
-        Asking_Price: document.getElementById("Asking_Price").value,
-        Lead_Priority_Level: document.getElementById("Lead_Priority_Level")
-          .value,
-        URL: document.getElementById("URL").value,
-        Available_Date: scrapedDate,
-        Ad_ID_New: (document.getElementById("Ad_ID_New").value = listingId),
-        Owner: { id: loggedInUserId },
-      };
 
-      const unitData = {
-        Name: document.getElementById("Interested_Unit_Title").value,
-        Unit_Type: document.getElementById("Unit_Type").value,
-        Total_Area_Sq_Ft:
-          parseInt(document.getElementById("Approximate_Sq_Ft").value) || null,
-        Max_Occupants:
-          parseInt(document.getElementById("Maximum_Occupants").value) || null,
-        Property_Condition: document.getElementById("Property_Condition").value,
-        Year_Built:
-          parseInt(document.getElementById("Year_Last_Renovated").value) ||
-          null,
-        Number_of_Floors: document.getElementById("Number_of_Levels").value,
-        Unit_Facing: document.getElementById("Unit_Facing").value,
-        Lawn_and_Snow_Care: document.getElementById("Lawn_Snow_Care").value,
-        Basement_Entrance: document.getElementById("Entrance_Type").value,
-        Furnished: document.getElementById("Furnished").value,
-        Basement_Included: document.getElementById("Basement_Included").value,
-        Basement_Details: document.getElementById("Basement_Details").value,
-        Earliest_Move_in_Date: scrapedDate,
-        Flooring_Common_Area:
-          document.getElementById("flooringCommonArea").value,
-        Ceiling_Hight: document.getElementById("Ceiling_Height").value,
-        Window_Coverings: document.getElementById("Window_Coverings_Common")
-          .value,
-        Window_Coverings_Common_Area: document.getElementById(
-          "Window_Coverings_Bedroom"
-        ).value,
-        Bedrooms: document.getElementById("Bedrooms").value,
-        Bedroom_Layout: document.getElementById("Bedroom_Layout").value,
-        Den_can_be_used_as_a_bedroom:
-          document.getElementById("Den_As_Bedroom").value,
-        Closets: document.getElementById("Closet_Type").value,
-        En_Suite_Bathrooms: document.getElementById("En_Suite_Bathrooms").value,
-        Bathrooms: document.getElementById("Bathrooms").value,
-        Countertops_Bathroom: document.getElementById("Countertops_Bathroom")
-          .value,
-        Shower_Type: document.getElementById("Shower_Type").value,
-        Appliances: document.getElementById("Appliance_Finishes").value,
-        Countertops: document.getElementById("Countertops_Kitchen").value,
-        Flooring_in_Bedrooms:
-          document.getElementById("Flooring_Bedrooms").value,
-        Location_of_Balcony: document.getElementById("Balcony_Location").value,
-        Backyard: document.getElementById("Backyard").value,
-        Is_the_backyard_fenced:
-          document.getElementById("Backyard_Fenced").value,
-        Number_of_Parking_Spaces:
-          parseInt(document.getElementById("Parking_Spaces").value) || 0,
-        Parking_Details: document.getElementById("Parking_Details").value,
-        parking_level_num: document.getElementById("Parking_Level_Number")
-          .value,
-        View: document.getElementById("View").value,
-        Number_of_Lockers:
-          parseInt(
-            document.getElementById("Number_of_Storage_Lockers").value
-          ) || null,
-        Storage_Details:
-          document.getElementById("Locker_Storage_Details").value || "",
-        locker_level_and_number:
-          document.getElementById("Locker_Level_and_Number").value || "",
-        How_are_utilities_split:
-          document.getElementById("Utilities_Financial_Responsibility").value ||
-          "",
-        Insurance_Home_Owner:
-          document.getElementById("Insurance_Home_Owner").value || "",
-        Insurance_Home_Owners:
-          document.getElementById("Insurance_Home_Owner").value || "",
-        Insurance_Policy_Number:
-          document.getElementById("Insurance_Policy_Number").value || "",
-        Address_Line_2: document.getElementById("Unit").value || "",
-        Street_Number: document.getElementById("Street_Number").value || "",
-        Address: document.getElementById("Street_Name").value || "",
-        City: document.getElementById("City").value || "",
-        Province: document.getElementById("Province").value || "",
-        Postal_Code: document.getElementById("Postal_Code").value || "",
-        Mail_Box_Number: document.getElementById("Mail_Box_Number").value || "",
-        Bank_Account: document.getElementById("Country").value || "Canada",
-        Hydro_Provider:
-          document.getElementById("Electricity_Provider").value || "",
-        Water_Provider: document.getElementById("Water_Provider").value || "",
-        Gas_Provider: document.getElementById("Gas_Provider").value || "",
-        Hot_Water_Tank_Provider:
-          document.getElementById("Hot_Water_Tank_Provider").value || "",
-        AC_Inclusion: document.getElementById("AC_Inclusion").checked,
-        Heat_Inclusion: document.getElementById("Heat_Inclusion").checked,
-        Internet_Inclusion:
-          document.getElementById("Internet_Inclusion").checked,
-        Cable_Inclusion: document.getElementById("Cable_Inclusion").checked,
-        Phone_Inclusion: document.getElementById("Phone_Inclusion").checked,
-        Utility_Notes: document.getElementById("Utility_Notes").value || "",
-        Corner_Unit: document.getElementById("Corner_Unit").checked,
-        Central_Vaccum: document.getElementById("Central_Vacuum").checked,
-        Penthouse: document.getElementById("Penthouse").checked,
-        Tons_of_Natural_Light:
-          document.getElementById("Natural_Sunlight").checked,
-        Fireplace: document.getElementById("Fireplace_Common_Area").checked,
-        Fireplace_Bedroom: document.getElementById("Fireplace_Bedroom").checked,
-        Upgraded_Bathrooms:
-          document.getElementById("Upgraded_Bathrooms").checked,
-        Upgraded_Back_Splash:
-          document.getElementById("Backsplash_Kitchen").checked,
-        Upgraded_Kitchen: document.getElementById("Upgraded_Kitchen").checked,
-        Dishwasher: document.getElementById("Dishwasher_Included").checked,
-        Huge_Private_Terrace: document.getElementById(
-          "Private_Terrace_Backyard"
-        ).checked,
-        Private_Garage: document.getElementById("Private_Garage").checked,
-        Walk_out_to_Garage:
-          document.getElementById("Walkout_To_Garage").checked,
-        Owner: { id: loggedInUserId },
-      };
-      const building_data = {
-        Date_of_Construction: document.getElementById("Construction_Date").value,
-        Developer_Name: document.getElementById("Developer_Name").value,
-        Concierge_Building_Management_Info: document.getElementById("Mgmt_Info").value,
-        Property_Management_Contact_Email: document.getElementById("Mgmt_Email").value,
-        Office_Phone_Number: document.getElementById("Mgmt_Phone").value,
-        Office_Address: document.getElementById("Mgmt_Office_Address").value,
-        floor_count: document.getElementById("Building_Floors").value,
-        unit_count: document.getElementById("Building_Units").value,
-        Corporation_Number: document.getElementById("Condo_Corp_Number").value,
-        // Pet_Restrictions: document.getElementById("Pet_Restrictions").value,
-        Address: document.getElementById("Building_Address").value,
-        Name: document.getElementById("Building_Name").value,
-        City: document.getElementById("Building_City").value,
-        Province: document.getElementById("Building_Province").value,
-        Postal_Code: document.getElementById("Building_Postal_Code").value,
-        ac_included: document.getElementById("Building_AC_Incl").checked,
-        heat_included: document.getElementById("Building_Heat_Incl").checked,
-        cable_inclusion: document.getElementById("Building_Cable_Incl").checked,
-        internet_inclusion: document.getElementById("Building_Internet_Incl").checked,
-        Water_Filtration_Softener_Rental: document.getElementById("Building_Water_Filtration_Rental").checked,
-        Parking_Garage: document.getElementById("Parking_Garage").checked,
-        Remote_Garage: document.getElementById("Remote_Garage").checked,
-        Visitor_Parking: document.getElementById("Visitor_Parking").checked,
-        Electric_Car_Charging_Stations: document.getElementById("EV_Charging").checked,
-        Car_Wash: document.getElementById("Car_Wash").checked,
-        has_subway_access: document.getElementById("Subway_Access").checked,
-        Laundry_Facilities: document.getElementById("Laundry_Building").checked,
-        has_lobby_lounge: document.getElementById("Lobby_Lounge").checked,
-        Wheelchair_Access: document.getElementById("Wheelchair_Access").checked,
-        Onsite_Staff: document.getElementById("Onsite_Staff").checked,
-        has_security: document.getElementById("Concierge_24_7").checked,
-        has_guest_suites: document.getElementById("Guest_Suites").checked,
-        has_bicycle_storage: document.getElementById("Bicycle_Storage").checked,
-        Elevators: document.getElementById("Elevators").checked,
-        Enter_Phone_System: document.getElementById("Buzzer_System").checked,
-        Security_Onsite: document.getElementById("Security").checked,
-        Keyless_Entry: document.getElementById("Keyless_Entry").checked,
-        Pet_Spa: document.getElementById("Pet_Spa").checked,
-        has_bbq_terrace: document.getElementById("BBQ_Area").checked,
-        has_rooftop_patio: document.getElementById("Rooftop_Patio").checked,
-        has_cabana: document.getElementById("Cabanas").checked,
-        has_tennis_court: document.getElementById("Tennis_Court").checked,
-        Outdoor_Patio: document.getElementById("Outdoor_Patio").checked,
-        has_outdoor_pool: document.getElementById("Outdoor_Pool").checked,
-        Outdoor_Child_Play_Area: document.getElementById("Outdoor_Child_Play_Area").checked,
-        has_fitness_center: document.getElementById("Gym_Fitness").checked,
-        Rec_Room: document.getElementById("Rec_Room").checked,
-        has_billiards_room: document.getElementById("Billiards").checked,
-        has_pool: document.getElementById("Indoor_Pool").checked,
-        has_sauna: document.getElementById("Sauna").checked,
-        Library: document.getElementById("Library").checked,
-        has_squash_court: document.getElementById("Squash").checked,
-        has_bowling_alley: document.getElementById("Bowling").checked,
-        Indoor_Child_Play_Area: document.getElementById("Indoor_Child_Area").checked,
-        has_business_centre: document.getElementById("Meeting_Room").checked,
-        has_yoga_room: document.getElementById("Yoga_Room").checked,
-        has_movie_theater: document.getElementById("Movie_Room").checked,
-        has_game_room: document.getElementById("Games_Room").checked,
-        has_whirlpool: document.getElementById("Whirlpool").checked,
-        has_steam_room: document.getElementById("Steam_Room").checked,
-        has_basketball_court: document.getElementById("Basketball").checked,
-        has_golf_range: document.getElementById("Golf_Range").checked,
-        Piano_Lounge: document.getElementById("Piano_Lounge").checked,
-        Day_Care_Centre: document.getElementById("Daycare").checked,
-        Category: document.getElementById("Building_Category").value,
-        Property_Type: document.getElementById("Building_Type").value
-      };
-      try {
-        // 🔁 Reset loaders
-        document.getElementById("pageLoader2").style.display = "flex";
-
-        // 💡 Step 1: Check for building match
-        let buildingid = null;
-        let existingBuilding = null;
-        const postalCode = document.getElementById("Building_Postal_Code").value?.trim();
-        if (postalCode) {
-          const searchResp = await ZOHO.CRM.API.searchRecord({
-            Entity: "Buildings",
-            Type: "criteria",
-            Query: `(Postal_Code:equals:${postalCode})`
-          });
-          if (searchResp?.data?.length > 0) {
-            existingBuilding = searchResp.data[0];
-            buildingid = existingBuilding.id;
-          }
-        }
-
-        // 💡 Step 2: Check unit duplicate by name
-        const unitName = unitData.Name;
-        const unitDupCheck = await ZOHO.CRM.API.searchRecord({
-          Entity: "Units",
+      // 💡 Step 1: Check for building match
+      let buildingid = null;
+      let existingBuilding = null;
+      const postalCode = document.getElementById("Building_Postal_Code").value?.trim();
+      if (postalCode) {
+        const searchResp = await ZOHO.CRM.API.searchRecord({
+          Entity: "Buildings",
           Type: "criteria",
-          Query: `(Name:equals:${unitName})`
+          Query: `(Postal_Code:equals:${postalCode})`
         });
-        if (unitDupCheck?.data?.length > 0) {
+        if (searchResp?.data?.length > 0) {
+          existingBuilding = searchResp.data[0];
+          buildingid = existingBuilding.id;
+        }
+      }
+
+      // 💡 Step 2: Check unit duplicate by name
+      const unitName = unitData.Name;
+      const unitDupCheck = await ZOHO.CRM.API.searchRecord({
+        Entity: "Units",
+        Type: "criteria",
+        Query: `(Name:equals:${unitName})`
+      });
+      if (unitDupCheck?.data?.length > 0) {
+        throw {
+          module: "Units",
+          message: "Duplicate Unit Name",
+          details: {
+            id: unitDupCheck.data[0].id,
+            field: "Name"
+          }
+        };
+      }
+
+      // 💡 Step 3: Check lead duplicate by Ad ID
+      const adID = leadData.Ad_ID_New;
+      if (adID) {
+        const leadDupCheck = await ZOHO.CRM.API.searchRecord({
+          Entity: "Leads",
+          Type: "criteria",
+          Query: `(Ad_ID_New:equals:${adID})`
+        });
+        if (leadDupCheck?.data?.length > 0) {
           throw {
-            module: "Units",
-            message: "Duplicate Unit Name",
+            module: "Leads",
+            message: "Duplicate Ad ID",
             details: {
-              id: unitDupCheck.data[0].id,
-              field: "Name"
+              id: leadDupCheck.data[0].id,
+              field: "Ad_ID_New"
             }
           };
         }
+      }
 
-        // 💡 Step 3: Check lead duplicate by Ad ID
-        const adID = leadData.Ad_ID_New;
-        if (adID) {
-          const leadDupCheck = await ZOHO.CRM.API.searchRecord({
-            Entity: "Leads",
-            Type: "criteria",
-            Query: `(Ad_ID_New:equals:${adID})`
-          });
-          if (leadDupCheck?.data?.length > 0) {
-            throw {
-              module: "Leads",
-              message: "Duplicate Ad ID",
-              details: {
-                id: leadDupCheck.data[0].id,
-                field: "Ad_ID_New"
-              }
-            };
-          }
-        }
-
-        // ✅ Step 4: Create building if not found
-        if (!buildingid) {
-          const buildingResp = await ZOHO.CRM.API.insertRecord({
-            Entity: "Buildings",
-            APIData: building_data,
-            Trigger: ["workflow"]
-          });
-
-          console.log("Building Response:", buildingResp);
-          if (!buildingResp || buildingResp.data[0].code !== "SUCCESS") throw buildingResp;
-          buildingid = buildingResp.data[0].details.id;
-        }
-
-
-        // ✅ Step 5: Create Lead
-        const leadResp = await ZOHO.CRM.API.insertRecord({
-          Entity: "Leads",
-          APIData: leadData,
+      // ✅ Step 4: Create building if not found
+      if (!buildingid) {
+        const buildingResp = await ZOHO.CRM.API.insertRecord({
+          Entity: "Buildings",
+          APIData: building_data,
           Trigger: ["workflow"]
         });
-        if (!leadResp || leadResp.data[0].code !== "SUCCESS") throw leadResp;
-        const leadId = leadResp.data[0].details.id;
 
-        // ✅ Step 6: Create Unit
-        const unitResp = await ZOHO.CRM.API.insertRecord({
-          Entity: "Units",
-          APIData: unitData,
-          Trigger: ["workflow"]
-        });
-        if (!unitResp || unitResp.data[0].code !== "SUCCESS") throw unitResp;
-        const unitId = unitResp.data[0].details.id;
+        console.log("Building Response:", buildingResp);
+        if (!buildingResp || buildingResp.data[0].code !== "SUCCESS") throw buildingResp;
+        buildingid = buildingResp.data[0].details.id;
+      }
 
 
+      // ✅ Step 5: Create Lead
+      const leadResp = await ZOHO.CRM.API.insertRecord({
+        Entity: "Leads",
+        APIData: leadData,
+        Trigger: ["workflow"]
+      });
+      if (!leadResp || leadResp.data[0].code !== "SUCCESS") throw leadResp;
+      const leadId = leadResp.data[0].details.id;
+
+      // ✅ Step 6: Create Unit
+      const unitResp = await ZOHO.CRM.API.insertRecord({
+        Entity: "Units",
+        APIData: unitData,
+        Trigger: ["workflow"]
+      });
+      if (!unitResp || unitResp.data[0].code !== "SUCCESS") throw unitResp;
+      const unitId = unitResp.data[0].details.id;
 
 
 
-        // ✅ Step 7: Update Lead
-        const updateLeadResp = await ZOHO.CRM.API.updateRecord({
-          Entity: "Leads",
-          RecordID: leadId,
-          Trigger: ["workflow"],
-          APIData: {
-            id: leadId,
-            Associated_Unit: { id: unitId },
-            Owner: { id: aid }
-          }
-        });
-        if (!updateLeadResp || updateLeadResp.data[0].code !== "SUCCESS") throw updateLeadResp;
 
-        // ✅ Step 8: Update Unit
-        const updateUnitResp = await ZOHO.CRM.API.updateRecord({
-          Entity: "Units",
-          RecordID: unitId,
-          Trigger: ["workflow"],
-          APIData: {
-            id: unitId,
-            Associated_Building: { id: buildingid }
-          }
-        });
-        if (!updateUnitResp || updateUnitResp.data[0].code !== "SUCCESS") throw updateUnitResp;
 
-        // 🎉 Success summary popup
-        Swal.fire({
-          icon: "success",
-          title: "✅ Records Created Successfully",
-          html: `
+      // ✅ Step 7: Update Lead
+      const updateLeadResp = await ZOHO.CRM.API.updateRecord({
+        Entity: "Leads",
+        RecordID: leadId,
+        Trigger: ["workflow"],
+        APIData: {
+          id: leadId,
+          Associated_Unit: { id: unitId },
+          Owner: { id: aid }
+        }
+      });
+      if (!updateLeadResp || updateLeadResp.data[0].code !== "SUCCESS") throw updateLeadResp;
+
+      // ✅ Step 8: Update Unit
+      const updateUnitResp = await ZOHO.CRM.API.updateRecord({
+        Entity: "Units",
+        RecordID: unitId,
+        Trigger: ["workflow"],
+        APIData: {
+          id: unitId,
+          Associated_Building: { id: buildingid }
+        }
+      });
+      if (!updateUnitResp || updateUnitResp.data[0].code !== "SUCCESS") throw updateUnitResp;
+
+      // 🎉 Success summary popup
+      Swal.fire({
+        icon: "success",
+        title: "✅ Records Created Successfully",
+        html: `
     <style>
       .summary-container {
         font-family: 'Segoe UI', sans-serif;
@@ -3353,76 +3657,76 @@ function detectViewFromUnitType(unitType = "") {
       </table>
     </div>
   `,
-          width: 750,
-          confirmButtonText: "Done",
-          confirmButtonColor: "#0d6efd"
-        }).then(() => {
-          location.reload();
-        });
+        width: 750,
+        confirmButtonText: "Done",
+        confirmButtonColor: "#0d6efd"
+      }).then(() => {
+        location.reload();
+      });
 
 
-      } catch (err) {
-        document.getElementById("pageLoader2").style.display = "none";
-        console.error("❌ Full Error Object:", err);
+    } catch (err) {
+      document.getElementById("pageLoader2").style.display = "none";
+      console.error("❌ Full Error Object:", err);
 
-        let title = "❌ Operation Failed";
-        let html = `<p>Something went wrong. Please review the message below.</p>`;
+      let title = "❌ Operation Failed";
+      let html = `<p>Something went wrong. Please review the message below.</p>`;
 
-        // Duplicate record handler
-        if (err?.module && err?.details?.id) {
-          const moduleName = err.module;
-          const field = err.details.field || "Field";
-          const id = err.details.id;
+      // Duplicate record handler
+      if (err?.module && err?.details?.id) {
+        const moduleName = err.module;
+        const field = err.details.field || "Field";
+        const id = err.details.id;
 
-          const moduleLinks = {
-            Units: `https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${id}`,
-            Leads: `https://crm.zoho.com/crm/org680397761/tab/Leads/${id}`,
-            Buildings: `https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${id}`
-          };
+        const moduleLinks = {
+          Units: `https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${id}`,
+          Leads: `https://crm.zoho.com/crm/org680397761/tab/Leads/${id}`,
+          Buildings: `https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${id}`
+        };
 
-          title = "🚫 Duplicate Entry Detected";
-          html = `
+        title = "🚫 Duplicate Entry Detected";
+        html = `
       <p><strong>Module:</strong> ${moduleName}</p>
       <p><strong>Field:</strong> ${field}</p>
       <p><strong>Message:</strong> ${err.message || "Duplicate record."}</p>
       <p><strong>Existing Record:</strong> <a href="${moduleLinks[moduleName]}" target="_blank">🔗 View Record</a></p>
     `;
-        }
-        // Unexpected errors like 400, validation issues
-        else if (err?.data?.[0]?.message) {
-          const message = err.data[0].message;
-          const reason = err.data[0]?.details?.[0]?.api_name || "Unknown Field";
-          title = "⚠️ API Validation Error";
-          html = `
+      }
+      // Unexpected errors like 400, validation issues
+      else if (err?.data?.[0]?.message) {
+        const message = err.data[0].message;
+        const reason = err.data[0]?.details?.[0]?.api_name || "Unknown Field";
+        title = "⚠️ API Validation Error";
+        html = `
       <p><strong>Error Message:</strong> ${message}</p>
       <p><strong>Problem Field:</strong> ${reason}</p>
     `;
-        }
-        // Fallback
-        else {
-          html = `
+      }
+      // Fallback
+      else {
+        html = `
       <p>An unexpected error occurred.</p>
       <p><code>${err?.message || JSON.stringify(err)}</code></p>
     `;
-        }
-
-        // Show in popup
-        Swal.fire({
-          icon: "error",
-          title: title,
-          html: html,
-          confirmButtonText: "Close",
-          confirmButtonColor: "#d33"
-        }).then(() => {
-          location.reload();
-        });
-      }
-      finally {
-        document.getElementById("pageLoader").style.display = "none";
-        document.getElementById("pageLoader2").style.display = "none";
       }
 
+      // Show in popup
+      Swal.fire({
+        icon: "error",
+        title: title,
+        html: html,
+        confirmButtonText: "Close",
+        confirmButtonColor: "#d33"
+      }).then(() => {
+        location.reload();
+      });
+    }
+    finally {
+      document.getElementById("pageLoader").style.display = "none";
+      document.getElementById("pageLoader2").style.display = "none";
+    }
 
-    });
+
+  });
 });
 ZOHO.embeddedApp.init();
