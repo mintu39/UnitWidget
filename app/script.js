@@ -254,8 +254,6 @@ function detectNumberOfFloors() {
 
     return "";
   }
-  
-
   // Detect backyard fenced status based on description and backyard value
   function detectBackyardFenced() {
     const text = JSON.stringify(data).toLowerCase();
@@ -282,7 +280,6 @@ function detectNumberOfFloors() {
 // Extract last renovated year from description
   function extractLastRenovatedYear() {
   const text = JSON.stringify(data).toLowerCase();
-
   // Match phrases followed by a 4-digit year
   const matches = [text.matchAll(
     /(renovated in|last renovated|updated in|new bathroom in)[^\d]*(\d{4})/g
@@ -383,6 +380,28 @@ function detectNumberOfFloors() {
 
     return ""; // Default if no matches
   }
+ //extract square footage from vipPrimary
+  function extractSqFt(vipPrimary) {
+  if (!vipPrimary || !Array.isArray(vipPrimary)) return "";
+
+  const matchItem = vipPrimary.find((x) =>
+    /\b\d{1,3}(,\d{3})?\s*(sq\s?ft|sqft)\b/i.test(x)
+  );
+  if (!matchItem) return "";
+
+  const match = matchItem.match(/\d{1,3}(,\d{3})?/);
+  if (!match) return "";
+
+  const sqft = parseInt(match[0].replace(/,/g, ""));
+  
+  // Round to nearest 10
+  return Math.round(sqft / 10) * 10;
+}
+/// Detect unit name based on location or description
+function detectUnitName() {
+  return data?.location || "";
+}
+
 
 
 
@@ -414,24 +433,6 @@ function detectNumberOfFloors() {
     return "";
   }
 
-
-
-
-
-
-  //extract square footage from vipPrimary
-  function extractSqFt(vipPrimary) {
-    if (!vipPrimary || !Array.isArray(vipPrimary)) return "";
-
-    const matchItem = vipPrimary.find((x) =>
-      /\b\d{1,3}(,\d{3})?\s*(sq\s?ft|sqft)\b/i.test(x)
-    );
-    if (!matchItem) return "";
-
-    // Match 1000–99999 with or without comma
-    const match = matchItem.match(/\d{1,3}(,\d{3})?/);
-    return match ? parseInt(match[0].replace(/,/g, "")) : "";
-  }
   // Detect furnished status based on description
   function detectFurnished(descriptionArray = []) {
     const text = (descriptionArray || []).join(" ").toLowerCase();
@@ -491,16 +492,6 @@ function detectNumberOfFloors() {
       return "Unfinished";
     }
     return "N/A - Basement does not exist";
-  }
-  // Detect lawn and snow care services based on description
-  function detectLawnAndSnowCare(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-    const hasLawn = /lawn care|grass cutting/.test(text);
-    const hasSnow = /snow removal|snow clearing|snow cleared/.test(text);
-    if (hasLawn && hasSnow) return "Lawn and Snow Removal: Included";
-    if (hasLawn) return "Lawn Care: Included";
-    if (hasSnow) return "Snow Removal: Included";
-    return "Not Included";
   }
   // detect View based on description
     function detectView(descriptionArray = []) {
@@ -640,29 +631,6 @@ function detectBalconyLocation(descriptionArray = [], balconyType = "") {
 
   return "No Balcony";
 }
-//
-function detectMaxOccupants(bedroomValue = "") {
-  if (!bedroomValue || typeof bedroomValue !== "string") return "";
-
-  const value = bedroomValue.toLowerCase().trim();
-
-  // Handle "Studio"
-  if (value === "studio") {
-    return 2;
-  }
-
-  // Match numeric part (e.g., "2", "3 + Den", "4 bedrooms", etc.)
-  const match = value.match(/^(\d+)/);
-  if (match) {
-    const bedrooms = parseInt(match[1], 10);
-    return bedrooms * 2;
-  }
-
-  return ""; // No valid bedroom count found
-}
-
-
-
 
   // Detect entrance type based on title and description
   function detectEntranceType(descriptionArray = []) {
@@ -711,9 +679,6 @@ function detectMaxOccupants(bedroomValue = "") {
 
     return "N/A - No basement";
   }
-  // Detect maximum occupants based on description
- 
-
   // Detect property condition based on description
   function detectPropertyCondition(descriptionArray) {
     const combined = (descriptionArray || []).join(" ").toLowerCase();
@@ -1329,16 +1294,6 @@ function detectMaxOccupants(bedroomValue = "") {
 
     return ""; // Default if nothing found
   }
-  
- 
-
-  // Detect view type based on description
-
-  
-
-
-
-
   
   // Detect if the unit has a private garage or personal garage
   function detectPrivateGarage(descriptionArray = []) {
@@ -2255,86 +2210,6 @@ function detectMaxOccupants(bedroomValue = "") {
     }
     return "";
   }
-  /* ───────── BUILDING TYPE (updated pick-list) ───────── */
-  function detectBuildingTypeFromText() {
-    const text = JSON.stringify(data).toLowerCase();
-
-    const typeMap = [
-      {
-        type: "Condominium",
-        keywords: [
-          "condominium",
-          "condo",
-          "luxury condo",
-          "condo unit",
-          "condo apartment",
-        ],
-      },
-      {
-        type: "Freehold Townhouse",
-        keywords: [
-          "freehold townhouse",
-          "freehold townhome",
-          "freehold town house",
-          "freehold",
-        ],
-      },
-      {
-        type: "Condo Townhouse",
-        keywords: [
-          "condo townhouse",
-          "condo townhome",
-          "stacked townhouse",
-          "stacked townhome",
-          "stacked town house",
-          "condo town house",
-        ],
-      },
-      {
-        type: "Apartment Building",
-        keywords: [
-          "apartment",
-          "unit in apartment building",
-          "high-rise",
-          "mid-rise",
-          "walk-up",
-          "corner unit",
-          "suite in building",
-          "low-rise",
-        ],
-      },
-      {
-        type: "House",
-        keywords: [
-          "house",
-          "detached",
-          "single family",
-          "entire house",
-          "bungalow",
-        ],
-      },
-      {
-        type: "Multi-Unit",
-        keywords: [
-          "multi-unit",
-          "multi family",
-          "triplex",
-          "duplex",
-          "fourplex",
-          "upstairs unit",
-          "main floor unit",
-          "upper level in house",
-        ],
-      },
-    ];
-
-    for (const entry of typeMap) {
-      for (const keyword of entry.keywords) {
-        if (text.includes(keyword)) return entry.type;
-      }
-    }
-    return "";
-  }
   /* ───────── FULL LOCATION STRING ───────── */
   function extractLocationString() {
     const text = JSON.stringify(data); // keep case
@@ -2714,9 +2589,13 @@ function detectMaxOccupants(bedroomValue = "") {
       // Show loader and disable button
       statusfc.disabled = true;
       document.getElementById("pageLoader").style.display = "flex";
-
+const controller = new AbortController();
+const timeout = setTimeout(() => controller.abort(), 120000); // 120 sec
       try {
-        const response = await fetch("https://api.royalyorkpm.com/kijiji-ocr-new?url=" + encodeURIComponent(url));
+        const response = await fetch("https://api.royalyorkpm.com/kijiji-ocr-new?url=" + encodeURIComponent(url), {
+    signal: controller.signal
+  });
+  clearTimeout(timeout); // Clear the timeout on success
         data = await response.json();
         const StringData = JSON.stringify(data).toLowerCase();
         console.log("StringData", StringData);
@@ -2759,8 +2638,114 @@ function detectMaxOccupants(bedroomValue = "") {
         document.getElementById("Parking_Spaces").value = Parkingspacs;
         const parkingDetails = detectParkingDetails() || "";
         document.getElementById("Parking_Details").value = parkingDetails;
-        const Address =data.location;
-        document.getElementById("Unit_name").value = Address || "";
+        const unitName =detectUnitName() || "";
+
+//function for conditions ::
+
+// Detect maximum occupants based on bedroom value
+function detectMaxOccupants(bedroomValue = "") {
+  if (!bedroomValue || typeof bedroomValue !== "string") return "";
+
+  const value = bedroomValue.toLowerCase().trim();
+
+  // Handle "Studio"
+  if (value === "studio") {
+    return 2;
+  }
+
+  // Match numeric part (e.g., "2", "3 + Den", "4 bedrooms", etc.)
+  const match = value.match(/^(\d+)/);
+  if (match) {
+    const bedrooms = parseInt(match[1], 10);
+    return bedrooms * 2;
+  }
+
+  return ""; // No valid bedroom count found
+}
+// Function to detect unit number 
+function detectUnitNumber(unitType, unitName) {
+  if (!unitName || typeof unitName !== "string") return "";
+
+  const trimmed = unitName.trim();
+
+  if (unitType === "Basement" && !trimmed.startsWith("2-")) {
+    return "2-" + trimmed;
+  }
+
+  if (unitType === "Multi Unit - Above Ground" && !trimmed.startsWith("1-")) {
+    return "1-" + trimmed;
+  }
+
+  return trimmed;
+}
+// Function to correct unit name
+function correctUnitName(unitType, unitName) {
+  if (!unitName || typeof unitName !== "string") return "";
+
+  const trimmed = unitName.trim();
+
+  if (unitType === "Basement" && !trimmed.startsWith("2-")) {
+    return "2-" + trimmed;
+  }
+
+  if (unitType === "Multi Unit - Above Ground" && !trimmed.startsWith("1-")) {
+    return "1-" + trimmed;
+  }
+
+  return trimmed;
+}
+// Detect lawn and snow care services based on description
+  function detectLawnAndSnowCare(descriptionArray = [], unitType = "") {
+  const text = (descriptionArray || []).join(" ").toLowerCase();
+  unitType = unitType.toLowerCase();
+
+  // Auto-include for specific unit types
+  if (unitType === "condominium" || unitType === "unit - apartment building") {
+    return "Lawn and Snow Removal: Included";
+  }
+
+  const hasLawn = /lawn care|grass cutting/.test(text);
+  const hasSnow = /snow removal|snow clearing|snow cleared/.test(text);
+
+  if (hasLawn && hasSnow) return "Lawn and Snow Removal: Included";
+  if (hasLawn) return "Lawn Care: Included";
+  if (hasSnow) return "Snow Removal: Included";
+
+  return "Not Included";
+}
+// building type mapping based on unit type
+function mapUnitTypeToBuildingType(unitType = "") {
+  const mapping = {
+    "condominium": "Condominium",
+    "unit - apartment building": "Apartment Building",
+    "single unit house": "Single Unit House",
+    "multi unit - above ground": "Multi Unit House",
+    "stacked townhouse": "Condo Townhouse",
+    "student room": "Multi Unit House",
+    "basement": "Multi Unit House"
+  };
+
+  const normalized = unitType.toLowerCase().trim();
+  return mapping[normalized] || "";
+}
+
+
+
+
+//Condition const here updated ones
+        const UnitName = correctUnitName(unitType, Address);
+        document.getElementById("Unit_name").value = UnitName || "";
+        const Unitnumber= detectUnitNumber(unitType, Address);
+        document.getElementById("Unit_number").value = Unitnumber;
+        const lawnSnowCare = detectLawnAndSnowCare(data.description || []);
+        const buildingType = mapUnitTypeToBuildingType(unitType);
+
+
+
+
+
+
+
 
 
 
@@ -2775,7 +2760,7 @@ function detectMaxOccupants(bedroomValue = "") {
           data.description || []
         );
         const maximumOccupants = detectMaxOccupants(data.description);
-        const lawnSnowCare = detectLawnAndSnowCare(data.description || []);
+        
         const entranceType = detectEntranceType(
           data.title || "",
           data.description || []
@@ -2851,10 +2836,6 @@ function detectMaxOccupants(bedroomValue = "") {
           data.title,
           data.description
         );
-        const buildingType = detectBuildingTypeFromText(
-          data.title,
-          data.description
-        );
         const fullLocation = extractLocationString();
         
         const condoCorpNumber = extractCondoCorpNumber(); 
@@ -2871,7 +2852,9 @@ function detectMaxOccupants(bedroomValue = "") {
         document.getElementById("pageLoader").style.display = "none";
         Swal.fire("Success", "All Details fectched successfully!", "success");
         statusfc.innerText = "✅ Data fetched.";
-      } catch (err) {
+      } 
+  
+      catch (err) {
         console.error("❌ Fetch error:", err);
         Swal.fire("Error", "Could not fetch data. See console.", "error");
 
