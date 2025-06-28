@@ -1,8 +1,158 @@
 var userId = "";
 let data = {};
 let scrapedDate = "";
+let Source = "";
+let BuildingName = "";
 let listingId = "";
 let loggedInUserId = "";
+let propertyCondition = "";
+let electricityProvider = "";
+let waterProvider = "";
+let gasProvider = "";
+let hotWaterTankProvider = "";
+let Corner_Unit = "";
+let Central_Vacuum = "";
+let Penthouse = "";
+let Fireplace_Common_Area = "";
+let Fireplace_Bedroom = "";
+let Upgraded_Bathrooms = "";
+let Backsplash_Kitchen = "";
+let Upgraded_Kitchen = "";
+let Dishwasher_Included = "";
+let Building_AC_Incl = "";
+let Building_Heat_Incl = "";
+let Building_Cable_Incl = "";
+let Building_Internet_Incl = "";
+let Building_Water_Filtration_Rental = "";
+let Parking_Garage = "";
+let Remote_Garage = "";
+let Visitor_Parking = "";
+let EV_Charging = "";
+let Car_Wash = "";
+let Subway_Access = "";
+let Laundry_Building = "";
+let Lobby_Lounge = "";
+let Wheelchair_Access = "";
+let Onsite_Staff = "";
+let Concierge_24_7 = "";
+let Guest_Suites = "";
+let Bicycle_Storage = "";
+let Elevators = "";
+let Buzzer_System = "";
+let Security = "";
+let Keyless_Entry = "";
+let Pet_Spa = "";
+let BBQ_Area = "";
+let Rooftop_Patio = "";
+let Cabanas = "";
+let Tennis_Court = "";
+let Outdoor_Patio = "";
+let Outdoor_Pool = "";
+let Outdoor_Child_Play_Area = "";
+let Gym_Fitness = "";
+let Rec_Room = "";
+let Billiards = "";
+let Indoor_Pool = "";
+let Sauna = "";
+let Library = "";
+let Squash = "";
+let Bowling = "";
+let Indoor_Child_Area = "";
+let Meeting_Room = "";
+let Yoga_Room = "";
+let Movie_Room = "";
+let unitData = {};
+let leadData = {};
+let building_data = {};
+let Games_Room = "";
+let Whirlpool = "";
+let Steam_Room = "";
+let Basketball = "";
+let Golf_Range = "";
+let Piano_Lounge = "";
+let Daycare = "";
+let ParkingLevelNumber = "";
+let lawnSnowCare = "";
+let buildingType = "";
+let basement = "";
+let basementDetails = "";
+let upgradedBathroom = "";
+let upgradedKitchen = "";
+let Lastyearrenovated = "";
+let Sunlight = "";
+let privateTerraceOrBackyard = "";
+let view = "";
+let numericPrice = "";
+let result = "";
+let BBQ_Area_Final = "";
+let Outdoor_Patio_Final = "";
+let Pets_Allowed = "";
+let sqFt = "";
+let furnished = "";
+let maximumOccupants = "";
+let entranceType = "";
+let numberOfLevels = "";
+let unitFacing = "";
+let flooringCommonArea = "";
+let ceilingHeight = "";
+let windowCoveringsCommon = "";
+let windowCoveringsBedroom = "";
+let bedroomLayout = "";
+let denAsBedroom = "";
+let closetType = "";
+let enSuiteBathrooms = "";
+let bathroomCountertop = "";
+let showerType = "";
+let applianceFinish = "";
+let kitchenCountertops = "";
+let flooringBedrooms = "";
+let balconyLocation = "";
+let isPrivateTerrace = "";
+let numberOfLockers = "";
+let lockerDetails = "";
+let lockerLevelAndNumber = "";
+let utilityShare = "";
+let insuranceCompany = "";
+let insurancePolicyNumber = "";
+let AC_Inclusion = "";
+let Heat_Inclusion = "";
+let Internet_Inclusion = "";
+let utilityNotes = "";
+let buildingCategory = "";
+let condoCorpNumber = "";
+let petRestrictions = "";
+let mgmtInfo = "";
+let mgmtEmail = "";
+let mgmtPhone = "";
+let officeAddress = "";
+let developerName = "";
+let dateOfConstructionISO = "";
+let Unitnumber = "";
+let UnitNamecorrected = "";
+let Walkout_to_Garage = "";
+let Private_Garage = "";
+let Street_Number = "";
+let Street_Name = "";
+let Mailbox_Number = "";
+let unitName = "";
+let obj = "";
+let fullName = "";
+let FirstName = "";
+let LastName = "";
+let Mobile = "";
+let unitType = "";
+let city = "";
+let Province = "";
+let PostalCode = "";
+let bedrooms = "";
+let bathrooms = "";
+let numberOfFloors = "";
+let numberOfUnits = "";
+let backyard = "";
+let backyardFenced = "";
+let Parkingspacs = "";
+let parkingDetails = "";
+
 ZOHO.embeddedApp.on("PageLoad", async function () {
   console.log("✅ Widget ready");
   const leasingSel = document.getElementById("ownerid");
@@ -145,15 +295,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
         ],
       },
       {
-        type: "Townhouse",
-        keywords: [
-          "townhouse",
-          "townhome",
-          "end unit townhouse",
-          "3-storey townhouse",
-        ],
-      },
-      {
         type: "Unit - Apartment Building",
         keywords: [
           "apartment",
@@ -165,9 +306,12 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
         ],
       },
       {
-        type: "House",
+        type: "Single Unit - House",
         keywords: [
+          "Private home",
           "house",
+          "Home",
+          "home",
           "detached",
           "bungalow",
           "single family",
@@ -192,6 +336,10 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
           "stacked townhome",
           "upper stacked",
           "lower stacked",
+          "townhouse",
+          "townhome",
+          "end unit townhouse",
+          "3-storey townhouse",
         ],
       },
       {
@@ -253,29 +401,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
     return "";
   }
-  // Detect backyard fenced status based on description and backyard value
-  function detectBackyardFenced() {
-    const text = JSON.stringify(data).toLowerCase();
-
-    if (text.includes("No Backyard") || text.includes("Not Included")) {
-      return "No Backyard";
-    }
-
-    if (text.includes("fully fenced") || text.includes("fenced yard")) {
-      return "Yes";
-    }
-
-    if (
-      text.includes("unfenced") ||
-      text.includes("open yard") ||
-      text.includes("no fence")
-    ) {
-      return "No";
-    }
-
-    // Default if nothing is mentioned
-    return "No";
-  }
   // detect backyard no backyard.
   function detectBackyard() {
     const text = JSON.stringify(data).toLowerCase();
@@ -299,6 +424,30 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
     return "Not Included";
   }
+  // Detect backyard fenced status based on description and backyard value
+  function detectBackyardFenced() {
+    const text = JSON.stringify(data).toLowerCase();
+
+    if (text.includes("No Backyard") || text.includes("Not Included")) {
+      return "No Backyard";
+    }
+
+    if (text.includes("fully fenced") || text.includes("fenced yard")) {
+      return "Yes";
+    }
+
+    if (
+      text.includes("unfenced") ||
+      text.includes("open yard") ||
+      text.includes("no fence")
+    ) {
+      return "No";
+    }
+
+    // Default if nothing is mentioned
+    return "No";
+  }
+
   // Extract parking spaces from vipPrimary and text content
   function extractParkingSpaces(vipPrimary = [], title = "", description = []) {
     const combinedText = (
@@ -1483,29 +1632,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return "No";
   }
 
-  // detect View based on description
-  function detectView(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-
-    const hasLake = text.includes("lake view") || text.includes("lake views");
-    const hasCity = text.includes("city view") || text.includes("city views");
-    const hasConservation = text.includes("conservation area");
-    const hasBackyard =
-      text.includes("backyard view") ||
-      text.includes("courtyard") ||
-      text.includes("overlooks backyard");
-
-    if (hasLake && hasCity && hasConservation)
-      return "Lake, City, and Conservation";
-    if (hasLake && hasCity) return "Lake and City";
-    if (hasCity && hasConservation) return "City and Conservation";
-    if (hasLake) return "Lake";
-    if (hasCity) return "City";
-    if (hasConservation) return "Conservation";
-    if (hasBackyard) return "Courtyard/Backyard";
-
-    return "";
-  }
   // detect private terrace
   function detectPrivateTerraceOrBackyard(
     descriptionArray = [],
@@ -2458,11 +2584,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
   function capitalizeWords(str) {
     return str.replace(/\b\w/g, (char) => char.toUpperCase());
   }
-  // 4. City (assumed 2nd part of location)
-  function extractCity(location = "") {
-    const parts = location.split(",");
-    return parts.length >= 2 ? parts[1].trim() : "";
-  }
   // 5. Province (3rd part of location)
   function extractProvince(location = "") {
     const parts = location.split(",");
@@ -2479,29 +2600,27 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     const match = text.match(/(?:mailbox|mb#|box)\s*([a-z0-9]+)/i);
     return match ? match[1] : "";
   }
-
   // Detect utility inclusions based on description
-  function detectUtilityInclusions(descriptionArray = [], attributes = []) {
+  function detectACInclusion(descriptionArray = [], attributes = []) {
     const combinedText = (descriptionArray || []).join(" ").toLowerCase();
-    const attributeValues = attributes
-      .flatMap((attr) => attr.values || [])
-      .join(" ")
-      .toLowerCase();
-
+    const attributeValues = attributes.flatMap(attr => attr.values || []).join(" ").toLowerCase();
     const fullText = `${combinedText} ${attributeValues}`;
 
-    return {
-      AC_Inclusion: /air conditioning included|central ac|ac provided/.test(
-        fullText
-      ),
-      Heat_Inclusion:
-        /heating included|heat paid by landlord|heat included/.test(fullText),
-      Internet_Inclusion: /wifi included|internet included|free internet/.test(
-        fullText
-      ),
-      Cable_Inclusion: /cable included|tv included/.test(fullText),
-      Phone_Inclusion: /phone line included|landline included/.test(fullText),
-    };
+    return /air conditioning included|central ac|ac provided/.test(fullText);
+  }
+  function detectHeatInclusion(descriptionArray = [], attributes = []) {
+    const combinedText = (descriptionArray || []).join(" ").toLowerCase();
+    const attributeValues = attributes.flatMap(attr => attr.values || []).join(" ").toLowerCase();
+    const fullText = `${combinedText} ${attributeValues}`;
+
+    return /heating included|heat paid by landlord|heat included/.test(fullText);
+  }
+  function detectInternetInclusion(descriptionArray = [], attributes = []) {
+    const combinedText = (descriptionArray || []).join(" ").toLowerCase();
+    const attributeValues = attributes.flatMap(attr => attr.values || []).join(" ").toLowerCase();
+    const fullText = `${combinedText} ${attributeValues}`;
+
+    return /wifi included|internet included|free internet/.test(fullText);
   }
   // utility notes extraction from description
   function extractUtilityNotes(descriptionArray = []) {
@@ -2531,8 +2650,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
     return unknownNotes.join(" ");
   }
-
-  /* ───────── BUILDING CATEGORY ───────── */
+  // Detect building category based on text
   function detectBuildingCategoryFromText() {
     const text = JSON.stringify(data).toLowerCase(); // search everywhere!
 
@@ -2569,13 +2687,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     }
     return "";
   }
-  /* ───────── FULL LOCATION STRING ───────── */
-  function extractLocationString() {
-    const text = JSON.stringify(data); // keep case
-    const match = text.match(/"location"\s*:\s*"([^"]+)"/i);
-    return match ? match[1].trim() : "";
-  }
-  /* ───────── CONDO CORP NUMBER ───────── */
+  // Extract condo corporation number from data
   function extractCondoCorpNumber() {
     const text = JSON.stringify(data); // keep case for corp codes
 
@@ -2583,8 +2695,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     const match = text.match(/\b([A-Z]{2,4}C{0,2})\s*#?\s*(\d{3,5})\b/);
     return match ? `${match[1].replace(/\s+/, "")} ${match[2]}` : "";
   }
-
-  /* ───────── PET RESTRICTIONS ───────── */
+  // Detect pet restrictions based on text
   function detectPetRestrictions() {
     const text = JSON.stringify(data).toLowerCase();
 
@@ -2596,8 +2707,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
     return "";
   }
-
-  /* ───────── BUILDING MGMT INFO ───────── */
+  // Detect building management info based on text
   function detectBuildingMgmtInfo() {
     const text = JSON.stringify(data).toLowerCase();
 
@@ -2615,15 +2725,13 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     }
     return ""; // leave blank if nothing relevant
   }
-
-  /* ───────── MGMT EMAIL ───────── */
+  //
   function extractMgmtEmail() {
     const text = JSON.stringify(data);
     const match = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i); // first email
     return match ? match[0] : "";
   }
-
-  /* ───────── MGMT PHONE NUMBER ───────── */
+  // Extract management phone number from data
   function extractMgmtPhone() {
     const text = JSON.stringify(data);
 
@@ -2633,8 +2741,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
     return match ? match[0].trim() : "";
   }
-
-  /* ───────── OFFICE ADDRESS (very basic) ───────── */
+  // Extract office address from data
   function extractOfficeAddress() {
     const text = JSON.stringify(data).toLowerCase();
 
@@ -2656,8 +2763,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     }
     return "";
   }
-
-  /* ───────── DEVELOPER NAME ───────── */
+  // Detect developer name based on text
   function detectDeveloperName() {
     const text = JSON.stringify(data).toLowerCase();
 
@@ -2689,8 +2795,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
     return "";
   }
-
-  /* ───────── DATE OF CONSTRUCTION → ISO yyyy-mm-dd ───────── */
+  // Detect date of construction based on text
   function detectDateOfConstruction() {
     const text = JSON.stringify(data).toLowerCase();
 
@@ -2716,201 +2821,199 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return ""; // nothing found
   }
 
+
   // Event listener for fetching data
-  document
-    .getElementById("fetchDataBtn")
-    .addEventListener("click", async () => {
-      const url = document.getElementById("unitUrl").value;
-      const match = url.match(/\/(\d+)(?:\/)?$/);
-      const statusfc = document.getElementById("fetchDataBtn");
+  document.getElementById("fetchDataBtn").addEventListener("click", async () => {
+    const url = document.getElementById("unitUrl").value;
+    const match = url.match(/\/(\d+)(?:\/)?$/);
+    const statusfc = document.getElementById("fetchDataBtn");
 
-      if (!url) {
-        Swal.fire("Enter URL", "Please enter a Kijiji listing URL.", "warning");
-        return;
-      }
+    if (!url) {
+      Swal.fire("Enter URL", "Please enter a Kijiji listing URL.", "warning");
+      return;
+    }
+    if (match) {
+      listingId = match[1];
+      // console.log(listingId);
+    } else {
+      console.log("No ID found in URL");
+    }
+    // Show loader and disable button
+    statusfc.disabled = true;
+    document.getElementById("pageLoader").style.display = "flex";
 
-      if (match) {
-        listingId = match[1];
-        console.log(listingId);
-      } else {
-        console.log("No ID found in URL");
-      }
+    try {
+      const response = await fetch(
+        "https://api.royalyorkpm.com/kijiji-ocr-new?url=" +
+        encodeURIComponent(url)
+      );
+      data = await response.json();
+      const StringData = JSON.stringify(data).toLowerCase();
+      // console.log("StringData", StringData);
+      // console.log("loggedInUserId", loggedInUserId);
 
-      // Show loader and disable button
-      statusfc.disabled = true;
-      document.getElementById("pageLoader").style.display = "flex";
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 120000); // 120 sec
-      try {
-        const response = await fetch(
-          "https://api.royalyorkpm.com/kijiji-ocr-new?url=" +
-            encodeURIComponent(url),
-          {
-            signal: controller.signal,
-          }
-        );
-        clearTimeout(timeout); // Clear the timeout on success
-        data = await response.json();
-        const StringData = JSON.stringify(data).toLowerCase();
-        console.log("StringData", StringData);
-        console.log("loggedInUserId", loggedInUserId);
 
-        //25th June start New -
-        const obj = { firstName: data.firstName || "" };
-        const fullName = obj.firstName || "";
-        const FirstName = extractFirstName(fullName);
-        document.getElementById("First_Name").value = FirstName;
-        const LastName = extractLastName(fullName);
-        document.getElementById("Last_Name").value = LastName;
-        scrapedDate = extractAvailableDate(data.vipAttributes?.attributes);
-        document.getElementById("Available_Date").value = scrapedDate;
-        const Mobile = data.phone || "";
-        document.getElementById("Mobile").value = Mobile;
-        const unitType = detectUnitTypeFromTitleAndDescription(
-          data.title,
-          data.description
-        );
-        document.getElementById("Unit_Type").value = unitType;
-        const city = extractCityFromAddress(data.location);
-        document.getElementById("City").value = city;
-        const Province = extractProvince(data.location);
-        document.getElementById("Province").value = Province;
-        const PostalCode = extractPostalCode(data.location);
-        document.getElementById("Postal_Code").value = PostalCode;
-        const bedrooms = extractBedroomsSmart(
-          data.vipAttributes?.primary || [],
-          data.title || "",
-          data.description || []
-        );
-        document.getElementById("Bedrooms").value = bedrooms;
-        const bathrooms = extractBathroomsSmart(
-          data.vipAttributes?.primary || [],
-          data.title || "",
-          data.description || []
-        );
-        document.getElementById("Bathrooms").value = bathrooms;
-        const numberOfFloors = detectNumberOfFloors() || 0;
-        document.getElementById("number_of_floors").value = numberOfFloors;
-        const numberOfUnits = detectNumberOfUnits() || 0;
-        document.getElementById("number_of_units").value = numberOfUnits;
-        const backyard = detectBackyard();
-        document.getElementById("Backyard").value = backyard;
-        const backyardFenced = detectBackyardFenced();
-        document.getElementById("Backyard_Fenced").value = backyardFenced;
-        const Parkingspacs = extractParkingSpaces() || 0;
-        document.getElementById("Parking_Spaces").value = Parkingspacs;
-        const parkingDetails = detectParkingDetails() || "";
-        document.getElementById("Parking_Details").value = parkingDetails;
-        const unitName = detectUnitName() || "";
-        const propertyCondition = detectPropertyCondition(data.description);
-        const electricityProvider = detectElectricityProvider(
-          data.description || []
-        );
-        const waterProvider = detectWaterProvider(data.description || []);
-        const gasProvider = detectGasProvider(data.description || []);
-        const hotWaterTankProvider = detectHotWaterTankProvider(
-          data.description || []
-        );
-        const Corner_Unit = detectCornerUnit(data.description || []);
-        const Central_Vacuum = detectCentralVacuum(data.description || []);
-        const Penthouse = detectPenthouse(data.description || []);
-        const Natural_Sunlight = detectNaturalSunlight(data.description || []);
-        const Fireplace_Common_Area = detectFireplaceCommonArea(
-          data.description || []
-        );
-        const Fireplace_Bedroom = detectFireplaceBedroom(
-          data.description || []
-        );
-        const Upgraded_Bathrooms = detectUpgradedBathrooms(
-          data.description || []
-        );
-        const Backsplash_Kitchen = detectBacksplashKitchen(
-          data.description || []
-        );
-        const Upgraded_Kitchen = detectUpgradedKitchen(data.description || []);
-        const Dishwasher_Included = detectDishwasherIncluded(
-          data.description || [],
-          data.attributes || []
-        );
-        const Building_AC_Incl = detectBuilding_AC_Incl();
-        const Building_Heat_Incl = detectBuilding_Heat_Incl();
-        const Building_Cable_Incl = detectBuilding_Cable_Incl();
-        const Building_Internet_Incl = detectBuilding_Internet_Incl();
-        const Building_Water_Filtration_Rental =
-          detectBuilding_Water_Filtration_Rental();
-        const Parking_Garage = detectParking_Garage();
-        const Remote_Garage = detectRemote_Garage();
-        const Visitor_Parking = detectVisitor_Parking();
-        const EV_Charging = detectEV_Charging();
-        const Car_Wash = detectCar_Wash();
-        const Subway_Access = detectSubway_Access();
-        const Laundry_Building = detectLaundry_Building();
-        const Lobby_Lounge = detectLobby_Lounge();
-        const Wheelchair_Access = detectWheelchair_Access();
-        const Onsite_Staff = detectOnsite_Staff();
-        const Concierge_24_7 = detectConcierge_24_7();
-        const Guest_Suites = detectGuest_Suites();
-        const Bicycle_Storage = detectBicycle_Storage();
-        const Elevators = detectElevators();
-        const Buzzer_System = detectBuzzer_System();
-        const Security = detectSecurity();
-        const Keyless_Entry = detectKeyless_Entry();
-        const Pet_Spa = detectPet_Spa();
-        const BBQ_Area = detectBBQ_Area();
-        const Rooftop_Patio = detectRooftop_Patio();
-        const Cabanas = detectCabanas();
-        const Tennis_Court = detectTennis_Court();
-        const Outdoor_Patio = detectOutdoor_Patio();
-        const Outdoor_Pool = detectOutdoor_Pool();
-        const Outdoor_Child_Play_Area = detectOutdoor_Child_Play_Area();
-        const Gym_Fitness = detectGym_Fitness();
-        const Rec_Room = detectRec_Room();
-        const Billiards = detectBilliards();
-        const Indoor_Pool = detectIndoor_Pool();
-        const Sauna = detectSauna();
-        const Library = detectLibrary();
-        const Squash = detectSquash();
-        const Bowling = detectBowling();
-        const Indoor_Child_Area = detectIndoor_Child_Area();
-        const Meeting_Room = detectMeeting_Room();
-        const Yoga_Room = detectYoga_Room();
-        const Movie_Room = detectMovie_Room();
-        const Games_Room = detectGames_Room();
-        const Whirlpool = detectWhirlpool();
-        const Steam_Room = detectSteam_Room();
-        const Basketball = detectBasketball();
-        const Golf_Range = detectGolf_Range();
-        const Piano_Lounge = detectPiano_Lounge();
-        const Daycare = detectDaycare();
+      //25th June start New -
+      const obj = { firstName: data.firstName || "" };
+      const fullName = obj.firstName || "";
+      const FirstName = extractFirstName(fullName);
+      document.getElementById("First_Name").value = FirstName;
+      const LastName = extractLastName(fullName);
+      document.getElementById("Last_Name").value = LastName;
+      scrapedDate = extractAvailableDate(data.vipAttributes?.attributes);
+      document.getElementById("Available_Date").value = scrapedDate;
+      const Mobile = data.phone || "";
+      document.getElementById("Mobile").value = Mobile;
+      const unitType = detectUnitTypeFromTitleAndDescription(data.title, data.description);
+      // console.log("unitType", unitType);
 
-        //function for conditions ::
+      document.getElementById("Unit_Type").value = unitType;
+      const city = extractCityFromAddress(data.location);
+      document.getElementById("City").value = city;
+      const Province = extractProvince(data.location);
+      document.getElementById("Province").value = Province;
+      const PostalCode = extractPostalCode(data.location);
+      document.getElementById("Postal_Code").value = PostalCode;
+      const bedrooms = extractBedroomsSmart(data.vipAttributes?.primary || [], data.title || "", data.description || []);
+      document.getElementById("Bedrooms").value = bedrooms;
+      const bathrooms = extractBathroomsSmart(data.vipAttributes?.primary || [], data.title || "", data.description || []);
+      document.getElementById("Bathrooms").value = bathrooms;
+      const numberOfFloors = detectNumberOfFloors() || 0;
+      document.getElementById("number_of_floors").value = numberOfFloors;
+      const numberOfUnits = detectNumberOfUnits() || 0;
+      document.getElementById("number_of_units").value = numberOfUnits;
+      const backyard = detectBackyard();
+      document.getElementById("Backyard").value = backyard;
+      const backyardFenced = detectBackyardFenced();
+      document.getElementById("Backyard_Fenced").value = backyardFenced;
+      const Parkingspacs = extractParkingSpaces() || 0;
+      document.getElementById("Parking_Spaces").value = Parkingspacs;
+      const parkingDetails = detectParkingDetails() || "";
+      document.getElementById("Parking_Details").value = parkingDetails;
+      const Walkout_to_Garage = detectWalkoutToGarage(data.description || []);
+      const Private_Garage = detectPrivateGarage(data.description || []);
+      const Street_Number = extractStreetNumber(data.location || "", data.firstName || "", data.title || "");
+      const Street_Name = extractStreetName(data.location || "", data.firstName || "", data.title || "");
+      const Mailbox_Number = extractMailBoxNumber(data.description || []);
+      const unitName = detectUnitName() || "";
+      console.log("unitName", unitName);
 
-        // Detect maximum occupants based on bedroom value
-        function detectMaxOccupants(bedroomValue = "") {
-          if (!bedroomValue || typeof bedroomValue !== "string") return "";
+      const propertyCondition = detectPropertyCondition(data.description);
+      const electricityProvider = detectElectricityProvider(data.description || []);
+      const waterProvider = detectWaterProvider(data.description || []);
+      const gasProvider = detectGasProvider(data.description || []);
+      const hotWaterTankProvider = detectHotWaterTankProvider(data.description || []);
+      const Corner_Unit = detectCornerUnit(data.description || []);
+      const Central_Vacuum = detectCentralVacuum(data.description || []);
+      const Penthouse = detectPenthouse(data.description || []);
+      const Fireplace_Common_Area = detectFireplaceCommonArea(data.description || []);
+      const Fireplace_Bedroom = detectFireplaceBedroom(data.description || []);
+      const Upgraded_Bathrooms = detectUpgradedBathrooms(data.description || []);
+      const Backsplash_Kitchen = detectBacksplashKitchen(data.description || []);
+      const Upgraded_Kitchen = detectUpgradedKitchen(data.description || []);
+      const Dishwasher_Included = detectDishwasherIncluded(data.description || [], data.attributes || []);
+      const Building_AC_Incl = detectBuilding_AC_Incl();
+      const Building_Heat_Incl = detectBuilding_Heat_Incl();
+      const Building_Cable_Incl = detectBuilding_Cable_Incl();
+      const Building_Internet_Incl = detectBuilding_Internet_Incl();
+      const Building_Water_Filtration_Rental = detectBuilding_Water_Filtration_Rental();
+      const Parking_Garage = detectParking_Garage();
+      const Remote_Garage = detectRemote_Garage();
+      const Visitor_Parking = detectVisitor_Parking();
+      const EV_Charging = detectEV_Charging();
+      const Car_Wash = detectCar_Wash();
+      const Subway_Access = detectSubway_Access();
+      const Laundry_Building = detectLaundry_Building();
+      const Lobby_Lounge = detectLobby_Lounge();
+      const Wheelchair_Access = detectWheelchair_Access();
+      const Onsite_Staff = detectOnsite_Staff();
+      const Concierge_24_7 = detectConcierge_24_7();
+      const Guest_Suites = detectGuest_Suites();
+      const Bicycle_Storage = detectBicycle_Storage();
+      const Elevators = detectElevators();
+      const Buzzer_System = detectBuzzer_System();
+      const Security = detectSecurity();
+      const Keyless_Entry = detectKeyless_Entry();
+      const Pet_Spa = detectPet_Spa();
+      const BBQ_Area = detectBBQ_Area();
+      const Rooftop_Patio = detectRooftop_Patio();
+      const Cabanas = detectCabanas();
+      const Tennis_Court = detectTennis_Court();
+      const Outdoor_Patio = detectOutdoor_Patio();
+      const Outdoor_Pool = detectOutdoor_Pool();
+      const Outdoor_Child_Play_Area = detectOutdoor_Child_Play_Area();
+      const Gym_Fitness = detectGym_Fitness();
+      const Rec_Room = detectRec_Room();
+      const Billiards = detectBilliards();
+      const Indoor_Pool = detectIndoor_Pool();
+      const Sauna = detectSauna();
+      const Library = detectLibrary();
+      const Squash = detectSquash();
+      const Bowling = detectBowling();
+      const Indoor_Child_Area = detectIndoor_Child_Area();
+      const Meeting_Room = detectMeeting_Room();
+      const Yoga_Room = detectYoga_Room();
+      const Movie_Room = detectMovie_Room();
+      const Games_Room = detectGames_Room();
+      const Whirlpool = detectWhirlpool();
+      const Steam_Room = detectSteam_Room();
+      const Basketball = detectBasketball();
+      const Golf_Range = detectGolf_Range();
+      const Piano_Lounge = detectPiano_Lounge();
+      const Daycare = detectDaycare();
+      const ParkingLevelNumber = extractParkingLevelNumber();
 
-          const value = bedroomValue.toLowerCase().trim();
+      //function for conditions ::
 
-          // Handle "Studio"
-          if (value === "studio") {
-            return 2;
-          }
+      // Detect maximum occupants based on bedroom value
+      function detectMaxOccupants(bedroomValue = "") {
+        if (!bedroomValue || typeof bedroomValue !== "string") return "";
 
-          // Match numeric part (e.g., "2", "3 + Den", "4 bedrooms", etc.)
-          const match = value.match(/^(\d+)/);
-          if (match) {
-            const bedrooms = parseInt(match[1], 10);
-            return bedrooms * 2;
-          }
+        const value = bedroomValue.toLowerCase().trim();
 
-          return ""; // No valid bedroom count found
+        // Handle "Studio"
+        if (value === "studio") {
+          return 2;
         }
-        // Function to detect unit number
-        function detectUnitNumber(unitType, unitName) {
-          if (!unitName || typeof unitName !== "string") return "";
 
-          const trimmed = unitName.trim();
+        // Match numeric part (e.g., "2", "3 + Den", "4 bedrooms", etc.)
+        const match = value.match(/^(\d+)/);
+        if (match) {
+          const bedrooms = parseInt(match[1], 10);
+          return bedrooms * 2;
+        }
 
+        return ""; // No valid bedroom count found
+      }
+      // Function to detect unit number
+      function detectUnitNumber(unitType, unitName) {
+        if (!unitName || typeof unitName !== "string") return "";
+
+        const trimmed = unitName.trim();
+
+        if (unitType === "Basement" && !trimmed.startsWith("2-")) {
+          return "2-" + trimmed;
+        }
+
+        if (
+          unitType === "Multi Unit - Above Ground" &&
+          !trimmed.startsWith("1-")
+        ) {
+          return "1-" + trimmed;
+        }
+
+        return trimmed;
+      }
+      // Function to correct unit name
+      function correctUnitName(unitType, unitName) {
+        if (!unitName || typeof unitName !== "string") return "";
+
+        const trimmed = unitName.trim();
+
+        // Check if unitName contains any digit
+        const hasNumber = /\d/.test(trimmed);
+
+        if (hasNumber) {
           if (unitType === "Basement" && !trimmed.startsWith("2-")) {
             return "2-" + trimmed;
           }
@@ -2924,671 +3027,579 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
           return trimmed;
         }
-        // Function to correct unit name
-        function correctUnitName(unitType, unitName, location = "") {
-          if (!unitName || typeof unitName !== "string") return "";
 
-          const trimmed = unitName.trim();
+        // If no number, prefix with "Not Listed – {unitName}"
+        return `Not Listed – ${trimmed}`;
+      }
 
-          // Check if unitName contains any digit
-          const hasNumber = /\d/.test(trimmed);
+      // Detect lawn and snow care services based on description
+      function detectLawnAndSnowCare(descriptionArray = [], unitType = "") {
+        const text = (descriptionArray || []).join(" ").toLowerCase();
+        unitType = unitType.toLowerCase();
 
-          if (hasNumber) {
-            if (unitType === "Basement" && !trimmed.startsWith("2-")) {
-              return "2-" + trimmed;
-            }
-
-            if (
-              unitType === "Multi Unit - Above Ground" &&
-              !trimmed.startsWith("1-")
-            ) {
-              return "1-" + trimmed;
-            }
-
-            return trimmed;
-          }
-
-          // If no number in unit name, fallback to formatted location
-          const fallback = location
-            ? `Not Listed – ${location.trim()}`
-            : "Not Listed";
-          return fallback;
-        }
-        // Detect lawn and snow care services based on description
-        function detectLawnAndSnowCare(descriptionArray = [], unitType = "") {
-          const text = (descriptionArray || []).join(" ").toLowerCase();
-          unitType = unitType.toLowerCase();
-
-          // Auto-include for specific unit types
-          if (
-            unitType === "condominium" ||
-            unitType === "unit - apartment building"
-          ) {
-            return "Lawn and Snow Removal: Included";
-          }
-
-          const hasLawn = /lawn care|grass cutting/.test(text);
-          const hasSnow = /snow removal|snow clearing|snow cleared/.test(text);
-
-          if (hasLawn && hasSnow) return "Lawn and Snow Removal: Included";
-          if (hasLawn) return "Lawn Care: Included";
-          if (hasSnow) return "Snow Removal: Included";
-
-          return "Not Included";
-        }
-        // building type mapping based on unit type
-        function mapUnitTypeToBuildingType(unitType = "") {
-          const mapping = {
-            condominium: "Condominium",
-            "unit - apartment building": "Apartment Building",
-            "single unit house": "Single Unit House",
-            "multi unit - above ground": "Multi Unit House",
-            "stacked townhouse": "Condo Townhouse",
-            "student room": "Multi Unit House",
-            basement: "Multi Unit House",
-          };
-
-          const normalized = unitType.toLowerCase().trim();
-          return mapping[normalized] || "";
-        }
-        // Detect basement type based on title and description
-        function detectBasementIncluded(
-          title = "",
-          descriptionArray = [],
-          unitType = ""
+        // Auto-include for specific unit types
+        if (
+          unitType === "condominium" ||
+          unitType === "unit - apartment building"
         ) {
-          const type = unitType.toLowerCase();
+          return "Lawn and Snow Removal: Included";
+        }
 
-          if (type === "basement") {
-            return "This is the basement";
-          }
+        const hasLawn = /lawn care|grass cutting/.test(text);
+        const hasSnow = /snow removal|snow clearing|snow cleared/.test(text);
 
-          if (type === "multi unit - above ground") {
-            return "Separate Unit";
-          }
+        if (hasLawn && hasSnow) return "Lawn and Snow Removal: Included";
+        if (hasLawn) return "Lawn Care: Included";
+        if (hasSnow) return "Snow Removal: Included";
 
-          if (type === "condominium" || type === "unit - apartment building") {
-            return "N/A - Basement does not exist";
-          }
+        return "Not Included";
+      }
+      // building type mapping based on unit type
+      function mapUnitTypeToBuildingType(unitType = "") {
+        const mapping = {
+          condominium: "Condominium",
+          "unit - apartment building": "Apartment Building",
+          "single unit house": "Single Unit House",
+          "multi unit - above ground": "Multi Unit House",
+          "stacked townhouse": "Condo Townhouse",
+          "student room": "Multi Unit House",
+          basement: "Multi Unit House",
+        };
 
-          const text = (
-            title +
-            " " +
-            (descriptionArray || []).join(" ")
-          ).toLowerCase();
+        const normalized = unitType.toLowerCase().trim();
+        return mapping[normalized] || "";
+      }
+      // Detect basement type based on title and description
+      function detectBasementIncluded(
+        title = "",
+        descriptionArray = [],
+        unitType = ""
+      ) {
+        const type = unitType.toLowerCase();
 
-          if (
-            text.includes("basement unit") ||
-            text.includes("this is the basement")
-          ) {
-            return "This is the basement";
-          }
-          if (
-            text.includes("separate basement") ||
-            text.includes("basement access") ||
-            text.includes("private basement")
-          ) {
-            return "Separate Unit";
-          }
-          if (text.includes("finished basement")) {
-            return "Finished";
-          }
-          if (
-            text.includes("partially finished basement") ||
-            text.includes("half finished basement")
-          ) {
-            return "Half-finished";
-          }
-          if (text.includes("unfinished basement")) {
-            return "Unfinished";
-          }
+        if (type === "basement") {
+          return "This is the basement";
+        }
 
+        if (type === "multi unit - above ground") {
+          return "Separate Unit";
+        }
+
+        if (type === "condominium" || type === "unit - apartment building") {
           return "N/A - Basement does not exist";
         }
-        // Extract basement details from description
-        function extractBasementDetails(descriptionArray = [], unitType = "") {
-          const type = unitType.toLowerCase();
 
-          if (type === "basement") {
-            return "This is the basement";
-          }
+        const text = (
+          title +
+          " " +
+          (descriptionArray || []).join(" ")
+        ).toLowerCase();
 
-          if (type === "multi unit - above ground") {
-            return "Separate Unit";
-          }
-
-          if (type === "condominium" || type === "unit - apartment building") {
-            return "N/A - Basement does not exist";
-          }
-
-          const basementKeywords = [
-            "basement",
-            "lower level",
-            "shared laundry",
-            "separate entrance",
-            "in basement",
-          ];
-
-          const matches = (descriptionArray || []).filter((line) =>
-            basementKeywords.some((keyword) =>
-              line.toLowerCase().includes(keyword)
-            )
-          );
-
-          return matches.join("\\n");
-        }
-        // check for upgraded bathroom
-        function checkUpgradedBathroom(propertyCondition = "") {
-          return propertyCondition === "Newly Renovated";
-        }
-        // Extract last renovated year from description
-        function extractLastRenovatedYear(propertyCondition = "") {
-          // If the property is brand new, return the current year
-          if (
-            propertyCondition.toLowerCase() === "brand new" ||
-            propertyCondition.toLowerCase() === "brand new - never lived in"
-          ) {
-            return new Date().getFullYear().toString();
-          }
-
-          const text = JSON.stringify(data).toLowerCase();
-
-          // Match phrases followed by a 4-digit year
-          const matches = [
-            ...text.matchAll(
-              /(renovated in|last renovated|updated in|new bathroom in)[^\d]*(\d{4})/g
-            ),
-          ];
-
-          if (matches.length === 0) return "";
-
-          // Extract years and return the most recent one
-          const years = matches.map((match) => parseInt(match[2], 10));
-          const latestYear = Math.max(...years);
-
-          return latestYear.toString();
-        }
-        function detectPrivateTerraceOrBackyardFromBackyardValue(
-          backyardValue = ""
+        if (
+          text.includes("basement unit") ||
+          text.includes("this is the basement")
         ) {
-          return backyardValue === "Included";
+          return "This is the basement";
         }
-        // Detect view based on unit type
-        function detectViewFromUnitType(unitType = "") {
-          const type = unitType.toLowerCase();
-
-          const typesWithCourtyardView = [
-            "house",
-            "multi unit - above ground",
-            "stacked townhouse",
-            "townhouse",
-            "basement",
-          ];
-
-          if (typesWithCourtyardView.includes(type)) {
-            return "Courtyard/Backyard";
-          }
-
-          return ""; // No override
-        }
-        // Detect if the property is verified by RYPM
-        function detectVerifiedByRYPM({
-          propertyCondition = "",
-          electricityProvider = "",
-          gasProvider = "",
-          hotWaterTankProvider = "",
-          waterProvider = "",
-        } = {}) {
-          const isVerified = propertyCondition.trim() !== "";
-
-          return {
-            verifiedByRYPM: isVerified ? "Yes" : "",
-            electricityProvider:
-              isVerified && !electricityProvider
-                ? "To be Determined (TBD)"
-                : electricityProvider,
-            gasProvider:
-              isVerified && !gasProvider
-                ? "To be Determined (TBD)"
-                : gasProvider,
-            hotWaterTankProvider:
-              isVerified && !hotWaterTankProvider
-                ? "To be Determined (TBD)"
-                : hotWaterTankProvider,
-            waterProvider:
-              isVerified && !waterProvider
-                ? "To be Determined (TBD)"
-                : waterProvider,
-          };
-        }
-        function detectBBQ_Area_Synced() {
-          if (Outdoor_Patio) return true;
-
-          const text = JSON.stringify(data).toLowerCase();
-          return (
-            text.includes("bbq terrace") ||
-            text.includes("grill area") ||
-            text.includes("barbecue") ||
-            text.includes("rooftop bbq")
-          );
-        }
-        function detectOutdoor_Patio_Synced() {
-          if (BBQ_Area) return true;
-
-          const text = JSON.stringify(data).toLowerCase();
-          return (
-            text.includes("backyard") ||
-            text.includes("outdoor space") ||
-            text.includes("garden terrace") ||
-            text.includes("open patio")
-          );
-        }
-        function detectPetsAllowed(
-          propertyCondition = "",
-          petRestrictions = ""
+        if (
+          text.includes("separate basement") ||
+          text.includes("basement access") ||
+          text.includes("private basement")
         ) {
-          const text = JSON.stringify(data).toLowerCase();
-
-          const keywordMatch =
-            text.includes("pets allowed") ||
-            text.includes("pet friendly") ||
-            text.includes("pets are welcome") ||
-            text.includes("small pets permitted") ||
-            text.includes("cats and dogs allowed");
-
-          const propertyConditionExists = propertyCondition.trim() !== "";
-          const petRestrictionsEmpty = petRestrictions.trim() === "";
-
-          return (
-            keywordMatch || (petRestrictionsEmpty && propertyConditionExists)
-          );
+          return "Separate Unit";
+        }
+        if (text.includes("finished basement")) {
+          return "Finished";
+        }
+        if (
+          text.includes("partially finished basement") ||
+          text.includes("half finished basement")
+        ) {
+          return "Half-finished";
+        }
+        if (text.includes("unfinished basement")) {
+          return "Unfinished";
         }
 
-        //Condition const here updated ones
-        const UnitName = correctUnitName(unitType, Address);
-        document.getElementById("Unit_name").value = UnitName || "";
-        const Unitnumber = detectUnitNumber(unitType, Address);
-        document.getElementById("Unit_number").value = Unitnumber;
-        const lawnSnowCare = detectLawnAndSnowCare(data.description || []);
-        const buildingType = mapUnitTypeToBuildingType(unitType);
-        const basement = detectBasementIncluded(
-          data.title || "",
-          data.description || [],
-          data.unitType || ""
-        );
-        const basementDetails = extractBasementDetails(
-          data.description || [],
-          data.unitType || ""
-        );
-        const upgradedBathroom = checkUpgradedBathroom(propertyCondition);
-        const upgradedKitchen = checkUpgradedBathroom(propertyCondition);
-        const lastYearRenovated =
-          extractLastRenovatedYear(propertyCondition) || "";
-        document.getElementById("Year_Last_Renovated").value =
-          Lastyearrenovated;
-        const Sunlight = true;
-        const privateTerraceOrBackyard =
-          detectPrivateTerraceOrBackyardFromBackyardValue(backyard);
-        const view = detectViewFromUnitType(data.unitType || "");
-        const numericPrice = data.price
-          ? Number(data.price.replace(/[$,]/g, ""))
-          : "";
-        const result = detectVerifiedByRYPM({
-          propertyCondition: detectPropertyCondition(data.description || []),
-          electricityProvider: detectElectricityProvider(
-            data.description || []
-          ),
-          gasProvider: detectGasProvider(data.description || []),
-          hotWaterTankProvider: detectHotWaterTankProvider(
-            data.description || []
-          ),
-          waterProvider: detectWaterProvider(data.description || []),
-        });
-        const BBQ_Area_Final = detectBBQ_Area_Synced();
-        const Outdoor_Patio_Final = detectOutdoor_Patio_Synced();
-        const Pets_Allowed = detectPetsAllowed();
-
-        const sqFt = extractSqFt(data.vipAttributes?.primary);
-
-        const furnished = detectFurnished(data.description || []);
-
-        const maximumOccupants = detectMaxOccupants(data.description);
-
-        const entranceType = detectEntranceType(
-          data.title || "",
-          data.description || []
-        );
-
-        const numberOfLevels = detectNumberOfLevels(
-          data.description,
-          data.title
-        );
-        const unitFacing = detectUnitFacing(data.description);
-
-        const flooringCommonArea = detectFlooringCommonArea(
-          data.description || []
-        );
-        const ceilingHeight = detectCeilingHeight(data.description || []);
-        const windowCoveringsCommon = detectWindowCoverings(
-          data.description || []
-        );
-        const windowCoveringsBedroom = detectWindowCoverings(
-          data.description || []
-        );
-        const bedroomLayout = detectBedroomLayout(data.description || []);
-        const denAsBedroom = detectDenAsBedroom(data.description || []);
-        const closetType = detectClosetType(data.description || []);
-        const enSuiteBathrooms = detectEnSuiteBathrooms(data.description || []);
-        const bathroomCountertop = detectBathroomCountertop(
-          data.description || []
-        );
-        const showerType = detectShowerType(data.description || []);
-        const applianceFinish = detectApplianceFinish(data.description || []);
-        const kitchenCountertops = detectKitchenCountertops(
-          data.description || []
-        );
-        const flooringBedrooms = detectBedroomFlooring(data.description || []);
-        const balconyLocation = detectBalconyLocation(data.description || []);
-        const isPrivateTerrace = detectPrivateTerraceOrBackyard(
-          data.description || []
-        );
-        const viewValue = detectView(data.description || []);
-
-        const numberOfLockers = extractStorageUnits(data.description || []);
-        const lockerDetails = extractLockerStorageDetails(
-          data.description || []
-        );
-        const lockerLevelAndNumber = extractLockerLevelAndNumber(
-          data.description || []
-        );
-        const utilityShare = extractUtilityResponsibility(
-          data.description || []
-        );
-        const insuranceCompany = detectHomeInsurance(data.description || []);
-        const insurancePolicyNumber = extractInsurancePolicyNumber(
-          data.description || []
-        );
-
-        const utilityInclusions = detectUtilityInclusions(
-          data.description || [],
-          data.vipAttributes?.attributes || []
-        );
-        const utilityNotes = extractUtilityNotes(data.description || []);
-        const buildingCategory = detectBuildingCategoryFromText(
-          data.title,
-          data.description
-        );
-        const fullLocation = extractLocationString();
-
-        const condoCorpNumber = extractCondoCorpNumber();
-        const petRestrictions = detectPetRestrictions();
-        const mgmtInfo = detectBuildingMgmtInfo();
-        const mgmtEmail = extractMgmtEmail();
-        const mgmtPhone = extractMgmtPhone();
-        const officeAddress = extractOfficeAddress();
-        const developerName = detectDeveloperName();
-        const dateOfConstructionISO = detectDateOfConstruction();
-
-        // ✅ Hide loader and update button status
-        document.getElementById("pageLoader").style.display = "none";
-        Swal.fire("Success", "All Details fectched successfully!", "success");
-        statusfc.innerText = "✅ Data fetched.";
-      } catch (err) {
-        console.error("❌ Fetch error:", err);
-        Swal.fire("Error", "Could not fetch data. See console.", "error");
-
-        // ❌ Hide loader and show error
-        document.getElementById("pageLoader").style.display = "none";
-        statusfc.innerText = "❌ Error fetching data.";
-        location.reload();
+        return "N/A - Basement does not exist";
       }
-    });
+      // Extract basement details from description
+      function extractBasementDetails(descriptionArray = [], unitType = "") {
+        const type = unitType.toLowerCase();
+
+        if (type === "basement") {
+          return "This is the basement";
+        }
+
+        if (type === "multi unit - above ground") {
+          return "Separate Unit";
+        }
+
+        if (type === "condominium" || type === "unit - apartment building") {
+          return "N/A - Basement does not exist";
+        }
+
+        const basementKeywords = [
+          "basement",
+          "lower level",
+          "shared laundry",
+          "separate entrance",
+          "in basement",
+        ];
+
+        const matches = (descriptionArray || []).filter((line) =>
+          basementKeywords.some((keyword) =>
+            line.toLowerCase().includes(keyword)
+          )
+        );
+
+        return matches.join("\\n");
+      }
+      // check for upgraded bathroom
+      function checkUpgradedBathroom(propertyCondition = "") {
+        return propertyCondition === "Newly Renovated";
+      }
+      // Extract last renovated year from description
+      function extractLastRenovatedYear(propertyCondition = "") {
+        // If the property is brand new, return the current year
+        if (
+          propertyCondition.toLowerCase() === "brand new" ||
+          propertyCondition.toLowerCase() === "brand new - never lived in"
+        ) {
+          return new Date().getFullYear().toString();
+        }
+
+        const text = JSON.stringify(data).toLowerCase();
+
+        // Match phrases followed by a 4-digit year
+        const matches = [
+          ...text.matchAll(
+            /(renovated in|last renovated|updated in|new bathroom in)[^\d]*(\d{4})/g
+          ),
+        ];
+
+        if (matches.length === 0) return "";
+
+        // Extract years and return the most recent one
+        const years = matches.map((match) => parseInt(match[2], 10));
+        const latestYear = Math.max(...years);
+
+        return latestYear.toString();
+      }
+      function detectPrivateTerraceOrBackyardFromBackyardValue(
+        backyardValue = ""
+      ) {
+        return backyardValue === "Included";
+      }
+      // Detect view based on unit type
+      function detectViewCombined(unitType = "", descriptionArray = []) {
+        const type = unitType.toLowerCase();
+
+        const typesWithCourtyardView = [
+          "house",
+          "multi unit - above ground",
+          "stacked townhouse",
+          "townhouse",
+          "basement",
+        ];
+
+        // Priority 1: Unit Type override
+        if (typesWithCourtyardView.includes(type)) {
+          return "Courtyard/Backyard";
+        }
+
+        // Priority 2: Description-based detection
+        const text = (descriptionArray || []).join(" ").toLowerCase();
+
+        const hasLake = text.includes("lake view") || text.includes("lake views");
+        const hasCity = text.includes("city view") || text.includes("city views");
+        const hasConservation = text.includes("conservation area");
+        const hasBackyard =
+          text.includes("backyard view") ||
+          text.includes("courtyard") ||
+          text.includes("overlooks backyard");
+
+        if (hasLake && hasCity && hasConservation)
+          return "Lake, City, and Conservation";
+        if (hasLake && hasCity) return "Lake and City";
+        if (hasCity && hasConservation) return "City and Conservation";
+        if (hasLake) return "Lake";
+        if (hasCity) return "City";
+        if (hasConservation) return "Conservation";
+        if (hasBackyard) return "Courtyard/Backyard";
+
+        return "";
+      }
+
+      // Detect if the property is verified by RYPM
+      function detectVerifiedByRYPM({
+        propertyCondition = "",
+        electricityProvider = "",
+        gasProvider = "",
+        hotWaterTankProvider = "",
+        waterProvider = "",
+      } = {}) {
+        const isVerified = propertyCondition.trim() !== "";
+
+        return {
+          verifiedByRYPM: isVerified ? "Yes" : "",
+          electricityProvider:
+            isVerified && !electricityProvider
+              ? "To be Determined (TBD)"
+              : electricityProvider,
+          gasProvider:
+            isVerified && !gasProvider
+              ? "To be Determined (TBD)"
+              : gasProvider,
+          hotWaterTankProvider:
+            isVerified && !hotWaterTankProvider
+              ? "To be Determined (TBD)"
+              : hotWaterTankProvider,
+          waterProvider:
+            isVerified && !waterProvider
+              ? "To be Determined (TBD)"
+              : waterProvider,
+        };
+      }
+      function detectBBQ_Area_Synced() {
+        if (Outdoor_Patio) return true;
+
+        const text = JSON.stringify(data).toLowerCase();
+        return (
+          text.includes("bbq terrace") ||
+          text.includes("grill area") ||
+          text.includes("barbecue") ||
+          text.includes("rooftop bbq")
+        );
+      }
+      function detectOutdoor_Patio_Synced() {
+        if (BBQ_Area) return true;
+
+        const text = JSON.stringify(data).toLowerCase();
+        return (
+          text.includes("backyard") ||
+          text.includes("outdoor space") ||
+          text.includes("garden terrace") ||
+          text.includes("open patio")
+        );
+      }
+      function detectPetsAllowed(
+        propertyCondition = "",
+        petRestrictions = ""
+      ) {
+        const text = JSON.stringify(data).toLowerCase();
+
+        const keywordMatch =
+          text.includes("pets allowed") ||
+          text.includes("pet friendly") ||
+          text.includes("pets are welcome") ||
+          text.includes("small pets permitted") ||
+          text.includes("cats and dogs allowed");
+
+        const propertyConditionExists = propertyCondition.trim() !== "";
+        const petRestrictionsEmpty = petRestrictions.trim() === "";
+
+        return (
+          keywordMatch || (petRestrictionsEmpty && propertyConditionExists)
+        );
+      }
+
+      //Condition const here updated ones
+      const UnitNamecorrected = correctUnitName(unitType, unitName);
+      document.getElementById("Unit_name").value = UnitNamecorrected || "";
+      const Unitnumber = detectUnitNumber(unitType,);
+      document.getElementById("Unit_number").value = Unitnumber;
+      const lawnSnowCare = detectLawnAndSnowCare(data.description || []);
+      const buildingType = mapUnitTypeToBuildingType(unitType);
+      const basement = detectBasementIncluded(data.title || "", data.description || [], data.unitType || "");
+      const basementDetails = extractBasementDetails(data.description || [], data.unitType || "");
+      const upgradedBathroom = checkUpgradedBathroom(propertyCondition);
+      const upgradedKitchen = checkUpgradedBathroom(propertyCondition);
+      const Lastyearrenovated = extractLastRenovatedYear(propertyCondition) || "";
+      document.getElementById("Year_Last_Renovated").value = Lastyearrenovated;
+      const Sunlight = true;
+
+
+      const privateTerraceOrBackyard = detectPrivateTerraceOrBackyardFromBackyardValue(backyard);
+      const view = detectViewCombined(data.unitType || "");
+      const numericPrice = data.price ? Number(data.price.replace(/[$,]/g, "")) : "";
+      const result = detectVerifiedByRYPM({
+        propertyCondition: detectPropertyCondition(data.description || []), electricityProvider: detectElectricityProvider(data.description || []),
+        gasProvider: detectGasProvider(data.description || []),
+        hotWaterTankProvider: detectHotWaterTankProvider(data.description || []), waterProvider: detectWaterProvider(data.description || []),
+      });
+      const BBQ_Area_Final = detectBBQ_Area_Synced();
+      const Outdoor_Patio_Final = detectOutdoor_Patio_Synced();
+      const Pets_Allowed = detectPetsAllowed();
+      const sqFt = extractSqFt(data.vipAttributes?.primary);
+      const furnished = detectFurnished(data.description || []);
+      const maximumOccupants = detectMaxOccupants(data.description);
+      const entranceType = detectEntranceType(data.title || "", data.description || []);
+      const numberOfLevels = detectNumberOfLevels(data.description, data.title);
+      const unitFacing = detectUnitFacing(data.description);
+      const flooringCommonArea = detectFlooringCommonArea(data.description || []);
+      const ceilingHeight = detectCeilingHeight(data.description || []);
+      const windowCoveringsCommon = detectWindowCoverings(data.description || []);
+      const windowCoveringsBedroom = detectWindowCoverings(data.description || []);
+      const bedroomLayout = detectBedroomLayout(data.description || []);
+      const denAsBedroom = detectDenAsBedroom(data.description || []);
+      const closetType = detectClosetType(data.description || []);
+      const enSuiteBathrooms = detectEnSuiteBathrooms(data.description || []);
+      const bathroomCountertop = detectBathroomCountertop(data.description || []);
+      const showerType = detectShowerType(data.description || []);
+      const applianceFinish = detectApplianceFinish(data.description || []);
+      const kitchenCountertops = detectKitchenCountertops(data.description || []);
+      const flooringBedrooms = detectBedroomFlooring(data.description || []);
+      const balconyLocation = detectBalconyLocation(data.description || []);
+      const isPrivateTerrace = detectPrivateTerraceOrBackyard(data.description || []);
+      const numberOfLockers = extractStorageUnits(data.description || []);
+      const lockerDetails = extractLockerStorageDetails(data.description || []);
+      const lockerLevelAndNumber = extractLockerLevelAndNumber(data.description || []);
+      const utilityShare = extractUtilityResponsibility(data.description || []);
+      const insuranceCompany = detectHomeInsurance(data.description || []);
+      const insurancePolicyNumber = extractInsurancePolicyNumber(data.description || []);
+      const AC_Inclusion = detectACInclusion(data.description || [], data.attributes || []);
+      const Heat_Inclusion = detectHeatInclusion(data.description || [], data.attributes || []);
+      const Internet_Inclusion = detectInternetInclusion(data.description || [], data.attributes || []);
+      const utilityNotes = extractUtilityNotes(data.description || []);
+      const buildingCategory = detectBuildingCategoryFromText(data.title, data.description);
+      const condoCorpNumber = extractCondoCorpNumber();
+      const petRestrictions = detectPetRestrictions();
+      const mgmtInfo = detectBuildingMgmtInfo();
+      const mgmtEmail = extractMgmtEmail();
+      const mgmtPhone = extractMgmtPhone();
+      const officeAddress = extractOfficeAddress();
+      const developerName = detectDeveloperName();
+      const dateOfConstructionISO = detectDateOfConstruction();
+
+
+
+
+
+       leadData = {
+      First_Name: FirstName,
+      Last_Name: LastName,
+      Mobile: Mobile,
+      Phone: Mobile,
+      City: city,
+      Lead_Source: "Kijiji",
+      Asking_Price: numericPrice,
+      Lead_Priority_Level: "High",
+      URL: document.getElementById("unitUrl").value,
+      Available_Date: scrapedDate,
+      Ad_ID_New: listingId,
+    };
+     unitData = {
+      Name: UnitNamecorrected,
+      Unit_Type: unitType,
+      Total_Area_Sq_Ft: sqFt,
+      Max_Occupants: maximumOccupants,
+      Property_Condition: propertyCondition,
+      Year_Built: Lastyearrenovated,
+      Number_of_Floors: numberOfFloors,
+      Unit_Facing: unitFacing,
+      Lawn_and_Snow_Care: lawnSnowCare,
+      Basement_Entrance: entranceType,
+      Furnished: furnished,
+      Basement_Included: basement,
+      Basement_Details: basementDetails,
+      Earliest_Move_in_Date: scrapedDate,
+      Flooring_Common_Area: flooringCommonArea,
+      Ceiling_Hight: ceilingHeight,
+      Window_Coverings: windowCoveringsCommon,
+      Window_Coverings_Common_Area: windowCoveringsBedroom,
+      Bedrooms: bedrooms,
+      Bedroom_Layout: bedroomLayout,
+      Den_can_be_used_as_a_bedroom: denAsBedroom,
+      Closets: closetType,
+      En_Suite_Bathrooms: enSuiteBathrooms,
+      Bathrooms: bathrooms,
+      Countertops_Bathroom: bathroomCountertop,
+      Shower_Type: showerType,
+      Appliances: applianceFinish,
+      Countertops: kitchenCountertops,
+      Flooring_in_Bedrooms: flooringBedrooms,
+      Location_of_Balcony: balconyLocation,
+      Backyard: backyard,
+      Is_the_backyard_fenced: backyardFenced,
+      Number_of_Parking_Spaces: Parkingspacs,
+      Parking_Details: parkingDetails,
+      parking_level_num: ParkingLevelNumber,
+      View: view,
+      Number_of_Lockers: numberOfLockers,
+      Storage_Details: lockerDetails,
+      locker_level_and_number: lockerLevelAndNumber,
+      How_are_utilities_split: utilityShare,
+      Insurance_Home_Owner: insuranceCompany,
+      Insurance_Home_Owners: insuranceCompany,
+      Insurance_Policy_Number: insurancePolicyNumber,
+      Address_Line_2: Unitnumber,
+      Street_Number: Street_Number,
+      Address: Street_Name,
+      City: city,
+      Province: Province,
+      Postal_Code: PostalCode,
+      Mail_Box_Number: Mailbox_Number,
+      Bank_Account: "Canada",
+      Hydro_Provider: electricityProvider,
+      Water_Provider: waterProvider,
+      Gas_Provider: gasProvider,
+      Hot_Water_Tank_Provider: hotWaterTankProvider,
+      AC_Inclusion: AC_Inclusion,
+      Heat_Inclusion: Heat_Inclusion,
+      Internet_Inclusion: Internet_Inclusion,
+      Cable_Inclusion: Building_Cable_Incl,
+      Utility_Notes: utilityNotes,
+      Corner_Unit: Corner_Unit,
+      Central_Vaccum: Central_Vacuum,
+      Penthouse: Penthouse,
+      Tons_of_Natural_Light: true,
+      Fireplace: Fireplace_Common_Area,
+      Fireplace_Bedroom: Fireplace_Bedroom,
+      Upgraded_Bathrooms: Upgraded_Bathrooms,
+      Upgraded_Back_Splash: Backsplash_Kitchen,
+      Upgraded_Kitchen: Upgraded_Kitchen,
+      Dishwasher: Dishwasher_Included,
+      Huge_Private_Terrace: isPrivateTerrace,
+      Private_Garage: Private_Garage,
+      Walk_out_to_Garage: Walkout_to_Garage,
+      Owner: { id: loggedInUserId },
+    };
+      building_data = {
+      Date_of_Construction: dateOfConstructionISO,
+      Developer_Name: developerName,
+      Concierge_Building_Management_Info: mgmtInfo,
+      Category: buildingCategory,
+      Property_Type: unitType,
+      Property_Management_Contact_Email: mgmtEmail,
+      Office_Phone_Number: mgmtPhone,
+      Office_Address: officeAddress,
+      floor_count: numberOfFloors,
+      unit_count: numberOfUnits,
+      Corporation_Number: condoCorpNumber,
+      Pet_Restrictions: petRestrictions,
+      Address: UnitNamecorrected,
+      Name: UnitNamecorrected,
+      City: city,
+      Province: Province,
+      Postal_Code: PostalCode,
+      ac_included: Building_AC_Incl,
+      heat_included: Building_Heat_Incl,
+      cable_inclusion: Building_Cable_Incl,
+      internet_inclusion: Building_Internet_Incl,
+      Water_Filtration_Softener_Rental: Building_Water_Filtration_Rental,
+      Parking_Garage: Parking_Garage,
+      Remote_Garage: Remote_Garage,
+      Visitor_Parking: Visitor_Parking,
+      Electric_Car_Charging_Stations: EV_Charging,
+      Car_Wash: Car_Wash,
+      has_subway_access: Subway_Access,
+      Laundry_Facilities: Laundry_Building,
+      has_lobby_lounge: Lobby_Lounge,
+      Wheelchair_Access: Wheelchair_Access,
+      Onsite_Staff: Onsite_Staff,
+      has_security: Concierge_24_7,
+      has_guest_suites: Guest_Suites,
+      has_bicycle_storage: Bicycle_Storage,
+      Elevators: Elevators,
+      Enter_Phone_System: Buzzer_System,
+      Security_Onsite: Security,
+      Keyless_Entry: Keyless_Entry,
+      Pet_Spa: Pet_Spa,
+      has_bbq_terrace: BBQ_Area_Final,
+      has_rooftop_patio: Rooftop_Patio,
+      has_cabana: Cabanas,
+      has_tennis_court: Tennis_Court,
+      Outdoor_Patio: Outdoor_Patio_Final,
+      has_outdoor_pool: Outdoor_Pool,
+      Outdoor_Child_Play_Area: Outdoor_Child_Play_Area,
+      has_fitness_center: Gym_Fitness,
+      Rec_Room: Rec_Room,
+      has_billiards_room: Billiards,
+      has_pool: Indoor_Pool,
+      has_sauna: Sauna,
+      Library: Library,
+      has_squash_court: Squash,
+      has_bowling_alley: Bowling,
+      Indoor_Child_Play_Area: Indoor_Child_Area,
+      has_business_centre: Meeting_Room,
+      has_yoga_room: Yoga_Room,
+      has_movie_theater: Movie_Room,
+      has_game_room: Games_Room,
+      has_whirlpool: Whirlpool,
+      has_steam_room: Steam_Room,
+      has_basketball_court: Basketball,
+      has_golf_range: Golf_Range,
+      Piano_Lounge: Piano_Lounge,
+      Day_Care_Centre: Daycare,
+
+    };
+
+console.log("Lead Data:", leadData);
+    console.log("Unit Data:", unitData);
+    console.log("Building Data:", building_data);
+      // ✅ Hide loader and update button status
+      document.getElementById("pageLoader").style.display = "none";
+      Swal.fire("Success", "All Details fectched successfully!", "success");
+      statusfc.innerText = "✅ Data fetched.";
+    } catch (err) {
+      console.error("❌ Fetch error:", err);
+      Swal.fire("Error", "Could not fetch data. See console.", "error");
+
+      // ❌ Hide loader and show error
+      document.getElementById("pageLoader").style.display = "none";
+      statusfc.innerText = "❌ Error fetching data.";
+      location.reload();
+    }
+  });
+
   // Event listener for creating records
   // Create records in Zoho CRM
-  document
-    .getElementById("createRecordsBtn")
-    .addEventListener("click", async () => {
-      const statuscr = document.getElementById("createRecordsBtn");
-      console.log("loggedInUserId", loggedInUserId);
-      // ✅ Show loader and disable fetchDataBtn
 
-      const aid = leasingSel.value;
-      console.log("📝 Agent selected:", aid);
-      statuscr.disabled = true;
+  document.getElementById("createRecordsBtn1").addEventListener("click", async () => {
+    const statuscr = document.getElementById("createRecordsBtn1");
+    const aid = leasingSel.value;
+    statuscr.disabled = true;
+    document.getElementById("pageLoader2").style.display = "flex";
+    console.log("sampleData",FirstName, LastName, Mobile, city, scrapedDate, listingId, unitType, sqFt, maximumOccupants, propertyCondition, Lastyearrenovated, numberOfFloors, unitFacing, lawnSnowCare, entranceType, furnished, basement, basementDetails,);
+    
+
+    try {
       document.getElementById("pageLoader2").style.display = "flex";
-      const leadData = {
-        Last_Name: document.getElementById("Last_Name").value,
-        Mobile: document.getElementById("Mobile").value,
-        Phone: document.getElementById("Phone").value,
-        Email: document.getElementById("Email").value,
-        City: document.getElementById("City").value,
-        Lead_Source: document.getElementById("Lead_Source").value,
-        Asking_Price: document.getElementById("Asking_Price").value,
-        Lead_Priority_Level: document.getElementById("Lead_Priority_Level")
-          .value,
-        URL: document.getElementById("URL").value,
-        Available_Date: scrapedDate,
-        Ad_ID_New: (document.getElementById("Ad_ID_New").value = listingId),
-        Owner: { id: loggedInUserId },
-      };
 
-      const unitData = {
-        Name: document.getElementById("Interested_Unit_Title").value,
-        Unit_Type: document.getElementById("Unit_Type").value,
-        Total_Area_Sq_Ft:
-          parseInt(document.getElementById("Approximate_Sq_Ft").value) || null,
-        Max_Occupants:
-          parseInt(document.getElementById("Maximum_Occupants").value) || null,
-        Property_Condition: document.getElementById("Property_Condition").value,
-        Year_Built:
-          parseInt(document.getElementById("Year_Last_Renovated").value) ||
-          null,
-        Number_of_Floors: document.getElementById("Number_of_Levels").value,
-        Unit_Facing: document.getElementById("Unit_Facing").value,
-        Lawn_and_Snow_Care: document.getElementById("Lawn_Snow_Care").value,
-        Basement_Entrance: document.getElementById("Entrance_Type").value,
-        Furnished: document.getElementById("Furnished").value,
-        Basement_Included: document.getElementById("Basement_Included").value,
-        Basement_Details: document.getElementById("Basement_Details").value,
-        Earliest_Move_in_Date: scrapedDate,
-        Flooring_Common_Area:
-          document.getElementById("flooringCommonArea").value,
-        Ceiling_Hight: document.getElementById("Ceiling_Height").value,
-        Window_Coverings: document.getElementById("Window_Coverings_Common")
-          .value,
-        Window_Coverings_Common_Area: document.getElementById(
-          "Window_Coverings_Bedroom"
-        ).value,
-        Bedrooms: document.getElementById("Bedrooms").value,
-        Bedroom_Layout: document.getElementById("Bedroom_Layout").value,
-        Den_can_be_used_as_a_bedroom:
-          document.getElementById("Den_As_Bedroom").value,
-        Closets: document.getElementById("Closet_Type").value,
-        En_Suite_Bathrooms: document.getElementById("En_Suite_Bathrooms").value,
-        Bathrooms: document.getElementById("Bathrooms").value,
-        Countertops_Bathroom: document.getElementById("Countertops_Bathroom")
-          .value,
-        Shower_Type: document.getElementById("Shower_Type").value,
-        Appliances: document.getElementById("Appliance_Finishes").value,
-        Countertops: document.getElementById("Countertops_Kitchen").value,
-        Flooring_in_Bedrooms:
-          document.getElementById("Flooring_Bedrooms").value,
-        Location_of_Balcony: document.getElementById("Balcony_Location").value,
-        Backyard: document.getElementById("Backyard").value,
-        Is_the_backyard_fenced:
-          document.getElementById("Backyard_Fenced").value,
-        Number_of_Parking_Spaces:
-          parseInt(document.getElementById("Parking_Spaces").value) || 0,
-        Parking_Details: document.getElementById("Parking_Details").value,
-        parking_level_num: document.getElementById("Parking_Level_Number")
-          .value,
-        View: document.getElementById("View").value,
-        Number_of_Lockers:
-          parseInt(
-            document.getElementById("Number_of_Storage_Lockers").value
-          ) || null,
-        Storage_Details:
-          document.getElementById("Locker_Storage_Details").value || "",
-        locker_level_and_number:
-          document.getElementById("Locker_Level_and_Number").value || "",
-        How_are_utilities_split:
-          document.getElementById("Utilities_Financial_Responsibility").value ||
-          "",
-        Insurance_Home_Owner:
-          document.getElementById("Insurance_Home_Owner").value || "",
-        Insurance_Home_Owners:
-          document.getElementById("Insurance_Home_Owner").value || "",
-        Insurance_Policy_Number:
-          document.getElementById("Insurance_Policy_Number").value || "",
-        Address_Line_2: document.getElementById("Unit").value || "",
-        Street_Number: document.getElementById("Street_Number").value || "",
-        Address: document.getElementById("Street_Name").value || "",
-        City: document.getElementById("City").value || "",
-        Province: document.getElementById("Province").value || "",
-        Postal_Code: document.getElementById("Postal_Code").value || "",
-        Mail_Box_Number: document.getElementById("Mail_Box_Number").value || "",
-        Bank_Account: document.getElementById("Country").value || "Canada",
-        Hydro_Provider:
-          document.getElementById("Electricity_Provider").value || "",
-        Water_Provider: document.getElementById("Water_Provider").value || "",
-        Gas_Provider: document.getElementById("Gas_Provider").value || "",
-        Hot_Water_Tank_Provider:
-          document.getElementById("Hot_Water_Tank_Provider").value || "",
-        AC_Inclusion: document.getElementById("AC_Inclusion").checked,
-        Heat_Inclusion: document.getElementById("Heat_Inclusion").checked,
-        Internet_Inclusion:
-          document.getElementById("Internet_Inclusion").checked,
-        Cable_Inclusion: document.getElementById("Cable_Inclusion").checked,
-        Phone_Inclusion: document.getElementById("Phone_Inclusion").checked,
-        Utility_Notes: document.getElementById("Utility_Notes").value || "",
-        Corner_Unit: document.getElementById("Corner_Unit").checked,
-        Central_Vaccum: document.getElementById("Central_Vacuum").checked,
-        Penthouse: document.getElementById("Penthouse").checked,
-        Tons_of_Natural_Light:
-          document.getElementById("Natural_Sunlight").checked,
-        Fireplace: document.getElementById("Fireplace_Common_Area").checked,
-        Fireplace_Bedroom: document.getElementById("Fireplace_Bedroom").checked,
-        Upgraded_Bathrooms:
-          document.getElementById("Upgraded_Bathrooms").checked,
-        Upgraded_Back_Splash:
-          document.getElementById("Backsplash_Kitchen").checked,
-        Upgraded_Kitchen: document.getElementById("Upgraded_Kitchen").checked,
-        Dishwasher: document.getElementById("Dishwasher_Included").checked,
-        Huge_Private_Terrace: document.getElementById(
-          "Private_Terrace_Backyard"
-        ).checked,
-        Private_Garage: document.getElementById("Private_Garage").checked,
-        Walk_out_to_Garage:
-          document.getElementById("Walkout_To_Garage").checked,
-        Owner: { id: loggedInUserId },
-      };
-      const building_data = {
-        Date_of_Construction:
-          document.getElementById("Construction_Date").value,
-        Developer_Name: document.getElementById("Developer_Name").value,
-        Concierge_Building_Management_Info:
-          document.getElementById("Mgmt_Info").value,
-        Property_Management_Contact_Email:
-          document.getElementById("Mgmt_Email").value,
-        Office_Phone_Number: document.getElementById("Mgmt_Phone").value,
-        Office_Address: document.getElementById("Mgmt_Office_Address").value,
-        floor_count: document.getElementById("Building_Floors").value,
-        unit_count: document.getElementById("Building_Units").value,
-        Corporation_Number: document.getElementById("Condo_Corp_Number").value,
-        // Pet_Restrictions: document.getElementById("Pet_Restrictions").value,
-        Address: document.getElementById("Building_Address").value,
-        Name: document.getElementById("Building_Name").value,
-        City: document.getElementById("Building_City").value,
-        Province: document.getElementById("Building_Province").value,
-        Postal_Code: document.getElementById("Building_Postal_Code").value,
-        ac_included: document.getElementById("Building_AC_Incl").checked,
-        heat_included: document.getElementById("Building_Heat_Incl").checked,
-        cable_inclusion: document.getElementById("Building_Cable_Incl").checked,
-        internet_inclusion: document.getElementById("Building_Internet_Incl")
-          .checked,
-        Water_Filtration_Softener_Rental: document.getElementById(
-          "Building_Water_Filtration_Rental"
-        ).checked,
-        Parking_Garage: document.getElementById("Parking_Garage").checked,
-        Remote_Garage: document.getElementById("Remote_Garage").checked,
-        Visitor_Parking: document.getElementById("Visitor_Parking").checked,
-        Electric_Car_Charging_Stations:
-          document.getElementById("EV_Charging").checked,
-        Car_Wash: document.getElementById("Car_Wash").checked,
-        has_subway_access: document.getElementById("Subway_Access").checked,
-        Laundry_Facilities: document.getElementById("Laundry_Building").checked,
-        has_lobby_lounge: document.getElementById("Lobby_Lounge").checked,
-        Wheelchair_Access: document.getElementById("Wheelchair_Access").checked,
-        Onsite_Staff: document.getElementById("Onsite_Staff").checked,
-        has_security: document.getElementById("Concierge_24_7").checked,
-        has_guest_suites: document.getElementById("Guest_Suites").checked,
-        has_bicycle_storage: document.getElementById("Bicycle_Storage").checked,
-        Elevators: document.getElementById("Elevators").checked,
-        Enter_Phone_System: document.getElementById("Buzzer_System").checked,
-        Security_Onsite: document.getElementById("Security").checked,
-        Keyless_Entry: document.getElementById("Keyless_Entry").checked,
-        Pet_Spa: document.getElementById("Pet_Spa").checked,
-        has_bbq_terrace: document.getElementById("BBQ_Area").checked,
-        has_rooftop_patio: document.getElementById("Rooftop_Patio").checked,
-        has_cabana: document.getElementById("Cabanas").checked,
-        has_tennis_court: document.getElementById("Tennis_Court").checked,
-        Outdoor_Patio: document.getElementById("Outdoor_Patio").checked,
-        has_outdoor_pool: document.getElementById("Outdoor_Pool").checked,
-        Outdoor_Child_Play_Area: document.getElementById(
-          "Outdoor_Child_Play_Area"
-        ).checked,
-        has_fitness_center: document.getElementById("Gym_Fitness").checked,
-        Rec_Room: document.getElementById("Rec_Room").checked,
-        has_billiards_room: document.getElementById("Billiards").checked,
-        has_pool: document.getElementById("Indoor_Pool").checked,
-        has_sauna: document.getElementById("Sauna").checked,
-        Library: document.getElementById("Library").checked,
-        has_squash_court: document.getElementById("Squash").checked,
-        has_bowling_alley: document.getElementById("Bowling").checked,
-        Indoor_Child_Play_Area:
-          document.getElementById("Indoor_Child_Area").checked,
-        has_business_centre: document.getElementById("Meeting_Room").checked,
-        has_yoga_room: document.getElementById("Yoga_Room").checked,
-        has_movie_theater: document.getElementById("Movie_Room").checked,
-        has_game_room: document.getElementById("Games_Room").checked,
-        has_whirlpool: document.getElementById("Whirlpool").checked,
-        has_steam_room: document.getElementById("Steam_Room").checked,
-        has_basketball_court: document.getElementById("Basketball").checked,
-        has_golf_range: document.getElementById("Golf_Range").checked,
-        Piano_Lounge: document.getElementById("Piano_Lounge").checked,
-        Day_Care_Centre: document.getElementById("Daycare").checked,
-        Category: document.getElementById("Building_Category").value,
-        Property_Type: document.getElementById("Building_Type").value,
-      };
-      try {
-        // 🔁 Reset loaders
-        document.getElementById("pageLoader2").style.display = "flex";
+      let buildingid = null;
+      let existingBuilding = null;
+      const BuildingName = building_data.Name?.trim();
 
-        // 💡 Step 1: Check for building match
-        let buildingid = null;
-        let existingBuilding = null;
-        const postalCode = document
-          .getElementById("Building_Postal_Code")
-          .value?.trim();
-        if (postalCode) {
-          const searchResp = await ZOHO.CRM.API.searchRecord({
-            Entity: "Buildings",
-            Type: "criteria",
-            Query: `(Postal_Code:equals:${postalCode})`,
-          });
-          if (searchResp?.data?.length > 0) {
-            existingBuilding = searchResp.data[0];
-            buildingid = existingBuilding.id;
-          }
+      if (BuildingName) {
+        const buildingQuery = `(Name:equals:${BuildingName})`;
+        console.log("🔍 Building Query:", buildingQuery);
+
+        const searchResp = await ZOHO.CRM.API.searchRecord({
+          Entity: "Buildings",
+          Type: "criteria",
+          Query: buildingQuery,
+        });
+        console.log("Building Search Response:", searchResp);
+
+        if (searchResp?.data?.length > 0) {
+          existingBuilding = searchResp.data[0];
+          buildingid = existingBuilding.id;
         }
+      }
 
-        // 💡 Step 2: Check unit duplicate by name
-        const unitName = unitData.Name;
+      const unitName = unitData.Name?.trim();
+      if (unitName) {
+        const unitQuery = `(Name:equals:${unitName})`;
+        console.log("🔍 Unit Query:", unitQuery);
+
         const unitDupCheck = await ZOHO.CRM.API.searchRecord({
           Entity: "Units",
           Type: "criteria",
-          Query: `(Name:equals:${unitName})`,
+          Query: unitQuery,
         });
+        console.log("Unit Search Response:", unitDupCheck);
+
         if (unitDupCheck?.data?.length > 0) {
           throw {
             module: "Units",
@@ -3599,91 +3610,137 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
             },
           };
         }
+      }
 
-        // 💡 Step 3: Check lead duplicate by Ad ID
-        const adID = leadData.Ad_ID_New;
-        if (adID) {
-          const leadDupCheck = await ZOHO.CRM.API.searchRecord({
-            Entity: "Leads",
-            Type: "criteria",
-            Query: `(Ad_ID_New:equals:${adID})`,
-          });
-          if (leadDupCheck?.data?.length > 0) {
-            throw {
-              module: "Leads",
-              message: "Duplicate Ad ID",
-              details: {
-                id: leadDupCheck.data[0].id,
-                field: "Ad_ID_New",
-              },
-            };
-          }
-        }
+      const adID = leadData.Ad_ID_New?.trim();
+      if (adID) {
+        const leadQuery = `(Ad_ID_New:equals:${adID})`;
+        console.log("🔍 Lead Query:", leadQuery);
 
-        // ✅ Step 4: Create building if not found
-        if (!buildingid) {
-          const buildingResp = await ZOHO.CRM.API.insertRecord({
-            Entity: "Buildings",
-            APIData: building_data,
-            Trigger: ["workflow"],
-          });
-
-          console.log("Building Response:", buildingResp);
-          if (!buildingResp || buildingResp.data[0].code !== "SUCCESS")
-            throw buildingResp;
-          buildingid = buildingResp.data[0].details.id;
-        }
-
-        // ✅ Step 5: Create Lead
-        const leadResp = await ZOHO.CRM.API.insertRecord({
+        const leadDupCheck = await ZOHO.CRM.API.searchRecord({
           Entity: "Leads",
-          APIData: leadData,
+          Type: "criteria",
+          Query: leadQuery,
+        });
+        console.log("Lead Search Response:", leadDupCheck);
+
+        if (leadDupCheck?.data?.length > 0) {
+          throw {
+            module: "Leads",
+            message: "Duplicate Ad ID",
+            details: {
+              id: leadDupCheck.data[0].id,
+              field: "Ad_ID_New",
+            },
+          };
+        }
+      }
+
+      if (!buildingid) {
+        const buildingResp = await ZOHO.CRM.API.insertRecord({
+          Entity: "Buildings",
+          APIData: building_data,
           Trigger: ["workflow"],
         });
-        if (!leadResp || leadResp.data[0].code !== "SUCCESS") throw leadResp;
-        const leadId = leadResp.data[0].details.id;
+        console.log("Building Response:", buildingResp);
+        if (!buildingResp || buildingResp.data[0].code !== "SUCCESS") {
+          throw {
+            module: "Buildings",
+            message: buildingResp.data[0].message || "Error creating building",
+            details: {
+              id: null,
+              field: "Insert Error",
+            },
+            data: buildingResp.data,
+          };
+        }
+        buildingid = buildingResp.data[0].details.id;
+      }
 
-        // ✅ Step 6: Create Unit
-        const unitResp = await ZOHO.CRM.API.insertRecord({
-          Entity: "Units",
-          APIData: unitData,
-          Trigger: ["workflow"],
-        });
-        if (!unitResp || unitResp.data[0].code !== "SUCCESS") throw unitResp;
-        const unitId = unitResp.data[0].details.id;
+      const leadResp = await ZOHO.CRM.API.insertRecord({
+        Entity: "Leads",
+        APIData: leadData,
+        Trigger: ["workflow"],
+      });
+      if (!leadResp || leadResp.data[0].code !== "SUCCESS") {
+        throw {
+          module: "Leads",
+          message: leadResp.data[0].message || "Error creating lead",
+          details: {
+            id: null,
+            field: "Insert Error",
+          },
+          data: leadResp.data,
+        };
+      }
+      const leadId = leadResp.data[0].details.id;
 
-        // ✅ Step 7: Update Lead
-        const updateLeadResp = await ZOHO.CRM.API.updateRecord({
-          Entity: "Leads",
-          RecordID: leadId,
-          Trigger: ["workflow"],
-          APIData: {
+      const unitResp = await ZOHO.CRM.API.insertRecord({
+        Entity: "Units",
+        APIData: unitData,
+        Trigger: ["workflow"],
+      });
+      if (!unitResp || unitResp.data[0].code !== "SUCCESS") {
+        throw {
+          module: "Units",
+          message: unitResp.data[0].message || "Error creating unit",
+          details: {
+            id: null,
+            field: "Insert Error",
+          },
+          data: unitResp.data,
+        };
+      }
+      const unitId = unitResp.data[0].details.id;
+
+      const updateLeadResp = await ZOHO.CRM.API.updateRecord({
+        Entity: "Leads",
+        RecordID: leadId,
+        Trigger: ["workflow"],
+        APIData: {
+          id: leadId,
+          Associated_Unit: { id: unitId },
+          Owner: { id: aid },
+        },
+      });
+      if (!updateLeadResp || updateLeadResp.data[0].code !== "SUCCESS") {
+        throw {
+          module: "Leads",
+          message: updateLeadResp.data[0].message || "Error updating lead",
+          details: {
             id: leadId,
-            Associated_Unit: { id: unitId },
-            Owner: { id: aid },
+            field: "Update Error",
           },
-        });
-        if (!updateLeadResp || updateLeadResp.data[0].code !== "SUCCESS")
-          throw updateLeadResp;
+          data: updateLeadResp.data,
+        };
+      }
 
-        // ✅ Step 8: Update Unit
-        const updateUnitResp = await ZOHO.CRM.API.updateRecord({
-          Entity: "Units",
-          RecordID: unitId,
-          Trigger: ["workflow"],
-          APIData: {
+      const updateUnitResp = await ZOHO.CRM.API.updateRecord({
+        Entity: "Units",
+        RecordID: unitId,
+        Trigger: ["workflow"],
+        APIData: {
+          id: unitId,
+          Associated_Building: { id: buildingid },
+        },
+      });
+      if (!updateUnitResp || updateUnitResp.data[0].code !== "SUCCESS") {
+        throw {
+          module: "Units",
+          message: updateUnitResp.data[0].message || "Error updating unit",
+          details: {
             id: unitId,
-            Associated_Building: { id: buildingid },
+            field: "Update Error",
           },
-        });
-        if (!updateUnitResp || updateUnitResp.data[0].code !== "SUCCESS")
-          throw updateUnitResp;
+          data: updateUnitResp.data,
+        };
+      }
 
-        // 🎉 Success summary popup
-        Swal.fire({
-          icon: "success",
-          title: "✅ Records Created Successfully",
-          html: `
+      // 🎉 Success summary popup
+      Swal.fire({
+        icon: "success",
+        title: "✅ Records Created Successfully",
+        html: `
     <style>
       .summary-container {
         font-family: 'Segoe UI', sans-serif;
@@ -3731,127 +3788,494 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
         <tr>
           <td class="summary-header">👤 Prospect</td>
           <td class="summary-cell">
-            <span class="summary-label">Name</span>
-            <a href="https://crm.zoho.com/crm/org680397761/tab/Leads/${leadId}" target="_blank">${
-            leadData.Last_Name || "N/A"
+            <span class="summary-label">Prospect Name</span>
+            <a href="https://crm.zoho.com/crm/org680397761/tab/Leads/${leadId}" target="_blank">${leadData.Last_Name || "N/A"
           }</a>
           </td>
-          <td class="summary-cell"><span class="summary-label">Mobile</span>${
-            leadData.Mobile || "N/A"
+          <td class="summary-cell"><span class="summary-label">Mobile</span>${leadData.Mobile || "N/A"
           }</td>
-          <td class="summary-cell"><span class="summary-label">Price</span>CAD ${
-            leadData.Asking_Price || "N/A"
+          <td class="summary-cell"><span class="summary-label">City</span>CAD ${leadData.City || "N/A"
           }</td>
-          <td class="summary-cell"><span class="summary-label">Available Date</span>${
-            leadData.Available_Date || "N/A"
+          <td class="summary-cell"><span class="summary-label">Available Date</span>${leadData.Available_Date || "N/A"
           }</td>
         </tr>
         <tr>
           <td class="summary-header">🏠 Unit</td>
           <td class="summary-cell">
             <span class="summary-label">Unit Name</span>
-            <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${unitId}" target="_blank">${
-            unitData.Name || "N/A"
+            <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${unitId}" target="_blank">${unitData.Name || "N/A"
           }</a>
           </td>
-          <td class="summary-cell"><span class="summary-label">Total Area</span>${
-            unitData.Total_Area_Sq_Ft + " sqft" || "N/A"
+          <td class="summary-cell"><span class="summary-label">Bathroom</span>${unitData.Bathrooms || "N/A"
           }</td>
-          <td class="summary-cell"><span class="summary-label">Type</span>${
-            unitData.Unit_Type || "N/A"
+          <td class="summary-cell"><span class="summary-label">Bedrooms</span>${unitData.Bedrooms || "N/A"
           }</td>
-          <td class="summary-cell"><span class="summary-label">Facing</span>${
-            unitData.Unit_Facing || "N/A"
+          <td class="summary-cell"><span class="summary-label">Unit Type</span>${unitData.Unit_Type || "N/A"
           }</td>
         </tr>
         <tr>
           <td class="summary-header">🏢 Building</td>
           <td class="summary-cell">
             <span class="summary-label">Building Name</span>
-            <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${buildingid}" target="_blank">${
-            existingBuilding?.Name || building_data.Name || "N/A"
+            <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${buildingid}" target="_blank">${existingBuilding?.Name || building_data.Name || "N/A"
           }</a>
           </td>
-          <td class="summary-cell"><span class="summary-label">Type</span>${
-            building_data.buildingType || "N/A"
+          <td class="summary-cell"><span class="summary-label">Property Type</span>${building_data.Property_Type || "N/A"
           }</td>
-          <td class="summary-cell"><span class="summary-label">Category</span>${
-            building_data.Category || "N/A"
+          <td class="summary-cell"><span class="summary-label">Number of Floors</span>${building_data.floor_count || "N/A"
           }</td>
-          <td class="summary-cell"><span class="summary-label">City</span>${
-            building_data.City || "N/A"
+          <td class="summary-cell"><span class="summary-label">City</span>${building_data.City || "N/A"
           }</td>
         </tr>
       </table>
     </div>
   `,
-          width: 750,
-          confirmButtonText: "Done",
-          confirmButtonColor: "#0d6efd",
-        }).then(() => {
-          location.reload();
-        });
-      } catch (err) {
-        document.getElementById("pageLoader2").style.display = "none";
-        console.error("❌ Full Error Object:", err);
+        width: 750,
+        confirmButtonText: "Done",
+        confirmButtonColor: "#0d6efd",
+      }).then(() => {
+        location.reload();
+      });
+    }
+    catch (err) {
+      document.getElementById("pageLoader2").style.display = "none";
+      console.error("❌ Full Error Object:", err);
 
-        let title = "❌ Operation Failed";
-        let html = `<p>Something went wrong. Please review the message below.</p>`;
+      let title = "❌ Operation Failed";
+      let html = `<p>Something went wrong. Please review the message below.</p>`;
 
-        // Duplicate record handler
-        if (err?.module && err?.details?.id) {
-          const moduleName = err.module;
-          const field = err.details.field || "Field";
-          const id = err.details.id;
+      // ✅ This will now trigger correctly:
+      if (err?.module && err?.details) {
+        const moduleName = err.module;
+        const field = err.details.field || "Field";
+        const id = err.details.id;
+        const message = err.message || "Error";
 
-          const moduleLinks = {
-            Units: `https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${id}`,
-            Leads: `https://crm.zoho.com/crm/org680397761/tab/Leads/${id}`,
-            Buildings: `https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${id}`,
-          };
+        const moduleLinks = {
+          Units: id ? `https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${id}` : "#",
+          Leads: id ? `https://crm.zoho.com/crm/org680397761/tab/Leads/${id}` : "#",
+          Buildings: id ? `https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${id}` : "#",
+        };
 
-          title = "🚫 Duplicate Entry Detected";
-          html = `
-      <p><strong>Module:</strong> ${moduleName}</p>
-      <p><strong>Field:</strong> ${field}</p>
-      <p><strong>Message:</strong> ${err.message || "Duplicate record."}</p>
-      <p><strong>Existing Record:</strong> <a href="${
-        moduleLinks[moduleName]
-      }" target="_blank">🔗 View Record</a></p>
-    `;
-        }
-        // Unexpected errors like 400, validation issues
-        else if (err?.data?.[0]?.message) {
-          const message = err.data[0].message;
-          const reason = err.data[0]?.details?.[0]?.api_name || "Unknown Field";
-          title = "⚠️ API Validation Error";
-          html = `
-      <p><strong>Error Message:</strong> ${message}</p>
-      <p><strong>Problem Field:</strong> ${reason}</p>
-    `;
-        }
-        // Fallback
-        else {
-          html = `
-      <p>An unexpected error occurred.</p>
-      <p><code>${err?.message || JSON.stringify(err)}</code></p>
-    `;
-        }
-
-        // Show in popup
-        Swal.fire({
-          icon: "error",
-          title: title,
-          html: html,
-          confirmButtonText: "Close",
-          confirmButtonColor: "#d33",
-        }).then(() => {
-          location.reload();
-        });
-      } finally {
-        document.getElementById("pageLoader").style.display = "none";
-        document.getElementById("pageLoader2").style.display = "none";
+        title = "🚫 Duplicate Entry or API Error";
+        html = `
+            <p><strong>Module:</strong> ${moduleName}</p>
+            <p><strong>Field:</strong> ${field}</p>
+            <p><strong>Message:</strong> ${message}</p>
+            ${id ? `<p><a href="${moduleLinks[moduleName]}" target="_blank">🔗 View Record</a></p>` : ""}
+        `;
       }
-    });
+      // For Zoho API errors
+      else if (err?.data?.[0]?.message) {
+        const message = err.data[0].message;
+        const reason = err.data[0]?.details?.[0]?.api_name || "Unknown Field";
+        title = "⚠️ API Validation Error";
+        html = `
+            <p><strong>Error Message:</strong> ${message}</p>
+            <p><strong>Problem Field:</strong> ${reason}</p>
+        `;
+      } else {
+        html = `
+            <p>An unexpected error occurred.</p>
+            <pre>${err?.message || JSON.stringify(err)}</pre>
+        `;
+      }
+
+      Swal.fire({
+        icon: "error",
+        title: title,
+        html: html,
+        confirmButtonText: "Close",
+        confirmButtonColor: "#d33",
+      });
+    } finally {
+      document.getElementById("pageLoader").style.display = "none";
+      document.getElementById("pageLoader2").style.display = "none";
+    }
+  });
+
+  // document.getElementById("createRecordsBtn2").addEventListener("click", async () => {
+  //   const statuscr = document.getElementById("createRecordsBtn2");
+  //   const aid = leasingSel.value;
+  //   statuscr.disabled = true;
+  //   document.getElementById("pageLoader2").style.display = "flex";
+  //   Source = document.getElementById("prospectSource").value;
+  //   console.log("Source", Source);
+
+  //   // ✅ Fetch values safely once
+  //   const firstNameValue = document.getElementById("First_Name")?.value || "";
+  //   const lastNameValue = document.getElementById("Last_Name")?.value || "";
+  //   const mobileValue = document.getElementById("Mobile")?.value || "";
+  //   const cityValue = document.getElementById("City")?.value || "";
+  //   const availableDateValue = document.getElementById("Available_Date")?.value || "";
+  //   const unitNameValue = document.getElementById("Unit_name")?.value || "";
+  //   const unitTypeValue = document.getElementById("Unit_Type")?.value || "";
+  //   const floorsValue = document.getElementById("number_of_floors")?.value || "";
+  //   const bedroomsValue = document.getElementById("Bedrooms")?.value || "";
+  //   const bathroomsValue = document.getElementById("Bathrooms")?.value || "";
+  //   const backyardValue = document.getElementById("Backyard")?.value || "";
+  //   const backyardFencedValue = document.getElementById("Backyard_Fenced")?.value || "";
+  //   const parkingSpacesValue = document.getElementById("Parking_Spaces")?.value || "";
+  //   const parkingDetailsValue = document.getElementById("Parking_Details")?.value || "";
+  //   const unitNumberValue = document.getElementById("Unit_number")?.value || "";
+  //   const provinceValue = document.getElementById("Province")?.value || "";
+  //   const postalCodeValue = document.getElementById("Postal_Code")?.value || "";
+  //   const unitCountValue = document.getElementById("number_of_units")?.value || "";
+
+  //   ;
+
+  //   // ✅ Create leadData safely
+  //   leadData = {
+  //     First_Name: firstNameValue,
+  //     Last_Name: lastNameValue,
+  //     Mobile: mobileValue,
+  //     Phone: mobileValue,
+  //     City: cityValue,
+  //     Lead_Source: Source,
+  //     Lead_Priority_Level: "High",
+  //     Available_Date: availableDateValue,
+  //   };
+
+  //   // ✅ Create unitData safely
+  //   unitData = {
+  //     Name: unitNameValue,
+  //     Unit_Type: unitTypeValue,
+  //     Number_of_Floors: floorsValue,
+  //     Bedrooms: bedroomsValue,
+  //     Bathrooms: bathroomsValue,
+  //     Backyard: backyardValue,
+  //     Is_the_backyard_fenced: backyardFencedValue,
+  //     Number_of_Parking_Spaces: parkingSpacesValue,
+  //     Parking_Details: parkingDetailsValue,
+  //     Address_Line_2: unitNumberValue,
+  //     City: cityValue,
+  //     Province: provinceValue,
+  //     Postal_Code: postalCodeValue,
+  //     Bank_Account: "Canada",
+  //     Tons_of_Natural_Light: true,
+  //     Owner: { id: loggedInUserId },
+  //   };
+
+  //   // ✅ Create building_data safely
+  //   building_data = {
+  //     Property_Type: unitTypeValue,
+  //     floor_count: floorsValue,
+  //     unit_count: unitCountValue,
+  //     Address: unitNameValue,
+  //     Name: unitNameValue,
+  //     City: cityValue,
+  //     Province: provinceValue,
+  //     Postal_Code: postalCodeValue,
+  //   };
+  //   try {
+  //     document.getElementById("pageLoader2").style.display = "flex";
+
+  //     let buildingid = null;
+  //     let existingBuilding = null;
+
+  //     const BuildingName = document.getElementById("Unit_name").value?.trim();
+
+  //     if (BuildingName) {
+  //       const buildingQuery = `(Name:equals:${BuildingName})`;
+  //       console.log("🔍 Building Query:", buildingQuery);
+
+  //       const searchResp = await ZOHO.CRM.API.searchRecord({
+  //         Entity: "Buildings",
+  //         Type: "criteria",
+  //         Query: buildingQuery,
+  //       });
+  //       console.log("Building Search Response:", searchResp);
+
+  //       if (searchResp?.data?.length > 0) {
+  //         existingBuilding = searchResp.data[0];
+  //         buildingid = existingBuilding.id;
+  //       }
+  //     }
+
+  //     const unitName = document.getElementById("Unit_name").value?.trim();
+
+  //     if (unitName) {
+  //       const unitQuery = `(Name:equals:${unitName})`;
+  //       console.log("🔍 Unit Query:", unitQuery);
+
+  //       const unitDupCheck = await ZOHO.CRM.API.searchRecord({
+  //         Entity: "Units",
+  //         Type: "criteria",
+  //         Query: unitQuery,
+  //       });
+  //       console.log("Unit Search Response:", unitDupCheck);
+
+  //       if (unitDupCheck?.data?.length > 0) {
+  //         throw {
+  //           module: "Units",
+  //           message: "Duplicate Unit Name",
+  //           details: {
+  //             id: unitDupCheck.data[0].id,
+  //             field: "Name",
+  //           },
+  //         };
+  //       }
+  //     }
+
+  //     if (!buildingid) {
+  //       const buildingResp = await ZOHO.CRM.API.insertRecord({
+  //         Entity: "Buildings",
+  //         APIData: building_data,
+  //         Trigger: ["workflow"],
+  //       });
+  //       console.log("Building Response:", buildingResp);
+  //       if (!buildingResp || buildingResp.data[0].code !== "SUCCESS") {
+  //         throw {
+  //           module: "Buildings",
+  //           message: buildingResp.data[0].message || "Error creating building",
+  //           details: {
+  //             id: null,
+  //             field: "Insert Error",
+  //           },
+  //           data: buildingResp.data,
+  //         };
+  //       }
+  //       buildingid = buildingResp.data[0].details.id;
+  //     }
+
+  //     const leadResp = await ZOHO.CRM.API.insertRecord({
+  //       Entity: "Leads",
+  //       APIData: leadData,
+  //       Trigger: ["workflow"],
+  //     });
+  //     if (!leadResp || leadResp.data[0].code !== "SUCCESS") {
+  //       throw {
+  //         module: "Leads",
+  //         message: leadResp.data[0].message || "Error creating lead",
+  //         details: {
+  //           id: null,
+  //           field: "Insert Error",
+  //         },
+  //         data: leadResp.data,
+  //       };
+  //     }
+  //     const leadId = leadResp.data[0].details.id;
+  //     const unitResp = await ZOHO.CRM.API.insertRecord({
+  //       Entity: "Units",
+  //       APIData: unitData,
+  //       Trigger: ["workflow"],
+  //     });
+  //     if (!unitResp || unitResp.data[0].code !== "SUCCESS") {
+  //       throw {
+  //         module: "Units",
+  //         message: unitResp.data[0].message || "Error creating unit",
+  //         details: {
+  //           id: null,
+  //           field: "Insert Error",
+  //         },
+  //         data: unitResp.data,
+  //       };
+  //     }
+  //     const unitId = unitResp.data[0].details.id;
+
+  //     const updateLeadResp = await ZOHO.CRM.API.updateRecord({
+  //       Entity: "Leads",
+  //       RecordID: leadId,
+  //       Trigger: ["workflow"],
+  //       APIData: {
+  //         id: leadId,
+  //         Associated_Unit: { id: unitId },
+  //         Owner: { id: aid },
+  //       },
+  //     });
+  //     if (!updateLeadResp || updateLeadResp.data[0].code !== "SUCCESS") {
+  //       throw {
+  //         module: "Leads",
+  //         message: updateLeadResp.data[0].message || "Error updating lead",
+  //         details: {
+  //           id: leadId,
+  //           field: "Update Error",
+  //         },
+  //         data: updateLeadResp.data,
+  //       };
+  //     }
+
+  //     const updateUnitResp = await ZOHO.CRM.API.updateRecord({
+  //       Entity: "Units",
+  //       RecordID: unitId,
+  //       Trigger: ["workflow"],
+  //       APIData: {
+  //         id: unitId,
+  //         Associated_Building: { id: buildingid },
+  //       },
+  //     });
+  //     if (!updateUnitResp || updateUnitResp.data[0].code !== "SUCCESS") {
+  //       throw {
+  //         module: "Units",
+  //         message: updateUnitResp.data[0].message || "Error updating unit",
+  //         details: {
+  //           id: unitId,
+  //           field: "Update Error",
+  //         },
+  //         data: updateUnitResp.data,
+  //       };
+  //     }
+
+  //     // 🎉 Success summary popup
+  //     Swal.fire({
+  //       icon: "success",
+  //       title: "✅ Records Created Successfully",
+  //       html: `
+  //   <style>
+  //     .summary-container {
+  //       font-family: 'Segoe UI', sans-serif;
+  //       font-size: 14px;
+  //       margin-top: 16px;
+  //     }
+  //     .summary-table {
+  //       width: 100%;
+  //       border-collapse: separate;
+  //       border-spacing: 0;
+  //       border-radius: 10px;
+  //       overflow: hidden;
+  //     }
+  //     .summary-table td {
+  //       padding: 14px 18px;
+  //       vertical-align: top;
+  //       border: 1px solid #e0e0e0;
+  //     }
+  //     .summary-header {
+  //       background-color: #0d6efd;
+  //       color: #fff;
+  //       font-weight: bold;
+  //       width: 140px;
+  //       text-align: center;
+  //     }
+  //     .summary-cell {
+  //       font-weight: 600;
+  //       background-color: #f8f9fa;
+  //     }
+  //     .summary-cell a {
+  //       color: #0d6efd;
+  //       font-weight: 500;
+  //       text-decoration: underline;
+  //     }
+  //     .summary-label {
+  //       color: #6c757d;
+  //       font-size: 13px;
+  //       font-weight: 500;
+  //       margin-bottom: 4px;
+  //       display: block;
+  //     }
+  //   </style>
+  //   <div class="summary-container">
+  //     <table class="summary-table">
+  //       <tr>
+  //         <td class="summary-header">👤 Prospect</td>
+  //         <td class="summary-cell">
+  //           <span class="summary-label">Prospect Name</span>
+  //           <a href="https://crm.zoho.com/crm/org680397761/tab/Leads/${leadId}" target="_blank">${leadData.Last_Name || "N/A"
+  //         }</a>
+  //         </td>
+  //         <td class="summary-cell"><span class="summary-label">Mobile</span>${leadData.Mobile || "N/A"
+  //         }</td>
+  //         <td class="summary-cell"><span class="summary-label">City</span>CAD ${leadData.City || "N/A"
+  //         }</td>
+  //         <td class="summary-cell"><span class="summary-label">Available Date</span>${leadData.Available_Date || "N/A"
+  //         }</td>
+  //       </tr>
+  //       <tr>
+  //         <td class="summary-header">🏠 Unit</td>
+  //         <td class="summary-cell">
+  //           <span class="summary-label">Unit Name</span>
+  //           <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${unitId}" target="_blank">${unitData.Name || "N/A"
+  //         }</a>
+  //         </td>
+  //         <td class="summary-cell"><span class="summary-label">Bathroom</span>${unitData.Bathrooms || "N/A"
+  //         }</td>
+  //         <td class="summary-cell"><span class="summary-label">Bedrooms</span>${unitData.Bedrooms || "N/A"
+  //         }</td>
+  //         <td class="summary-cell"><span class="summary-label">Unit Type</span>${unitData.Unit_Type || "N/A"
+  //         }</td>
+  //       </tr>
+  //       <tr>
+  //         <td class="summary-header">🏢 Building</td>
+  //         <td class="summary-cell">
+  //           <span class="summary-label">Building Name</span>
+  //           <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${buildingid}" target="_blank">${existingBuilding?.Name || building_data.Name || "N/A"
+  //         }</a>
+  //         </td>
+  //         <td class="summary-cell"><span class="summary-label">Property Type</span>${building_data.Property_Type || "N/A"
+  //         }</td>
+  //         <td class="summary-cell"><span class="summary-label">Number of Floors</span>${building_data.floor_count || "N/A"
+  //         }</td>
+  //         <td class="summary-cell"><span class="summary-label">City</span>${building_data.City || "N/A"
+  //         }</td>
+  //       </tr>
+  //     </table>
+  //   </div>
+  // `,
+  //       width: 750,
+  //       confirmButtonText: "Done",
+  //       confirmButtonColor: "#0d6efd",
+  //     }).then(() => {
+  //       location.reload();
+  //     });
+  //   }
+  //   catch (err) {
+  //     document.getElementById("pageLoader2").style.display = "none";
+  //     console.error("❌ Full Error Object:", err);
+
+  //     let title = "❌ Operation Failed";
+  //     let html = `<p>Something went wrong. Please review the message below.</p>`;
+
+  //     // ✅ This will now trigger correctly:
+  //     if (err?.module && err?.details) {
+  //       const moduleName = err.module;
+  //       const field = err.details.field || "Field";
+  //       const id = err.details.id;
+  //       const message = err.message || "Error";
+
+  //       const moduleLinks = {
+  //         Units: id ? `https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${id}` : "#",
+  //         Leads: id ? `https://crm.zoho.com/crm/org680397761/tab/Leads/${id}` : "#",
+  //         Buildings: id ? `https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${id}` : "#",
+  //       };
+
+  //       title = "🚫 Duplicate Entry or API Error";
+  //       html = `
+  //           <p><strong>Module:</strong> ${moduleName}</p>
+  //           <p><strong>Field:</strong> ${field}</p>
+  //           <p><strong>Message:</strong> ${message}</p>
+  //           ${id ? `<p><a href="${moduleLinks[moduleName]}" target="_blank">🔗 View Record</a></p>` : ""}
+  //       `;
+  //     }
+  //     // For Zoho API errors
+  //     else if (err?.data?.[0]?.message) {
+  //       const message = err.data[0].message;
+  //       const reason = err.data[0]?.details?.[0]?.api_name || "Unknown Field";
+  //       title = "⚠️ API Validation Error";
+  //       html = `
+  //           <p><strong>Error Message:</strong> ${message}</p>
+  //           <p><strong>Problem Field:</strong> ${reason}</p>
+  //       `;
+  //     } else {
+  //       html = `
+  //           <p>An unexpected error occurred.</p>
+  //           <pre>${err?.message || JSON.stringify(err)}</pre>
+  //       `;
+  //     }
+
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: title,
+  //       html: html,
+  //       confirmButtonText: "Close",
+  //       confirmButtonColor: "#d33",
+  //     });
+  //   } finally {
+  //     document.getElementById("pageLoader").style.display = "none";
+  //     document.getElementById("pageLoader2").style.display = "none";
+  //   }
+
+
+  // });
+
+
 });
 ZOHO.embeddedApp.init();

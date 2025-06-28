@@ -21,8 +21,13 @@
                 // Show if it contains 'kijiji' anywhere
                 if (selectedSource == 'kijiji') {
                     $('#kijijiSection').show();
+                    $('#bt1').show();
+                    $('#bt2').hide();
                 } else {
                     $('#kijijiSection').hide();
+                    $('#bt1').hide();
+                    $('#bt2').show();
+
                 }
             });
         });
@@ -34,7 +39,7 @@
         <div class="card mb-4">
             <div class="col-md-6">
                 <label for="prospectSource" class="form-label">Prospect Source</label>
-                <select class="form-control" id="prospectSource" required>
+                <select class="form-control" id="prospectSource" required value="">
                     <option value="">Select</option>
                     <option value="Facebook - Outbound">Facebook - Outbound</option>
                     <option value="Kijiji Renewal">Kijiji Renewal</option>
@@ -109,28 +114,28 @@
 
                     <div class="col-md-6">
                         <label for="Last_Name" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="First_Name" />
+                        <input type="text" class="form-control" id="First_Name" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Last_Name" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="Last_Name" />
+                        <input type="text" class="form-control" id="Last_Name" value=""/>
                     </div>
 
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Available_Date" class="form-label">Available Date</label>
-                        <input type="date" class="form-control" id="Available_Date" />
+                        <input type="date" class="form-control" id="Available_Date" value="" required/>
                     </div>
                     <div class="col-md-6">
                         <label for="Mobile" class="form-label">Mobile</label>
-                        <input type="text" class="form-control" id="Mobile" />
+                        <input type="text" class="form-control" id="Mobile" value=""/>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Unit_Type" class="form-label">Unit Type</label>
-                        <select class="form-control" id="Unit_Type">
+                        <select class="form-control" id="Unit_Type" value="">
                             <option value="">Select</option>
                             <option value="Condominium">Condominium</option>
                             <option value="Unit - Apartment Building">Unit - Apartment Building</option>
@@ -143,24 +148,24 @@
                     </div>
                     <div class="col-md-6">
                         <label for="City" class="form-label">City</label>
-                        <input type="text" class="form-control" id="City" />
+                        <input type="text" class="form-control" id="City" value=""/>
                     </div>
                 </div>
                 <div class="row mb-3">
 
                     <div class="col-md-6">
                         <label for="Province" class="form-label">Province</label>
-                        <input type="text" class="form-control" id="Province" />
+                        <input type="text" class="form-control" id="Province" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Postal_Code" class="form-label">Postal Code</label>
-                        <input type="text" class="form-control" id="Postal_Code" />
+                        <input type="text" class="form-control" id="Postal_Code" value=""/>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Bedrooms" class="form-label">Bedrooms</label>
-                        <select class="form-control" id="Bedrooms">
+                        <select class="form-control" id="Bedrooms" value="">
                             <option value="">Select</option>
                             <option value="Studio">Studio</option>
                             <option value="1">1</option>
@@ -188,7 +193,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="Bathrooms" class="form-label">Bathrooms</label>
-                        <select class="form-control" id="Bathrooms">
+                        <select class="form-control" id="Bathrooms" value="">
                             <option value="">Select</option>
                             <option value="0">0</option>
                             <option value="1">1</option>
@@ -216,17 +221,17 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Interested_Unit_Title" class="form-label">Number of Floors</label>
-                        <input type="text" class="form-control" id="number_of_floors" />
+                        <input type="text" class="form-control" id="number_of_floors" value=""/>
                     </div>
                     <div class="col-md-6">
                         <label for="Available_Date_Unit" class="form-label">Number of Units</label>
-                        <input type="text" class="form-control" id="number_of_units" />
+                        <input type="text" class="form-control" id="number_of_units" value=""/>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Backyard" class="form-label">Backyard</label>
-                        <select class="form-control" id="Backyard">
+                        <select class="form-control" id="Backyard" value="">
                             <option value="">Select</option>
                             <option value="Included">Included</option>
                             <option value="Shared">Shared</option>
@@ -236,7 +241,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="Backyard_Fenced" class="form-label">Is the Backyard Fenced?</label>
-                        <select class="form-control" id="Backyard_Fenced">
+                        <select class="form-control" id="Backyard_Fenced" value="">
                             <option value="">Select</option>
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
@@ -247,11 +252,11 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Year_Last_Renovated" class="form-label">Year Last Renovated</label>
-                        <input type="text" class="form-control" id="Year_Last_Renovated" />
+                        <input type="text" class="form-control" id="Year_Last_Renovated" value=""/>
                     </div>
                     <div class="col-md-6">
                         <label for="Parking_Spaces" class="form-label">Number of Parking Spaces</label>
-                        <input type="number" class="form-control" id="Parking_Spaces" />
+                        <input type="text" class="form-control" id="Parking_Spaces" value=""/>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -283,18 +288,21 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Maximum_Occupants" class="form-label">Unit Name</label>
-                        <input type="text" class="form-control" id="Unit_name" />
+                        <input type="text" class="form-control" id="Unit_name" value=""/>
                     </div>
                     <div class="col-md-6">
                         <label for="Maximum_Occupants" class="form-label">Unit Number</label>
-                        <input type="text" class="form-control" id="Unit_number" />
+                        <input type="text" class="form-control" id="Unit_number" value=""/>
                     </div>
                 </div>
             </div>
         </div>
         <!-- Final Part: Create Records Button -->
-        <div class="text-end mt-4">
-            <button class="btn btn-success px-4" id="createRecordsBtn">Create Records</button>
+        <div id="bt1" class="text-end mt-4" style="display: none;">
+            <button class="btn btn-success px-4" id="createRecordsBtn1">Create Records</button>
+        </div>
+        <div id="bt2" class="text-end mt-4" style="display: none;"> 
+            <button class="btn btn-success px-4" id="createRecordsBtn2">Create Records</button>
         </div>
 
     </div>
