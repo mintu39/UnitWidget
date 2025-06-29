@@ -207,6 +207,56 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       console.error("❌ Failed to get user info:", err);
     });
 
+    // validateAllFields();
+    function validateAllFields() {
+    // List all required field IDs here
+    const requiredFieldIds = [
+        "First_Name",
+        "Last_Name",
+        "Available_Date",
+        "Mobile",
+        "Unit_Type",
+        "City",
+        "Province",
+        "Postal_Code",
+        "Bedrooms",
+        "Bathrooms",
+        "number_of_floors",
+        "number_of_units",
+        "Backyard",
+        "Backyard_Fenced",
+        "Year_Last_Renovated",
+        "Parking_Spaces",
+        "Parking_Details",
+        "ownerid",
+        "Unit_name",
+        "Unit_number"
+    ];
+
+    let missingFields = [];
+    requiredFieldIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            // For select elements, check selected value
+            let value = el.value ? el.value.trim() : "";
+            if (!value) {
+                let label = el.previousElementSibling ? el.previousElementSibling.innerText : id;
+                missingFields.push(label);
+            }
+        }
+    });
+
+    if (missingFields.length > 0) {
+        Swal.fire({
+            icon: "warning",
+            title: "Please fill all required fields",
+            html: `<ul style="text-align:left;">${missingFields.map(f => `<li>${f}</li>`).join("")}</ul>`,
+        });
+        return false;
+    }
+    return true;
+}
+
   // Get First Name
   function extractFirstName(fullName) {
     const nameParts = fullName.trim().split(/\s+/);
@@ -2850,54 +2900,31 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       data = await response.json();
       const StringData = JSON.stringify(data).toLowerCase();
       // console.log("StringData", StringData);
-      // console.log("loggedInUserId", loggedInUserId);
-
-
       //25th June start New -
       const obj = { firstName: data.firstName || "" };
       const fullName = obj.firstName || "";
       const FirstName = extractFirstName(fullName);
-      document.getElementById("First_Name").value = FirstName;
       const LastName = extractLastName(fullName);
-      document.getElementById("Last_Name").value = LastName;
       scrapedDate = extractAvailableDate(data.vipAttributes?.attributes);
-      document.getElementById("Available_Date").value = scrapedDate;
       const Mobile = data.phone || "";
-      document.getElementById("Mobile").value = Mobile;
       const unitType = detectUnitTypeFromTitleAndDescription(data.title, data.description);
-      // console.log("unitType", unitType);
-
-      document.getElementById("Unit_Type").value = unitType;
       const city = extractCityFromAddress(data.location);
-      document.getElementById("City").value = city;
       const Province = extractProvince(data.location);
-      document.getElementById("Province").value = Province;
       const PostalCode = extractPostalCode(data.location);
-      document.getElementById("Postal_Code").value = PostalCode;
       const bedrooms = extractBedroomsSmart(data.vipAttributes?.primary || [], data.title || "", data.description || []);
-      document.getElementById("Bedrooms").value = bedrooms;
       const bathrooms = extractBathroomsSmart(data.vipAttributes?.primary || [], data.title || "", data.description || []);
-      document.getElementById("Bathrooms").value = bathrooms;
       const numberOfFloors = detectNumberOfFloors() || 0;
-      document.getElementById("number_of_floors").value = numberOfFloors;
       const numberOfUnits = detectNumberOfUnits() || 0;
-      document.getElementById("number_of_units").value = numberOfUnits;
       const backyard = detectBackyard();
-      document.getElementById("Backyard").value = backyard;
       const backyardFenced = detectBackyardFenced();
-      document.getElementById("Backyard_Fenced").value = backyardFenced;
       const Parkingspacs = extractParkingSpaces() || 0;
-      document.getElementById("Parking_Spaces").value = Parkingspacs;
       const parkingDetails = detectParkingDetails() || "";
-      document.getElementById("Parking_Details").value = parkingDetails;
       const Walkout_to_Garage = detectWalkoutToGarage(data.description || []);
       const Private_Garage = detectPrivateGarage(data.description || []);
       const Street_Number = extractStreetNumber(data.location || "", data.firstName || "", data.title || "");
       const Street_Name = extractStreetName(data.location || "", data.firstName || "", data.title || "");
       const Mailbox_Number = extractMailBoxNumber(data.description || []);
       const unitName = detectUnitName() || "";
-      console.log("unitName", unitName);
-
       const propertyCondition = detectPropertyCondition(data.description);
       const electricityProvider = detectElectricityProvider(data.description || []);
       const waterProvider = detectWaterProvider(data.description || []);
@@ -2962,6 +2989,22 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       const Piano_Lounge = detectPiano_Lounge();
       const Daycare = detectDaycare();
       const ParkingLevelNumber = extractParkingLevelNumber();
+      document.getElementById("First_Name").value = FirstName;
+      document.getElementById("Last_Name").value = LastName;
+      document.getElementById("Available_Date").value = scrapedDate;
+      document.getElementById("Mobile").value = Mobile;
+      document.getElementById("Unit_Type").value = unitType;
+      document.getElementById("City").value = city;
+      document.getElementById("Province").value = Province;
+      document.getElementById("Bathrooms").value = bathrooms;
+      document.getElementById("Bedrooms").value = bedrooms;
+      document.getElementById("Postal_Code").value = PostalCode;
+      document.getElementById("number_of_floors").value = numberOfFloors;
+      document.getElementById("number_of_units").value = numberOfUnits;
+      document.getElementById("Backyard").value = backyard;
+      document.getElementById("Backyard_Fenced").value = backyardFenced;
+      document.getElementById("Parking_Spaces").value = Parkingspacs;
+      document.getElementById("Parking_Details").value = parkingDetails;
 
       //function for conditions ::
 
@@ -3303,12 +3346,46 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
           keywordMatch || (petRestrictionsEmpty && propertyConditionExists)
         );
       }
+// website title generation function
+function generateWebsiteTitle(bedrooms, bathrooms, unitType, unitName) {
+    // Format bedrooms
+    let bedPart = bedrooms ? `${bedrooms} BED` : "";
+
+    // Format bathrooms
+    let bathPart = bathrooms ? `${bathrooms} BATH` : "";
+
+    // Combine BED + BATH
+    let bedBath = [bedPart, bathPart].filter(Boolean).join(" + ");
+
+    // Format unit type
+    let unitTypeFormatted = unitType ? unitType.toUpperCase() : "UNIT";
+
+    // Remove postal code from unitName
+    let unitNameClean = unitName;
+    if (unitName.includes(",")) {
+        let parts = unitName.split(",");
+        // Remove last part if it looks like a postal code
+        if (parts[parts.length - 1].trim().match(/[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d/)) {
+            parts.pop();
+        }
+        unitNameClean = parts.join(",").trim();
+    }
+
+    // Capitalize each word in unit name
+    function titleCase(str) {
+        return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1));
+    }
+
+    // Combine
+    const title = `${bedBath} - ${unitTypeFormatted} FOR RENT - ${titleCase(unitNameClean)}`;
+    return title;
+}
+
+
 
       //Condition const here updated ones
       const UnitNamecorrected = correctUnitName(unitType, unitName);
-      document.getElementById("Unit_name").value = UnitNamecorrected || "";
       const Unitnumber = detectUnitNumber(unitType,);
-      document.getElementById("Unit_number").value = Unitnumber;
       const lawnSnowCare = detectLawnAndSnowCare(data.description || []);
       const buildingType = mapUnitTypeToBuildingType(unitType);
       const basement = detectBasementIncluded(data.title || "", data.description || [], data.unitType || "");
@@ -3316,10 +3393,8 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       const upgradedBathroom = checkUpgradedBathroom(propertyCondition);
       const upgradedKitchen = checkUpgradedBathroom(propertyCondition);
       const Lastyearrenovated = extractLastRenovatedYear(propertyCondition) || "";
-      document.getElementById("Year_Last_Renovated").value = Lastyearrenovated;
       const Sunlight = true;
-
-
+      const websiteTitle = generateWebsiteTitle(bedrooms, bathrooms, unitType, unitName);
       const privateTerraceOrBackyard = detectPrivateTerraceOrBackyardFromBackyardValue(backyard);
       const view = detectViewCombined(data.unitType || "");
       const numericPrice = data.price ? Number(data.price.replace(/[$,]/g, "")) : "";
@@ -3371,11 +3446,195 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       const officeAddress = extractOfficeAddress();
       const developerName = detectDeveloperName();
       const dateOfConstructionISO = detectDateOfConstruction();
+      document.getElementById("Year_Last_Renovated").value = Lastyearrenovated;
+      document.getElementById("Unit_name").value = UnitNamecorrected || "";
+      document.getElementById("Unit_number").value = Unitnumber;
+
+      function generateAdDescription({
+    FirstName,
+    LastName,
+    Mobile,
+    bedrooms,
+    bathrooms,
+    unitType,
+    unitName,
+    Street_Name,
+    Street_Number,
+    city,
+    Province,
+    PostalCode,
+    price,
+    Parkingspacs,
+    Upgraded_Kitchen,
+    kitchenCountertops,
+    applianceFinish,
+    furnished,
+    flooringBedrooms,
+    ceilingHeight,
+    upgradedBathroom,
+    closetType,
+    enSuiteBathrooms,
+    privateTerraceOrBackyard,
+    Sunlight,
+    Outdoor_Patio_Final,
+    BBQ_Area_Final,
+    Parking_Garage,
+    Remote_Garage,
+    Subway_Access,
+    dateOfConstructionISO,
+}) {
+    const phoneDisplay = Mobile || "(437) 561-9900"; // fallback to call number
+
+    // Address block
+    const addressFull = `${Street_Number ? Street_Number + " " : ""}${Street_Name}, ${city}, ${Province} ${PostalCode}`.trim();
+
+    // Intersection placeholder (can enhance to extract if needed)
+    const intersection = `${city} Main Intersection`;
+
+    // Price and parking
+    const priceDisplay = price ? `$${price.toLocaleString()}/mo` : "Price Upon Request";
+    const parkingDisplay = Parkingspacs ? `(${Parkingspacs} Parking Spots Available)` : "";
+
+    // Building amenities
+    const amenities = []
+    if (Outdoor_Patio_Final) amenities.push("Outdoor Patio");
+    if (BBQ_Area_Final) amenities.push("Barbecue Area");
+    if (Parking_Garage) amenities.push("Parking Garage");
+    if (Remote_Garage) amenities.push("Remote Garage");
+    if (Subway_Access) amenities.push("Public Transit");
+
+    const amenitiesDisplay = amenities.length > 0 ? `- ${amenities.join(" - ")} -` : "Inquire for building amenities.";
+
+    // Unit Features
+    const features = [];
+
+    if (bedrooms) features.push(`${bedrooms} Bedrooms`);
+    if (bathrooms) features.push(`${bathrooms} Bathrooms`);
+    if (dateOfConstructionISO) features.push(`Built: ${dateOfConstructionISO}`);
+    if (Upgraded_Kitchen) features.push("Upgraded Kitchen");
+    if (kitchenCountertops) features.push(`${kitchenCountertops} Countertops`);
+    if (applianceFinish) features.push(`${applianceFinish} Appliances`);
+    if (furnished) features.push("Furnished");
+    if (flooringBedrooms) features.push(`${flooringBedrooms} Floors`);
+    if (ceilingHeight) features.push(`${ceilingHeight} Ceilings`);
+    if (upgradedBathroom) features.push("Upgraded Bathrooms");
+    if (closetType) features.push(`${closetType} Closets`);
+    if (enSuiteBathrooms) features.push("En-suite Bathroom");
+    if (privateTerraceOrBackyard) features.push("Private Terrace/Backyard");
+    if (Sunlight) features.push("Tons of Natural Light");
+
+    const featuresDisplay = features.map(f => `- ${f}`).join("\n");
+
+    return `** OPEN 24/7 - CALL: ${phoneDisplay} **
+
+${bedrooms || "Multiple"} Bedrooms, ${bathrooms || "Multiple"} Bathrooms, Near Parks, Public Transportation, Bus Stops, Schools, Shopping Malls, Grocery Stores, Restaurants, Bars and Sport Clubs. The unit also has ${Upgraded_Kitchen ? "an Upgraded Kitchen, " : ""}${kitchenCountertops ? `${kitchenCountertops} Countertops, ` : ""}${flooringBedrooms ? `${flooringBedrooms} Floors, ` : ""}${upgradedBathroom ? "Upgraded Bathrooms, " : ""}${privateTerraceOrBackyard ? "Private Terrace/Backyard, " : ""}${Sunlight ? "and Tons of Natural Light." : ""}
+
+ADDRESS AND INTERSECTION:
+${addressFull}
+${intersection}
+
+PRICE AND SPECIAL OFFERS:
+${priceDisplay} ${parkingDisplay}
+Enjoy Special Offers From Our Partners: Rogers, Telus, Bell, Apollo Insurance, The Brick
+
+UNIT FEATURES:
+${featuresDisplay}
+
+BUILDING AMENITIES:
+${amenitiesDisplay}
+
+Available Immediately!!
+
+** OPEN 24/7 - CALL: ${phoneDisplay} **
+READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
+}
+function generateLocationAndIncentives({
+    locationFeatures = [],
+    hasParks = true,
+    hasTransit = true,
+    hasSchools = true,
+    hasShopping = true,
+    hasRestaurants = true,
+    incentivesPartners = ["Rogers", "Bell", "Apollo Insurance", "The Brick"],
+    customIncentives = [],
+} = {}) {
+    // 📍 Location Description Assembly
+    const features = [];
+
+    if (hasParks) features.push("Parks");
+    if (hasTransit) features.push("Public Transportation, Bus Stops");
+    if (hasSchools) features.push("Schools");
+    if (hasShopping) features.push("Shopping Malls, Grocery Stores");
+    if (hasRestaurants) features.push("Restaurants, Bars and Sports Clubs");
+
+    if (locationFeatures.length > 0) {
+        features.push(...locationFeatures);
+    }
+
+    const locationDescription = `Near ${features.join(", ")}.`;
+
+    // 🎁 Incentives Assembly
+    const partners = incentivesPartners.length > 0
+        ? incentivesPartners.join(", ")
+        : "our trusted partners";
+
+    const incentives = customIncentives.length > 0
+        ? `Enjoy Special Rates and Offers: ${customIncentives.join(", ")}.`
+        : `Enjoy Special Rates From Our Partners: ${partners}.`;
+
+    return {
+        locationDescription,
+        incentives
+    };
+}
+
+
+
+const adDescription = generateAdDescription({
+    FirstName,
+    LastName,
+    Mobile,
+    bedrooms,
+    bathrooms,
+    unitType,
+    unitName,
+    Street_Name,
+    Street_Number,
+    city,
+    Province,
+    PostalCode,
+    price: numericPrice,
+    Parkingspacs,
+    Upgraded_Kitchen,
+    kitchenCountertops,
+    applianceFinish,
+    furnished,
+    flooringBedrooms,
+    ceilingHeight,
+    upgradedBathroom,
+    closetType,
+    enSuiteBathrooms,
+    privateTerraceOrBackyard,
+    Sunlight,
+    Outdoor_Patio_Final,
+    BBQ_Area_Final,
+    Parking_Garage,
+    Remote_Garage,
+    Subway_Access,
+    dateOfConstructionISO,
+});
+const { locationDescription, incentives } = generateLocationAndIncentives();
+
+console.log("📍 Location Description:", locationDescription);
+console.log("🎁 Incentives:", incentives);
+
+
+console.log("🚀 Generated Ad Description:\n", adDescription);
 
 
 
 
-
+  
        leadData = {
       First_Name: FirstName,
       Last_Name: LastName,
@@ -3388,6 +3647,13 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       URL: document.getElementById("unitUrl").value,
       Available_Date: scrapedDate,
       Ad_ID_New: listingId,
+      Posting_Title_With_Parking_and_Locker: websiteTitle,
+      Posting_Title:websiteTitle,
+      Ad_Description: adDescription,
+      Ad_Description_Long: adDescription,
+      Meta_Description: adDescription,
+      Location_Description: locationDescription,
+      Incentives: incentives,
     };
      unitData = {
       Name: UnitNamecorrected,
@@ -3535,9 +3801,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
     };
 
-console.log("Lead Data:", leadData);
-    console.log("Unit Data:", unitData);
-    console.log("Building Data:", building_data);
       // ✅ Hide loader and update button status
       document.getElementById("pageLoader").style.display = "none";
       Swal.fire("Success", "All Details fectched successfully!", "success");
@@ -3560,9 +3823,17 @@ console.log("Lead Data:", leadData);
     const statuscr = document.getElementById("createRecordsBtn1");
     const aid = leasingSel.value;
     statuscr.disabled = true;
+    if (!validateAllFields()) {
+    // Stop the function if validation fails
+    return;
+}
+
     document.getElementById("pageLoader2").style.display = "flex";
-    console.log("sampleData",FirstName, LastName, Mobile, city, scrapedDate, listingId, unitType, sqFt, maximumOccupants, propertyCondition, Lastyearrenovated, numberOfFloors, unitFacing, lawnSnowCare, entranceType, furnished, basement, basementDetails,);
-    
+
+    console.log("Lead Data:", leadData);
+    console.log("Unit Data:", unitData);
+    console.log("Building Data:", building_data);
+
 
     try {
       document.getElementById("pageLoader2").style.display = "flex";
@@ -3887,394 +4158,404 @@ console.log("Lead Data:", leadData);
         html: html,
         confirmButtonText: "Close",
         confirmButtonColor: "#d33",
-      });
+      }).then(() => {
+        location.reload();
+      });;
     } finally {
       document.getElementById("pageLoader").style.display = "none";
       document.getElementById("pageLoader2").style.display = "none";
     }
   });
 
-  // document.getElementById("createRecordsBtn2").addEventListener("click", async () => {
-  //   const statuscr = document.getElementById("createRecordsBtn2");
-  //   const aid = leasingSel.value;
-  //   statuscr.disabled = true;
-  //   document.getElementById("pageLoader2").style.display = "flex";
-  //   Source = document.getElementById("prospectSource").value;
-  //   console.log("Source", Source);
+  document.getElementById("createRecordsBtn2").addEventListener("click", async () => {
+    const statuscr = document.getElementById("createRecordsBtn2");
+    const aid = leasingSel.value;
+    if (!validateAllFields()) {
+    // Stop the function if validation fails
+    return;
+}
+    statuscr.disabled = true;
+    document.getElementById("pageLoader2").style.display = "flex";
+    Source = document.getElementById("prospectSource").value;
+    console.log("Source", Source);
 
-  //   // ✅ Fetch values safely once
-  //   const firstNameValue = document.getElementById("First_Name")?.value || "";
-  //   const lastNameValue = document.getElementById("Last_Name")?.value || "";
-  //   const mobileValue = document.getElementById("Mobile")?.value || "";
-  //   const cityValue = document.getElementById("City")?.value || "";
-  //   const availableDateValue = document.getElementById("Available_Date")?.value || "";
-  //   const unitNameValue = document.getElementById("Unit_name")?.value || "";
-  //   const unitTypeValue = document.getElementById("Unit_Type")?.value || "";
-  //   const floorsValue = document.getElementById("number_of_floors")?.value || "";
-  //   const bedroomsValue = document.getElementById("Bedrooms")?.value || "";
-  //   const bathroomsValue = document.getElementById("Bathrooms")?.value || "";
-  //   const backyardValue = document.getElementById("Backyard")?.value || "";
-  //   const backyardFencedValue = document.getElementById("Backyard_Fenced")?.value || "";
-  //   const parkingSpacesValue = document.getElementById("Parking_Spaces")?.value || "";
-  //   const parkingDetailsValue = document.getElementById("Parking_Details")?.value || "";
-  //   const unitNumberValue = document.getElementById("Unit_number")?.value || "";
-  //   const provinceValue = document.getElementById("Province")?.value || "";
-  //   const postalCodeValue = document.getElementById("Postal_Code")?.value || "";
-  //   const unitCountValue = document.getElementById("number_of_units")?.value || "";
+    // ✅ Fetch values safely once
+    const firstNameValue = document.getElementById("First_Name")?.value || "";
+    const lastNameValue = document.getElementById("Last_Name")?.value || "";
+    const mobileValue = document.getElementById("Mobile")?.value || "";
+    const cityValue = document.getElementById("City")?.value || "";
+    const availableDateValue = document.getElementById("Available_Date")?.value || "";
+    const unitNameValue = document.getElementById("Unit_name")?.value || "";
+    const unitTypeValue = document.getElementById("Unit_Type")?.value || "";
+    const floorsValue = document.getElementById("number_of_floors")?.value || "";
+    const bedroomsValue = document.getElementById("Bedrooms")?.value || "";
+    const bathroomsValue = document.getElementById("Bathrooms")?.value || "";
+    const backyardValue = document.getElementById("Backyard")?.value || "";
+    const backyardFencedValue = document.getElementById("Backyard_Fenced")?.value || "";
+    const parkingSpacesValue = document.getElementById("Parking_Spaces")?.value || "";
+    const parkingDetailsValue = document.getElementById("Parking_Details")?.value || "";
+    const unitNumberValue = document.getElementById("Unit_number")?.value || "";
+    const provinceValue = document.getElementById("Province")?.value || "";
+    const postalCodeValue = document.getElementById("Postal_Code")?.value || "";
+    const unitCountValue = document.getElementById("number_of_units")?.value || "";
+    const constructedon=document.getElementById("Date_of_Construction")?.value || "";
 
-  //   ;
+    ;
 
-  //   // ✅ Create leadData safely
-  //   leadData = {
-  //     First_Name: firstNameValue,
-  //     Last_Name: lastNameValue,
-  //     Mobile: mobileValue,
-  //     Phone: mobileValue,
-  //     City: cityValue,
-  //     Lead_Source: Source,
-  //     Lead_Priority_Level: "High",
-  //     Available_Date: availableDateValue,
-  //   };
+    // ✅ Create leadData safely
+    leadData = {
+      First_Name: firstNameValue,
+      Last_Name: lastNameValue,
+      Mobile: mobileValue,
+      Phone: mobileValue,
+      City: cityValue,
+      Lead_Source: Source,
+      Lead_Priority_Level: "High",
+      Available_Date: availableDateValue,
+    };
 
-  //   // ✅ Create unitData safely
-  //   unitData = {
-  //     Name: unitNameValue,
-  //     Unit_Type: unitTypeValue,
-  //     Number_of_Floors: floorsValue,
-  //     Bedrooms: bedroomsValue,
-  //     Bathrooms: bathroomsValue,
-  //     Backyard: backyardValue,
-  //     Is_the_backyard_fenced: backyardFencedValue,
-  //     Number_of_Parking_Spaces: parkingSpacesValue,
-  //     Parking_Details: parkingDetailsValue,
-  //     Address_Line_2: unitNumberValue,
-  //     City: cityValue,
-  //     Province: provinceValue,
-  //     Postal_Code: postalCodeValue,
-  //     Bank_Account: "Canada",
-  //     Tons_of_Natural_Light: true,
-  //     Owner: { id: loggedInUserId },
-  //   };
+    // ✅ Create unitData safely
+    unitData = {
+      Name: unitNameValue,
+      Unit_Type: unitTypeValue,
+      Number_of_Floors: floorsValue,
+      Bedrooms: bedroomsValue,
+      Bathrooms: bathroomsValue,
+      Backyard: backyardValue,
+      Is_the_backyard_fenced: backyardFencedValue,
+      Number_of_Parking_Spaces: parkingSpacesValue,
+      Parking_Details: parkingDetailsValue,
+      Address_Line_2: unitNumberValue,
+      City: cityValue,
+      Province: provinceValue,
+      Postal_Code: postalCodeValue,
+      Bank_Account: "Canada",
+      Tons_of_Natural_Light: true,
+      Owner: { id: loggedInUserId },
+    };
 
-  //   // ✅ Create building_data safely
-  //   building_data = {
-  //     Property_Type: unitTypeValue,
-  //     floor_count: floorsValue,
-  //     unit_count: unitCountValue,
-  //     Address: unitNameValue,
-  //     Name: unitNameValue,
-  //     City: cityValue,
-  //     Province: provinceValue,
-  //     Postal_Code: postalCodeValue,
-  //   };
-  //   try {
-  //     document.getElementById("pageLoader2").style.display = "flex";
+    // ✅ Create building_data safely
+    building_data = {
+      Property_Type: unitTypeValue,
+      floor_count: floorsValue,
+      unit_count: unitCountValue,
+      Address: unitNameValue,
+      Name: unitNameValue,
+      City: cityValue,
+      Province: provinceValue,
+      Postal_Code: postalCodeValue,
+      Date_of_Construction: constructedon,
+    };
+    try {
+      document.getElementById("pageLoader2").style.display = "flex";
 
-  //     let buildingid = null;
-  //     let existingBuilding = null;
+      let buildingid = null;
+      let existingBuilding = null;
 
-  //     const BuildingName = document.getElementById("Unit_name").value?.trim();
+      const BuildingName = document.getElementById("Unit_name").value?.trim();
 
-  //     if (BuildingName) {
-  //       const buildingQuery = `(Name:equals:${BuildingName})`;
-  //       console.log("🔍 Building Query:", buildingQuery);
+      if (BuildingName) {
+        const buildingQuery = `(Name:equals:${BuildingName})`;
+        console.log("🔍 Building Query:", buildingQuery);
 
-  //       const searchResp = await ZOHO.CRM.API.searchRecord({
-  //         Entity: "Buildings",
-  //         Type: "criteria",
-  //         Query: buildingQuery,
-  //       });
-  //       console.log("Building Search Response:", searchResp);
+        const searchResp = await ZOHO.CRM.API.searchRecord({
+          Entity: "Buildings",
+          Type: "criteria",
+          Query: buildingQuery,
+        });
+        console.log("Building Search Response:", searchResp);
 
-  //       if (searchResp?.data?.length > 0) {
-  //         existingBuilding = searchResp.data[0];
-  //         buildingid = existingBuilding.id;
-  //       }
-  //     }
+        if (searchResp?.data?.length > 0) {
+          existingBuilding = searchResp.data[0];
+          buildingid = existingBuilding.id;
+        }
+      }
 
-  //     const unitName = document.getElementById("Unit_name").value?.trim();
+      const unitName = document.getElementById("Unit_name").value?.trim();
 
-  //     if (unitName) {
-  //       const unitQuery = `(Name:equals:${unitName})`;
-  //       console.log("🔍 Unit Query:", unitQuery);
+      if (unitName) {
+        const unitQuery = `(Name:equals:${unitName})`;
+        console.log("🔍 Unit Query:", unitQuery);
 
-  //       const unitDupCheck = await ZOHO.CRM.API.searchRecord({
-  //         Entity: "Units",
-  //         Type: "criteria",
-  //         Query: unitQuery,
-  //       });
-  //       console.log("Unit Search Response:", unitDupCheck);
+        const unitDupCheck = await ZOHO.CRM.API.searchRecord({
+          Entity: "Units",
+          Type: "criteria",
+          Query: unitQuery,
+        });
+        console.log("Unit Search Response:", unitDupCheck);
 
-  //       if (unitDupCheck?.data?.length > 0) {
-  //         throw {
-  //           module: "Units",
-  //           message: "Duplicate Unit Name",
-  //           details: {
-  //             id: unitDupCheck.data[0].id,
-  //             field: "Name",
-  //           },
-  //         };
-  //       }
-  //     }
+        if (unitDupCheck?.data?.length > 0) {
+          throw {
+            module: "Units",
+            message: "Duplicate Unit Name",
+            details: {
+              id: unitDupCheck.data[0].id,
+              field: "Name",
+            },
+          };
+        }
+      }
 
-  //     if (!buildingid) {
-  //       const buildingResp = await ZOHO.CRM.API.insertRecord({
-  //         Entity: "Buildings",
-  //         APIData: building_data,
-  //         Trigger: ["workflow"],
-  //       });
-  //       console.log("Building Response:", buildingResp);
-  //       if (!buildingResp || buildingResp.data[0].code !== "SUCCESS") {
-  //         throw {
-  //           module: "Buildings",
-  //           message: buildingResp.data[0].message || "Error creating building",
-  //           details: {
-  //             id: null,
-  //             field: "Insert Error",
-  //           },
-  //           data: buildingResp.data,
-  //         };
-  //       }
-  //       buildingid = buildingResp.data[0].details.id;
-  //     }
+      if (!buildingid) {
+        const buildingResp = await ZOHO.CRM.API.insertRecord({
+          Entity: "Buildings",
+          APIData: building_data,
+          Trigger: ["workflow"],
+        });
+        console.log("Building Response:", buildingResp);
+        if (!buildingResp || buildingResp.data[0].code !== "SUCCESS") {
+          throw {
+            module: "Buildings",
+            message: buildingResp.data[0].message || "Error creating building",
+            details: {
+              id: null,
+              field: "Insert Error",
+            },
+            data: buildingResp.data,
+          };
+        }
+        buildingid = buildingResp.data[0].details.id;
+      }
 
-  //     const leadResp = await ZOHO.CRM.API.insertRecord({
-  //       Entity: "Leads",
-  //       APIData: leadData,
-  //       Trigger: ["workflow"],
-  //     });
-  //     if (!leadResp || leadResp.data[0].code !== "SUCCESS") {
-  //       throw {
-  //         module: "Leads",
-  //         message: leadResp.data[0].message || "Error creating lead",
-  //         details: {
-  //           id: null,
-  //           field: "Insert Error",
-  //         },
-  //         data: leadResp.data,
-  //       };
-  //     }
-  //     const leadId = leadResp.data[0].details.id;
-  //     const unitResp = await ZOHO.CRM.API.insertRecord({
-  //       Entity: "Units",
-  //       APIData: unitData,
-  //       Trigger: ["workflow"],
-  //     });
-  //     if (!unitResp || unitResp.data[0].code !== "SUCCESS") {
-  //       throw {
-  //         module: "Units",
-  //         message: unitResp.data[0].message || "Error creating unit",
-  //         details: {
-  //           id: null,
-  //           field: "Insert Error",
-  //         },
-  //         data: unitResp.data,
-  //       };
-  //     }
-  //     const unitId = unitResp.data[0].details.id;
+      const leadResp = await ZOHO.CRM.API.insertRecord({
+        Entity: "Leads",
+        APIData: leadData,
+        Trigger: ["workflow"],
+      });
+      if (!leadResp || leadResp.data[0].code !== "SUCCESS") {
+        throw {
+          module: "Leads",
+          message: leadResp.data[0].message || "Error creating lead",
+          details: {
+            id: null,
+            field: "Insert Error",
+          },
+          data: leadResp.data,
+        };
+      }
+      const leadId = leadResp.data[0].details.id;
+      const unitResp = await ZOHO.CRM.API.insertRecord({
+        Entity: "Units",
+        APIData: unitData,
+        Trigger: ["workflow"],
+      });
+      if (!unitResp || unitResp.data[0].code !== "SUCCESS") {
+        throw {
+          module: "Units",
+          message: unitResp.data[0].message || "Error creating unit",
+          details: {
+            id: null,
+            field: "Insert Error",
+          },
+          data: unitResp.data,
+        };
+      }
+      const unitId = unitResp.data[0].details.id;
 
-  //     const updateLeadResp = await ZOHO.CRM.API.updateRecord({
-  //       Entity: "Leads",
-  //       RecordID: leadId,
-  //       Trigger: ["workflow"],
-  //       APIData: {
-  //         id: leadId,
-  //         Associated_Unit: { id: unitId },
-  //         Owner: { id: aid },
-  //       },
-  //     });
-  //     if (!updateLeadResp || updateLeadResp.data[0].code !== "SUCCESS") {
-  //       throw {
-  //         module: "Leads",
-  //         message: updateLeadResp.data[0].message || "Error updating lead",
-  //         details: {
-  //           id: leadId,
-  //           field: "Update Error",
-  //         },
-  //         data: updateLeadResp.data,
-  //       };
-  //     }
+      const updateLeadResp = await ZOHO.CRM.API.updateRecord({
+        Entity: "Leads",
+        RecordID: leadId,
+        Trigger: ["workflow"],
+        APIData: {
+          id: leadId,
+          Associated_Unit: { id: unitId },
+          Owner: { id: aid },
+        },
+      });
+      if (!updateLeadResp || updateLeadResp.data[0].code !== "SUCCESS") {
+        throw {
+          module: "Leads",
+          message: updateLeadResp.data[0].message || "Error updating lead",
+          details: {
+            id: leadId,
+            field: "Update Error",
+          },
+          data: updateLeadResp.data,
+        };
+      }
 
-  //     const updateUnitResp = await ZOHO.CRM.API.updateRecord({
-  //       Entity: "Units",
-  //       RecordID: unitId,
-  //       Trigger: ["workflow"],
-  //       APIData: {
-  //         id: unitId,
-  //         Associated_Building: { id: buildingid },
-  //       },
-  //     });
-  //     if (!updateUnitResp || updateUnitResp.data[0].code !== "SUCCESS") {
-  //       throw {
-  //         module: "Units",
-  //         message: updateUnitResp.data[0].message || "Error updating unit",
-  //         details: {
-  //           id: unitId,
-  //           field: "Update Error",
-  //         },
-  //         data: updateUnitResp.data,
-  //       };
-  //     }
+      const updateUnitResp = await ZOHO.CRM.API.updateRecord({
+        Entity: "Units",
+        RecordID: unitId,
+        Trigger: ["workflow"],
+        APIData: {
+          id: unitId,
+          Associated_Building: { id: buildingid },
+        },
+      });
+      if (!updateUnitResp || updateUnitResp.data[0].code !== "SUCCESS") {
+        throw {
+          module: "Units",
+          message: updateUnitResp.data[0].message || "Error updating unit",
+          details: {
+            id: unitId,
+            field: "Update Error",
+          },
+          data: updateUnitResp.data,
+        };
+      }
 
-  //     // 🎉 Success summary popup
-  //     Swal.fire({
-  //       icon: "success",
-  //       title: "✅ Records Created Successfully",
-  //       html: `
-  //   <style>
-  //     .summary-container {
-  //       font-family: 'Segoe UI', sans-serif;
-  //       font-size: 14px;
-  //       margin-top: 16px;
-  //     }
-  //     .summary-table {
-  //       width: 100%;
-  //       border-collapse: separate;
-  //       border-spacing: 0;
-  //       border-radius: 10px;
-  //       overflow: hidden;
-  //     }
-  //     .summary-table td {
-  //       padding: 14px 18px;
-  //       vertical-align: top;
-  //       border: 1px solid #e0e0e0;
-  //     }
-  //     .summary-header {
-  //       background-color: #0d6efd;
-  //       color: #fff;
-  //       font-weight: bold;
-  //       width: 140px;
-  //       text-align: center;
-  //     }
-  //     .summary-cell {
-  //       font-weight: 600;
-  //       background-color: #f8f9fa;
-  //     }
-  //     .summary-cell a {
-  //       color: #0d6efd;
-  //       font-weight: 500;
-  //       text-decoration: underline;
-  //     }
-  //     .summary-label {
-  //       color: #6c757d;
-  //       font-size: 13px;
-  //       font-weight: 500;
-  //       margin-bottom: 4px;
-  //       display: block;
-  //     }
-  //   </style>
-  //   <div class="summary-container">
-  //     <table class="summary-table">
-  //       <tr>
-  //         <td class="summary-header">👤 Prospect</td>
-  //         <td class="summary-cell">
-  //           <span class="summary-label">Prospect Name</span>
-  //           <a href="https://crm.zoho.com/crm/org680397761/tab/Leads/${leadId}" target="_blank">${leadData.Last_Name || "N/A"
-  //         }</a>
-  //         </td>
-  //         <td class="summary-cell"><span class="summary-label">Mobile</span>${leadData.Mobile || "N/A"
-  //         }</td>
-  //         <td class="summary-cell"><span class="summary-label">City</span>CAD ${leadData.City || "N/A"
-  //         }</td>
-  //         <td class="summary-cell"><span class="summary-label">Available Date</span>${leadData.Available_Date || "N/A"
-  //         }</td>
-  //       </tr>
-  //       <tr>
-  //         <td class="summary-header">🏠 Unit</td>
-  //         <td class="summary-cell">
-  //           <span class="summary-label">Unit Name</span>
-  //           <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${unitId}" target="_blank">${unitData.Name || "N/A"
-  //         }</a>
-  //         </td>
-  //         <td class="summary-cell"><span class="summary-label">Bathroom</span>${unitData.Bathrooms || "N/A"
-  //         }</td>
-  //         <td class="summary-cell"><span class="summary-label">Bedrooms</span>${unitData.Bedrooms || "N/A"
-  //         }</td>
-  //         <td class="summary-cell"><span class="summary-label">Unit Type</span>${unitData.Unit_Type || "N/A"
-  //         }</td>
-  //       </tr>
-  //       <tr>
-  //         <td class="summary-header">🏢 Building</td>
-  //         <td class="summary-cell">
-  //           <span class="summary-label">Building Name</span>
-  //           <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${buildingid}" target="_blank">${existingBuilding?.Name || building_data.Name || "N/A"
-  //         }</a>
-  //         </td>
-  //         <td class="summary-cell"><span class="summary-label">Property Type</span>${building_data.Property_Type || "N/A"
-  //         }</td>
-  //         <td class="summary-cell"><span class="summary-label">Number of Floors</span>${building_data.floor_count || "N/A"
-  //         }</td>
-  //         <td class="summary-cell"><span class="summary-label">City</span>${building_data.City || "N/A"
-  //         }</td>
-  //       </tr>
-  //     </table>
-  //   </div>
-  // `,
-  //       width: 750,
-  //       confirmButtonText: "Done",
-  //       confirmButtonColor: "#0d6efd",
-  //     }).then(() => {
-  //       location.reload();
-  //     });
-  //   }
-  //   catch (err) {
-  //     document.getElementById("pageLoader2").style.display = "none";
-  //     console.error("❌ Full Error Object:", err);
+      // 🎉 Success summary popup
+      Swal.fire({
+        icon: "success",
+        title: "✅ Records Created Successfully",
+        html: `
+    <style>
+      .summary-container {
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 14px;
+        margin-top: 16px;
+      }
+      .summary-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .summary-table td {
+        padding: 14px 18px;
+        vertical-align: top;
+        border: 1px solid #e0e0e0;
+      }
+      .summary-header {
+        background-color: #0d6efd;
+        color: #fff;
+        font-weight: bold;
+        width: 140px;
+        text-align: center;
+      }
+      .summary-cell {
+        font-weight: 600;
+        background-color: #f8f9fa;
+      }
+      .summary-cell a {
+        color: #0d6efd;
+        font-weight: 500;
+        text-decoration: underline;
+      }
+      .summary-label {
+        color: #6c757d;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 4px;
+        display: block;
+      }
+    </style>
+    <div class="summary-container">
+      <table class="summary-table">
+        <tr>
+          <td class="summary-header">👤 Prospect</td>
+          <td class="summary-cell">
+            <span class="summary-label">Prospect Name</span>
+            <a href="https://crm.zoho.com/crm/org680397761/tab/Leads/${leadId}" target="_blank">${leadData.Last_Name || "N/A"
+          }</a>
+          </td>
+          <td class="summary-cell"><span class="summary-label">Mobile</span>${leadData.Mobile || "N/A"
+          }</td>
+          <td class="summary-cell"><span class="summary-label">City</span>CAD ${leadData.City || "N/A"
+          }</td>
+          <td class="summary-cell"><span class="summary-label">Available Date</span>${leadData.Available_Date || "N/A"
+          }</td>
+        </tr>
+        <tr>
+          <td class="summary-header">🏠 Unit</td>
+          <td class="summary-cell">
+            <span class="summary-label">Unit Name</span>
+            <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${unitId}" target="_blank">${unitData.Name || "N/A"
+          }</a>
+          </td>
+          <td class="summary-cell"><span class="summary-label">Bathroom</span>${unitData.Bathrooms || "N/A"
+          }</td>
+          <td class="summary-cell"><span class="summary-label">Bedrooms</span>${unitData.Bedrooms || "N/A"
+          }</td>
+          <td class="summary-cell"><span class="summary-label">Unit Type</span>${unitData.Unit_Type || "N/A"
+          }</td>
+        </tr>
+        <tr>
+          <td class="summary-header">🏢 Building</td>
+          <td class="summary-cell">
+            <span class="summary-label">Building Name</span>
+            <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${buildingid}" target="_blank">${existingBuilding?.Name || building_data.Name || "N/A"
+          }</a>
+          </td>
+          <td class="summary-cell"><span class="summary-label">Property Type</span>${building_data.Property_Type || "N/A"
+          }</td>
+          <td class="summary-cell"><span class="summary-label">Number of Floors</span>${building_data.floor_count || "N/A"
+          }</td>
+          <td class="summary-cell"><span class="summary-label">City</span>${building_data.City || "N/A"
+          }</td>
+        </tr>
+      </table>
+    </div>
+  `,
+        width: 750,
+        confirmButtonText: "Done",
+        confirmButtonColor: "#0d6efd",
+      }).then(() => {
+        location.reload();
+      });
+    }
+    catch (err) {
+      document.getElementById("pageLoader2").style.display = "none";
+      console.error("❌ Full Error Object:", err);
 
-  //     let title = "❌ Operation Failed";
-  //     let html = `<p>Something went wrong. Please review the message below.</p>`;
+      let title = "❌ Operation Failed";
+      let html = `<p>Something went wrong. Please review the message below.</p>`;
 
-  //     // ✅ This will now trigger correctly:
-  //     if (err?.module && err?.details) {
-  //       const moduleName = err.module;
-  //       const field = err.details.field || "Field";
-  //       const id = err.details.id;
-  //       const message = err.message || "Error";
+      // ✅ This will now trigger correctly:
+      if (err?.module && err?.details) {
+        const moduleName = err.module;
+        const field = err.details.field || "Field";
+        const id = err.details.id;
+        const message = err.message || "Error";
 
-  //       const moduleLinks = {
-  //         Units: id ? `https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${id}` : "#",
-  //         Leads: id ? `https://crm.zoho.com/crm/org680397761/tab/Leads/${id}` : "#",
-  //         Buildings: id ? `https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${id}` : "#",
-  //       };
+        const moduleLinks = {
+          Units: id ? `https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${id}` : "#",
+          Leads: id ? `https://crm.zoho.com/crm/org680397761/tab/Leads/${id}` : "#",
+          Buildings: id ? `https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${id}` : "#",
+        };
 
-  //       title = "🚫 Duplicate Entry or API Error";
-  //       html = `
-  //           <p><strong>Module:</strong> ${moduleName}</p>
-  //           <p><strong>Field:</strong> ${field}</p>
-  //           <p><strong>Message:</strong> ${message}</p>
-  //           ${id ? `<p><a href="${moduleLinks[moduleName]}" target="_blank">🔗 View Record</a></p>` : ""}
-  //       `;
-  //     }
-  //     // For Zoho API errors
-  //     else if (err?.data?.[0]?.message) {
-  //       const message = err.data[0].message;
-  //       const reason = err.data[0]?.details?.[0]?.api_name || "Unknown Field";
-  //       title = "⚠️ API Validation Error";
-  //       html = `
-  //           <p><strong>Error Message:</strong> ${message}</p>
-  //           <p><strong>Problem Field:</strong> ${reason}</p>
-  //       `;
-  //     } else {
-  //       html = `
-  //           <p>An unexpected error occurred.</p>
-  //           <pre>${err?.message || JSON.stringify(err)}</pre>
-  //       `;
-  //     }
+        title = "🚫 Duplicate Entry or API Error";
+        html = `
+            <p><strong>Module:</strong> ${moduleName}</p>
+            <p><strong>Field:</strong> ${field}</p>
+            <p><strong>Message:</strong> ${message}</p>
+            ${id ? `<p><a href="${moduleLinks[moduleName]}" target="_blank">🔗 View Record</a></p>` : ""}
+        `;
+      }
+      // For Zoho API errors
+      else if (err?.data?.[0]?.message) {
+        const message = err.data[0].message;
+        const reason = err.data[0]?.details?.[0]?.api_name || "Unknown Field";
+        title = "⚠️ API Validation Error";
+        html = `
+            <p><strong>Error Message:</strong> ${message}</p>
+            <p><strong>Problem Field:</strong> ${reason}</p>
+        `;
+      } else {
+        html = `
+            <p>An unexpected error occurred.</p>
+            <pre>${err?.message || JSON.stringify(err)}</pre>
+        `;
+      }
 
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: title,
-  //       html: html,
-  //       confirmButtonText: "Close",
-  //       confirmButtonColor: "#d33",
-  //     });
-  //   } finally {
-  //     document.getElementById("pageLoader").style.display = "none";
-  //     document.getElementById("pageLoader2").style.display = "none";
-  //   }
+      Swal.fire({
+        icon: "error",
+        title: title,
+        html: html,
+        confirmButtonText: "Close",
+        confirmButtonColor: "#d33",
+      }).then(() => {
+        location.reload();
+      });
+    } finally {
+      document.getElementById("pageLoader").style.display = "none";
+      document.getElementById("pageLoader2").style.display = "none";
+    }
 
 
-  // });
+  });
 
 
 });
