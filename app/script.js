@@ -86,7 +86,6 @@ let numericPrice = "";
 let result = "";
 let BBQ_Area_Final = "";
 let Outdoor_Patio_Final = "";
-let Pets_Allowed = "";
 let sqFt = "";
 let furnished = "";
 let maximumOccupants = "";
@@ -258,10 +257,10 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 }
 
   // Get First Name
-  function extractFirstName(fullName) {
-    const nameParts = fullName.trim().split(/\s+/);
-    return nameParts.length > 1 ? nameParts[0] : "";
-  }
+function extractFirstName(fullName) {
+  const nameParts = fullName.trim().split(/\s+/);
+  return nameParts[0] || "";
+}
   //get Last Name
   function extractLastName(fullName) {
     const nameParts = fullName.trim().split(/\s+/);
@@ -269,6 +268,26 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       ? nameParts.slice(1).join(" ")
       : fullName.trim();
   }
+ function extractPhoneNumberFromText(data) {
+  const text = JSON.stringify(data).toLowerCase();
+
+  // This will match most North American phone formats (with dashes, spaces, +1, etc.)
+  const matches = text.match(/(\+?1[\s\-\.]?)?(\d{3})[\s\-\.]?\d{3}[\s\-\.]?\d{4}/g);
+
+  if (!matches || matches.length === 0) return "";
+
+  // Get the **last** phone-like match
+  const lastMatch = matches[matches.length - 1];
+
+  // Extract digits only
+  const digits = lastMatch.replace(/\D/g, "");
+
+  // Always return last 10 digits, with "1" in front
+  const last10 = digits.slice(-10);
+  return last10;
+}
+
+
   // Helper to parse date from the string
   function parseAvailableDate(text) {
     const dateMatch = text.match(/available\s*(from)?\s*(.*)/i);
@@ -414,12 +433,29 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
     return "";
   }
-  // Extract city from address
-  function extractCityFromAddress(address) {
-    if (!address) return "";
-    const parts = address.split(",");
-    return parts.length >= 2 ? parts[1].trim() : address;
+  // Paste your city list here
+const cityList = [
+  "Acton","Ajax","Aligarh","Allensville","Alton","Alwar","Amherstburg","Amigo Beach","Ancaster","Angus","Athens","Aurora","Aylmer","Ayr","Bala","Balton","Barrie","Beamsville","Belle River","Belleville","Binbrook","Bloomington","Blue Mountains","Bolton","Bothwell","Bowmanville","Bracebridge","Bradford","Brampton","Brantford","Breslau","Bridgenorth","Brockville","Brooklin","Brucefield","Burlington","Burnaby","Caledon","Caledon East","Caledon Village","Caledonia","Cambridge","Campbellville","Chatham","Clarington","Cobourg","Coldwater","Collingwood","Comber","Concord","Coquitlam","Cornwall","Corunna","Courtice","Craighurst","Crystal Beach","Crystal Rock","Deerbrook","Delete","Delhi","Dundas","East Gwillimbury","East York","Elmstead","Embro","Essex","Etobicoke","Fallingbrook","Ficko","Fisherville","Fonthill","Forest Harbour","Fort Erie","Gananoque","Georgetown","Georgina","Gravenhurst","Greater Napanee","Green River","Grimsby","Guelph","Gwalior","Haldimand","Halton Hills","Hamilton","Hannon","Harrisburg","Hathras","Holland Landing","Honey Harbour","Horseshoe Valley","Huntsville","Ilderton","Ingersoll","Innisfil","Jaipur","Jarvis","Jasper","Jerseyville","Jodhpur","Johnstown","Kanata","Katowice","Kattleby","Kemptville","Kennedy Acres","Keswick","Kimberley","Kimberly","King City","Kingston","Kingsville","Kitchener","Kleinburg","Klondyke","Komoka","Krakow","Lakefield","LaSalle","Leamington","Lefroy","Lincoln","Lindsay","Lindsy","Listowel","Little Britain","London","Mallorytown","Malton","Maple","Markham","Merlin","Metcalfe","Milbrook","Millbrook","Milton","Mississauga","Mount Hope","Muskoka","Nagaur","Nashville","Navan","New Delhi","New Tecumseth","New Westminster","Newcastle","Newmarket","Newtonville","Niagara Falls","Niagara-on-the-Lake","Nobleton","North Vancouver","North York","Norwood","Oakville","Oakwood","Odessa","Oldcastle","Orangeville","Orillia","Osgoode","Oshawa","Ottawa","Owen Sound","Paris","Pefferlaw","Peterborough","Pickering","Pinkerton","Pittsburgh","Point Edward","Port Colborne","Port Coquitlam","Port Hope","Port Moody","Port Perry","Port Rowan","Portservain","Prince Edward","Prishtine","Pushkar","Richmond Hill","Rosseau","Saint Catharines","Saint George","Saint Joachim","Saint Thomas","Sarnia","Scarborough","Schomberg","Shannonville","Sikar","Simcoe","South Woodslee","Spencerville","Springdale Park","Springwater","St Catharines","St Thomas","St. Catharines","St. Thomas","Staples","Stevensville","Stittsville","Stoney Creek","Stoney Point","Stouffville","Stratford","Strathroy","Sunderland","Surrey","Taunton","Tecumseh","Test City","Thamesford","Thompsonville","Thornhill","Thornton","Thorold","Thousand Islands","Tillbury","Tillsonburg","Tirana","Toronto","Unionville","Uxbridge","Vancouver","Vanier","Vaughan","Warsaw","Wasaga Beach","Waterdown","Waterloo","Welland","West Gwillimbury","West Vancouver","Wheatley","Whitby","Whitchurch-Stouffville","Willowdale","Windsor","Windsville","Woodbridge","Woodstock","Wyoming","York"
+];
+
+function extractCityFromAddress(data) {
+  const text = JSON.stringify(data).toLowerCase();
+
+  // For best matching, sort by length (to match "St. Catharines" before "St Catharines")
+  const sortedCities = cityList.slice().sort((a, b) => b.length - a.length);
+
+  for (const city of sortedCities) {
+    // Allow matching ignoring periods/commas (St. Catharines ~ St Catharines)
+    const cityPattern = city.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // escape regex
+                            .replace(/[\.\,]/g, '[\\.\\,\\s]?'); // period/comma/space flexible
+    const regex = new RegExp(`\\b${cityPattern}\\b`, 'i');
+    if (regex.test(text)) {
+      return city; // Return the first matched city
+    }
   }
+  return ""; // Nothing found
+}
+
   // Detect number of floors based on description
   function detectNumberOfFloors() {
     const text = JSON.stringify(data).toLowerCase();
@@ -497,34 +533,27 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     // Default if nothing is mentioned
     return "No";
   }
-
   // Extract parking spaces from vipPrimary and text content
-  function extractParkingSpaces(vipPrimary = [], title = "", description = []) {
-    const combinedText = (
-      title +
-      " " +
-      (description || []).join(" ")
-    ).toLowerCase();
+function extractParkingSpacesFromText() {
+  // Lowercase for easier matching
+  const text = JSON.stringify(data).toLowerCase();
+  // 1. Highest priority: detect "no parking"
+  if (text.includes("no parking")) return 0;
 
-    // Priority: extract from vipPrimary first
-    for (let item of vipPrimary) {
-      const match = item.match(/(\d+)\s*parking/i);
-      if (match) return parseInt(match[1]);
-      if (item.toLowerCase().includes("no parking")) return 0;
-    }
+  // 2. Look for "#+ parking" (e.g. "3+ parking included")
+  let match = text.match(/(\d+)\s*\+\s*parking/);
+  if (match) return parseInt(match[1]);
 
-    // Then check text content
-    const textMatch = combinedText.match(/parking (for|included)?\s*(\d+)/i);
-    if (textMatch) {
-      return parseInt(textMatch[2]);
-    }
+  // 3. Look for "# parking" (e.g. "2 parking included", "1 parking included")
+  match = text.match(/(\d+)\s*parking/);
+  if (match) return parseInt(match[1]);
 
-    if (combinedText.includes("no parking")) {
-      return 0;
-    }
+  // 4. "parking included" (just says included, but not how many: return 1 as default)
+  if (text.includes("parking included")) return 1;
 
-    return ""; // If no info found
-  }
+  // 5. Fallback: no info
+  return "";
+}
   // Detect parking details based on description and title
   function detectParkingDetails(descriptionArray = [], title = "") {
     const text = (title + " " + descriptionArray.join(" ")).toLowerCase();
@@ -1068,66 +1097,74 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return "Not Mentioned";
   }
   // Detect corner unit based on description
-  function detectCornerUnit(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-    return text.includes("corner unit");
-  }
-  // Detect central vacuum based on description
-  function detectCentralVacuum(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-    return text.includes("central vacuum");
-  }
-  // Detect penthouse based on description
-  function detectPenthouse(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-    return text.includes("penthouse") || text.includes("top floor");
-  }
-  // Detect Common Area Fireplace based on description
-  function detectFireplaceCommonArea(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-    return text.includes("fireplace") || text.includes("living room fireplace");
-  }
-  // Detect Fireplace in Bedroom based on description
-  function detectFireplaceBedroom(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-    return text.includes("fireplace in bedroom");
-  }
-  // Detect upgraded bathrooms based on description
-  function detectUpgradedBathrooms(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-    return text.includes("upgraded bathroom") || text.includes("modern bath");
-  }
-  // Detect upgraded kitchen based on description
-  function detectUpgradedKitchen(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-    return (
-      text.includes("renovated kitchen") || text.includes("modern kitchen")
-    );
-  }
-  // Detect backsplash in kitchen based on description
-  function detectBacksplashKitchen(descriptionArray = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
-    return (
-      text.includes("backsplash") ||
-      text.includes("tile wall behind stove") ||
-      text.includes("tile wall behind sink")
-    );
-  }
+  function detectCornerUnit() {
+  const text = JSON.stringify(data).toLowerCase();
+  return text.includes("corner unit");
+}
+
+function detectCentralVacuum() {
+  const text = JSON.stringify(data).toLowerCase();
+  return text.includes("central vacuum");
+}
+
+function detectPenthouse() {
+  const text = JSON.stringify(data).toLowerCase();
+  return text.includes("penthouse") || text.includes("top floor");
+}
+
+function detectFireplaceCommonArea() {
+  const text = JSON.stringify(data).toLowerCase();
+  return text.includes("fireplace") || text.includes("living room fireplace");
+}
+
+function detectFireplaceBedroom() {
+  const text = JSON.stringify(data).toLowerCase();
+  return text.includes("fireplace in bedroom");
+}
+
+function detectUpgradedBathrooms() {
+  const text = JSON.stringify(data).toLowerCase();
+  return text.includes("upgraded bathroom") || text.includes("modern bath");
+}
+
+function detectUpgradedKitchen() {
+  const text = JSON.stringify(data).toLowerCase();
+  return (
+    text.includes("renovated kitchen") ||
+    text.includes("modern kitchen") ||
+    text.includes("upgraded kitchen")
+  );
+}
+
+function detectBacksplashKitchen() {
+  const text = JSON.stringify(data).toLowerCase();
+  return (
+    text.includes("backsplash") ||
+    text.includes("tile wall behind stove") ||
+    text.includes("tile wall behind sink")
+  );
+}
   // Detect dishwasher included based on description and attributes
-  function detectDishwasherIncluded(descriptionArray = [], attributes = []) {
-    const text = (descriptionArray || []).join(" ").toLowerCase();
 
-    const appliances = attributes
-      .filter((attr) => attr.label?.toLowerCase() === "appliances")
-      .flatMap((attr) => attr.values || [])
-      .map((val) => val.toLowerCase());
+  function detectDishwasherIncludedFromText() {
+  const text = JSON.stringify(data).toLowerCase(); // search everywhere!
 
-    return (
-      appliances.includes("dishwasher") ||
-      text.includes("dishwasher included") ||
-      text.includes("built-in dishwasher")
-    );
+  // Array of possible phrases that indicate a dishwasher is included
+  const dishwasherKeywords = [
+    "dishwasher", // general mention
+    "dishwasher included",
+    "built-in dishwasher",
+    "dishwasher (in unit)",
+    "dishwasher (in building)",
+    "dishwasher provided",
+    "includes dishwasher",
+  ];
+
+  for (let keyword of dishwasherKeywords) {
+    if (text.includes(keyword)) return true;
   }
+  return false;
+}
 
   function detectBuilding_AC_Incl() {
     const text = JSON.stringify(data).toLowerCase();
@@ -1459,6 +1496,41 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
+  function extractWasherManufacturer(data) {
+  // 1. Lowercase the entire data text
+  const text = JSON.stringify(data).toLowerCase();
+
+  // 2. Define your picklist in lowercase for easier matching
+  const washerManufacturers = [
+    "galanz", "aeg", "allure", "amana", "asko", "avg", "bertazzoni", "best", "bloomberg", "bluestar",
+    "bosch", "braoa", "brgan", "broan", "caloric", "cavavin", "chambers", "cyclone", "dacor", "danby",
+    "direct drive", "electrolux", "elica", "faber", "fisher & paykel", "forester", "frigidaire",
+    "fulgor", "gaggenau", "gasland", "general electric", "ge appliances", "gorenje", "haier", "hamilton beach",
+    "hisense", "homestyles", "huebsch", "iflow", "ikea", "inglis", "jennair", "kenmore", "kitchenaid", "kobe",
+    "krupps", "kucht", "la cornue", "lg", "liebherr", "lotus", "lynx", "marvel", "maxima", "maytag", "midea",
+    "miele", "moffat", "monogram", "napoleon", "nca", "not mentioned", "nutone", "panasonic",
+    "porter & charles", "roper", "sakura", "samsung", "sanyo", "sharp", "silhouette", "sirius", "smeg",
+    "sub-zero", "sunbeam", "thermador", "unique appliances", "venmar", "vent a hood", "vesta", "vitara",
+    "whirlpool", "wolf", "z-air", "zephyr"
+  ];
+
+  // 3. Try to match any manufacturer name in the text (partial/typo-tolerant)
+  for (let brand of washerManufacturers) {
+    // Handle short brands (e.g., LG, GE) with word boundaries
+    const regex = new RegExp(`\\b${brand.replace(/[^a-z0-9]/g, "\\$&")}\\b`, "i");
+    if (regex.test(text)) {
+      // Return with correct CRM casing (from picklist)
+      const crmBrand = brand
+        .split(" ")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+      return crmBrand;
+    }
+  }
+  return "Not Mentioned"; // fallback for blank, null, or not found
+}
+
+
   function detectOutdoor_Child_Play_Area() {
     const text = JSON.stringify(data).toLowerCase();
     return (
@@ -1681,6 +1753,40 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     }
     return "No";
   }
+ function detectOnSiteLaundry(data) {
+  // Flatten all text, attributes, and descriptions for a global search
+  const text = JSON.stringify(data).toLowerCase();
+
+  // Pay Per Use
+  if (
+    /pay per use|coin(\s|-)?(operated|laundry|machine)|card(\s|-)?operated|paid laundry|pay laundry|pay to use/.test(text)
+  ) return "Pay Per Use";
+
+  // En-Suite / In-Unit (most specific, most valuable)
+  if (
+    /en(\s|-)?suite laundry|in(\s|-)?suite laundry|private laundry|laundry in unit|in-unit laundry|unit has laundry|in unit (washer|dryer|laundry)|in-apartment laundry|laundry inside unit|apartment laundry|unit laundry|inside unit laundry/.test(text)
+  ) return "En-Suite";
+
+  // Shared (building/common)
+  if (
+    /shared laundry|communal laundry|laundry (in building)|building laundry|laundry room|common laundry|laundry in building|shared (washer|dryer)|laundry facilities|community laundry/.test(text)
+    ||
+    /laundry\s?\(in building\)/.test(text) // direct match for your sample
+  ) return "Shared";
+
+  // No Laundry
+  if (
+    /no laundry|no washer|no dryer|laundry not included|laundry not available|no laundry facilities|no in(\s|-)?building laundry/.test(text)
+  ) return "No";
+
+  // If it just says "laundry" but no other details, treat as Shared (weak fallback)
+  if (/laundry/.test(text)) return "Shared";
+
+  // Default
+  return "";
+}
+
+
 
   // detect private terrace
   function detectPrivateTerraceOrBackyard(
@@ -1808,6 +1914,13 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
     return "";
   }
+  function extractEmailFromData(data) {
+  const text = JSON.stringify(data).toLowerCase();
+  // Regex for matching most email formats
+  const emailMatch = text.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/);
+  return emailMatch ? emailMatch[0] : "";
+}
+
   // Detect unit facing direction based on description
   function detectUnitFacing(descriptionArray = []) {
     const directions = [
@@ -2576,56 +2689,72 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     const match = text.match(pattern);
     return match ? match[3] : "";
   }
-  //street number, street name, postal code, province, city, unit, mailbox number
-  // 1. Unit (e.g., Unit 1404, 22-136)
-  function extractUnit(title = "", firstName = "") {
-    const combined = `${title} ${firstName}`;
-    const match = combined.match(/\b(unit\s*)?#?\s?(\d{1,4}(-\d{1,4})?)\b/i);
-    return match ? match[2] : "";
-  }
+
   // 2. Street Number (e.g., 123 in "123 King St")
-  function extractStreetNumber(location = "", firstName = "", title = "") {
-    const combined = `${location} ${firstName} ${title}`;
-    const match = combined.match(/\b(\d{1,5})\b\s+[A-Za-z]/);
-    return match ? match[1] : "";
+  // 1. Extract Street Number: Returns the first number before the street name (works for "10-456 Elm Street" => "456", "123A Main Ave" => "123")
+function extractStreetNumber(location = "") {
+  if (!location) return "";
+  // Only match if the second part after '-' starts with a number
+  const cleaned = location.trim().split('-').pop();
+  const match = cleaned.match(/^(\d{1,5})[A-Za-z]?\b/);
+  return match ? match[1] : "";
+}
+function detectWasherAndDryer(data) {
+  // Combine all text
+  const text = JSON.stringify(data).toLowerCase();
+
+  // Ensuite: In-unit, private, ensuite
+  if (
+    /in-?unit laundry|in-?suite laundry|private laundry|ensuite laundry|laundry in unit|washer and dryer in unit|unit has laundry|apartment laundry|laundry inside unit|in-apartment laundry/.test(text)
+  ) {
+    return "Ensuite";
   }
-  // 3. Street Name (everything after number before city)
-  function extractStreetName(location = "", firstName = "", title = "") {
-    const combined = `${location} ${firstName} ${title}`.toLowerCase();
 
-    const streetTypes = [
-      "street",
-      "st",
-      "road",
-      "rd",
-      "avenue",
-      "ave",
-      "boulevard",
-      "blvd",
-      "drive",
-      "dr",
-      "lane",
-      "ln",
-      "court",
-      "ct",
-      "crescent",
-      "cr",
-      "terrace",
-      "way",
-      "trail",
-      "place",
-      "pkwy",
-    ].join("|");
-
-    // Match optional number, followed by street name + suffix
-    const regex = new RegExp(
-      `(?:\\d{1,5}\\s+)?([a-z\\s]+?\\s(?:${streetTypes}))\\b`,
-      "i"
-    );
-
-    const match = combined.match(regex);
-    return match ? capitalizeWords(match[1].trim()) : "";
+  // Shared: Shared/common
+  if (
+    /shared laundry|shared washer|shared dryer|common laundry|communal laundry|laundry (in building)|laundry room|building laundry|common laundry room|laundry in building|laundry facilities/.test(text)
+  ) {
+    return "Shared";
   }
+
+  // Pay Per Use: Coin, paid, pay per use, card operated
+  if (
+    /coin(-|\s)?laundry|coin(-|\s)?operated|card(-|\s)?operated|pay per use laundry|paid laundry|pay to use/.test(text)
+  ) {
+    return "Pay Per Use";
+  }
+
+  // No: Absence, negative statements
+  if (
+    /no laundry|no washer|no dryer|no laundry available|no laundry facility|laundry not included|laundry not available|no in(-|\s)?building laundry/.test(text)
+  ) {
+    return "No";
+  }
+
+  // If nothing matched, default to "No"
+  return "No";
+}
+
+
+// 2. Extract Street Name: Gets street name and suffix, stops at comma/city/province/postal
+function extractStreetName(location = "") {
+  if (!location) return "";
+  const streetTypes = [
+    "street","st","road","rd","avenue","ave","boulevard","blvd","drive","dr",
+    "lane","ln","court","ct","crescent","cr","terrace","way","trail","place","pkwy"
+  ].join("|");
+  // Pattern: optional number/unit, then name + suffix
+  const regex = new RegExp(
+    `\\d{1,5}(?:-\\d{1,5})?\\s+([\\w\\s']+?\\s(?:${streetTypes}))\\b`,
+    "i"
+  );
+  const match = location.match(regex);
+  if (match && match[1]) {
+    return match[1].replace(/\s+/g, " ").replace(/\b\w/g, c => c.toUpperCase()).trim();
+  }
+  return "";
+}
+
   // Helper function to capitalize words
   function capitalizeWords(str) {
     return str.replace(/\b\w/g, (char) => char.toUpperCase());
@@ -2651,27 +2780,160 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return match ? match[1] : "";
   }
   // Detect utility inclusions based on description
-  function detectACInclusion(descriptionArray = [], attributes = []) {
-    const combinedText = (descriptionArray || []).join(" ").toLowerCase();
-    const attributeValues = attributes.flatMap(attr => attr.values || []).join(" ").toLowerCase();
-    const fullText = `${combinedText} ${attributeValues}`;
+  function detectACInclusionFromText() {
+  const text = JSON.stringify(data).toLowerCase(); // search everywhere!
 
-    return /air conditioning included|central ac|ac provided/.test(fullText);
-  }
-  function detectHeatInclusion(descriptionArray = [], attributes = []) {
-    const combinedText = (descriptionArray || []).join(" ").toLowerCase();
-    const attributeValues = attributes.flatMap(attr => attr.values || []).join(" ").toLowerCase();
-    const fullText = `${combinedText} ${attributeValues}`;
+  const acKeywords = [
+    "air conditioning included",
+    "central ac",
+    "ac provided",
+    "a/c included",
+    "includes air conditioning",
+    "with air conditioning",
+    "air conditioning",
+  ];
 
-    return /heating included|heat paid by landlord|heat included/.test(fullText);
+  for (let keyword of acKeywords) {
+    if (text.includes(keyword)) return true;
   }
-  function detectInternetInclusion(descriptionArray = [], attributes = []) {
-    const combinedText = (descriptionArray || []).join(" ").toLowerCase();
-    const attributeValues = attributes.flatMap(attr => attr.values || []).join(" ").toLowerCase();
-    const fullText = `${combinedText} ${attributeValues}`;
+  return false;
+}
 
-    return /wifi included|internet included|free internet/.test(fullText);
+  function detectHeatInclusionFromText() {
+  const text = JSON.stringify(data).toLowerCase();
+
+  const heatKeywords = [
+    "heating included",
+    "heat paid by landlord",
+    "heat included",
+    "includes heating",
+    "with heating"
+  ];
+
+  for (let keyword of heatKeywords) {
+    if (text.includes(keyword)) return true;
   }
+  return false;
+}
+
+  function detectInternetInclusionFromText() {
+  const text = JSON.stringify(data).toLowerCase();
+
+  const internetKeywords = [
+    "wifi included",
+    "internet included",
+    "free internet",
+    "with wifi",
+    "with internet",
+    "includes wifi",
+    "includes internet"
+  ];
+
+  for (let keyword of internetKeywords) {
+    if (text.includes(keyword)) return true;
+  }
+  return false;
+}
+function detectWaterInclusion(data) {
+  // Turn the whole object into a string for searching
+  const text = JSON.stringify(data).toLowerCase();
+
+  // List of keywords to check for
+  const waterKeywords = [
+    "water included",
+    "water is included",
+    "water paid by landlord",
+    "hydro and water included",
+    "water utility included",
+    "water bill included",
+    "water softener",
+    "reverse osmosis",
+    "culligan",
+    "rent water system",
+    "filter rental",
+    "water purification",
+    "purified water",
+    "water filter",
+    "drinking water included",
+    "water system rental",
+    "osmosis system",
+    "soft water included",
+    "water & heat included",
+    "hot water included"
+  ];
+
+  // If any of the keywords are found, return true
+  return waterKeywords.some(keyword => text.includes(keyword));
+}
+
+function detectHydroProvider(data) {
+  const text = JSON.stringify(data).toLowerCase();
+
+  // List of common hydro/electricity provider names and related keywords
+  const hydroKeywords = [
+    "hydro",
+    "hydro included",
+    "hydro one",
+    "toronto hydro",
+    "alectra",
+    "enwin",
+    "enmax",
+    "hydro ottawa",
+    "powerstream",
+    "brampton hydro",
+    "oakville hydro",
+    "london hydro",
+    "energy provider",
+    "electricity provider",
+    "electricity included",
+    "utility provider",
+    "utilities included",
+    "electric included"
+  ];
+  const found = hydroKeywords.some(keyword => text.includes(keyword));
+  if (found) return true;
+
+
+
+  return false;
+}
+
+function detectCableInclusion(data) {
+  const text = JSON.stringify(data).toLowerCase();
+
+  // Cable-related keywords and popular provider terms
+  const cableKeywords = [
+    "cable included",
+    "cable incl",
+    "free cable",
+    "tv package",
+    "rogers tv",
+    "bell fibe",
+    "bell tv",
+    "shaw cable",
+    "cogeco tv",
+    "videotron",
+    "cable ready",
+    "cable provided",
+    "cable tv included",
+    "satellite tv included",
+    "satellite included",
+    "cable service included",
+    "cable service",
+    "cable tv",
+    "cable subscription",
+    "cable television",
+    "cable service provider",
+    "cable provider",
+    "cable and internet included",
+    "tv included",
+  ];
+
+  return cableKeywords.some(keyword => text.includes(keyword));
+}
+
+
+
   // utility notes extraction from description
   function extractUtilityNotes(descriptionArray = []) {
     const text = (descriptionArray || []).join(" ");
@@ -2749,14 +3011,16 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
   function detectPetRestrictions() {
     const text = JSON.stringify(data).toLowerCase();
 
-    if (/no pets|no dogs|cats only/.test(text)) return "Restrictions";
-    if (/pet friendly|pets allowed|dogs ok/.test(text)) return "Pet Friendly";
-    if (/service animals only/.test(text)) return "Service Animals Only";
-    if (/breed restrictions|small pets/.test(text))
-      return "Breed / Size Restrictions";
+    // Returns true if *any* restriction is detected
+    if (
+        /no pets|no dogs|cats only|service animals only|breed restrictions|small pets/.test(text)
+    ) {
+        return true;
+    }
 
-    return "";
-  }
+    return false;
+}
+
   // Detect building management info based on text
   function detectBuildingMgmtInfo() {
     const text = JSON.stringify(data).toLowerCase();
@@ -2775,6 +3039,26 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     }
     return ""; // leave blank if nothing relevant
   }
+  function extractDryerManufacturer(data) {
+  const manufacturerList = [
+    "Galanz","AEG","Allure","Amana","Asko","AVG","Bertazzoni","Best","Bloomberg","Bluestar","Bosch","Braoa","Brgan","Broan","Caloric","Cavavin","Chambers","Cyclone","Dacor","Danby","Direct drive","Electrolux","Elica","Faber","Fisher & Paykel","Forester","Frigidaire","Fulgor","Gaggenau","Gasland","General Electric (GE Appliances)","Gorenje","Haier","Hamilton Beach","Hisense","Homestyles","Huebsch","iFlow","Ikea","Inglis","Jennair","Kenmore","KitchenAid","Kobe","Krupps","Kucht","La Cornue","LG","Liebherr","Lotus","Lynx","Marvel","Maxima","Maytag","Midea","Miele","Moffat","Monogram","Napoleon","NCA","Not Mentioned","NuTone","Panasonic","Porter & Charles","Roper","Sakura","Samsung","Sanyo","Sharp","Silhouette","Sirius","Smeg","Sub-Zero","Sunbeam","Thermador","Unique Appliances","Venmar","Vent A Hood","Vesta","Vitara","Whirlpool","Wolf","Z-Air","Zephyr"
+  ];
+  
+  const text = JSON.stringify(data).toLowerCase();
+
+  // Try to match a brand near "dryer"
+  for (let brand of manufacturerList) {
+    const brandPattern = new RegExp(
+      `\\b${brand.toLowerCase()}\\b[^\\w\\d]{0,20}dryer|dryer[^\\w\\d]{0,20}\\b${brand.toLowerCase()}\\b`, 'i'
+    );
+    if (brandPattern.test(text)) {
+      return brand; // Return CRM-style value
+    }
+  }
+
+  // Not found
+  return "Not Mentioned";
+}
   //
   function extractMgmtEmail() {
     const text = JSON.stringify(data);
@@ -2899,16 +3183,17 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       );
       data = await response.json();
       const StringData = JSON.stringify(data).toLowerCase();
-      // console.log("StringData", StringData);
+      console.log("StringData", StringData);
       //25th June start New -
       const obj = { firstName: data.firstName || "" };
       const fullName = obj.firstName || "";
       const FirstName = extractFirstName(fullName);
       const LastName = extractLastName(fullName);
       scrapedDate = extractAvailableDate(data.vipAttributes?.attributes);
-      const Mobile = data.phone || "";
+      const Mobile = extractPhoneNumberFromText(data);
+      console.log("Mobile", Mobile);
       const unitType = detectUnitTypeFromTitleAndDescription(data.title, data.description);
-      const city = extractCityFromAddress(data.location);
+      const city = extractCityFromAddress(data);
       const Province = extractProvince(data.location);
       const PostalCode = extractPostalCode(data.location);
       const bedrooms = extractBedroomsSmart(data.vipAttributes?.primary || [], data.title || "", data.description || []);
@@ -2917,12 +3202,13 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       const numberOfUnits = detectNumberOfUnits() || 0;
       const backyard = detectBackyard();
       const backyardFenced = detectBackyardFenced();
-      const Parkingspacs = extractParkingSpaces() || 0;
+      const Parkingspacs = extractParkingSpacesFromText();
+      const washerManufacturer = extractWasherManufacturer(data); 
       const parkingDetails = detectParkingDetails() || "";
       const Walkout_to_Garage = detectWalkoutToGarage(data.description || []);
       const Private_Garage = detectPrivateGarage(data.description || []);
-      const Street_Number = extractStreetNumber(data.location || "", data.firstName || "", data.title || "");
-      const Street_Name = extractStreetName(data.location || "", data.firstName || "", data.title || "");
+      const Street_Number = extractStreetNumber(data.location || "");
+      const Street_Name = extractStreetName(data.location || "");
       const Mailbox_Number = extractMailBoxNumber(data.description || []);
       const unitName = detectUnitName() || "";
       const propertyCondition = detectPropertyCondition(data.description);
@@ -2930,15 +3216,15 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       const waterProvider = detectWaterProvider(data.description || []);
       const gasProvider = detectGasProvider(data.description || []);
       const hotWaterTankProvider = detectHotWaterTankProvider(data.description || []);
-      const Corner_Unit = detectCornerUnit(data.description || []);
-      const Central_Vacuum = detectCentralVacuum(data.description || []);
-      const Penthouse = detectPenthouse(data.description || []);
-      const Fireplace_Common_Area = detectFireplaceCommonArea(data.description || []);
-      const Fireplace_Bedroom = detectFireplaceBedroom(data.description || []);
-      const Upgraded_Bathrooms = detectUpgradedBathrooms(data.description || []);
-      const Backsplash_Kitchen = detectBacksplashKitchen(data.description || []);
-      const Upgraded_Kitchen = detectUpgradedKitchen(data.description || []);
-      const Dishwasher_Included = detectDishwasherIncluded(data.description || [], data.attributes || []);
+      const Corner_Unit = detectCornerUnit();
+      const Central_Vacuum = detectCentralVacuum();
+      const Penthouse = detectPenthouse();
+      const Fireplace_Common_Area = detectFireplaceCommonArea();
+      const Fireplace_Bedroom = detectFireplaceBedroom();
+      const Upgraded_Bathrooms = detectUpgradedBathrooms();
+      const Backsplash_Kitchen = detectBacksplashKitchen();
+      const Upgraded_Kitchen = detectUpgradedKitchen();
+      const Dishwasher_Included = detectDishwasherIncludedFromText();
       const Building_AC_Incl = detectBuilding_AC_Incl();
       const Building_Heat_Incl = detectBuilding_Heat_Incl();
       const Building_Cable_Incl = detectBuilding_Cable_Incl();
@@ -2977,6 +3263,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       const Library = detectLibrary();
       const Squash = detectSquash();
       const Bowling = detectBowling();
+      const washerAndDryer = detectWasherAndDryer(data); // returns "Ensuite", "Shared", "Pay Per Use", or "No"
       const Indoor_Child_Area = detectIndoor_Child_Area();
       const Meeting_Room = detectMeeting_Room();
       const Yoga_Room = detectYoga_Room();
@@ -2988,6 +3275,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       const Golf_Range = detectGolf_Range();
       const Piano_Lounge = detectPiano_Lounge();
       const Daycare = detectDaycare();
+      const Email=extractEmailFromData(data);
       const ParkingLevelNumber = extractParkingLevelNumber();
       document.getElementById("First_Name").value = FirstName;
       document.getElementById("Last_Name").value = LastName;
@@ -3005,6 +3293,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       document.getElementById("Backyard_Fenced").value = backyardFenced;
       document.getElementById("Parking_Spaces").value = Parkingspacs;
       document.getElementById("Parking_Details").value = parkingDetails;
+
 
       //function for conditions ::
 
@@ -3072,7 +3361,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
         }
 
         // If no number, prefix with "Not Listed – {unitName}"
-        return `Not Listed – ${trimmed}`;
+        return ` ${trimmed}`;
       }
 
       // Detect lawn and snow care services based on description
@@ -3326,26 +3615,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
           text.includes("open patio")
         );
       }
-      function detectPetsAllowed(
-        propertyCondition = "",
-        petRestrictions = ""
-      ) {
-        const text = JSON.stringify(data).toLowerCase();
-
-        const keywordMatch =
-          text.includes("pets allowed") ||
-          text.includes("pet friendly") ||
-          text.includes("pets are welcome") ||
-          text.includes("small pets permitted") ||
-          text.includes("cats and dogs allowed");
-
-        const propertyConditionExists = propertyCondition.trim() !== "";
-        const petRestrictionsEmpty = petRestrictions.trim() === "";
-
-        return (
-          keywordMatch || (petRestrictionsEmpty && propertyConditionExists)
-        );
-      }
 // website title generation function
 function generateWebsiteTitle(bedrooms, bathrooms, unitType, unitName) {
     // Format bedrooms
@@ -3385,6 +3654,8 @@ function generateWebsiteTitle(bedrooms, bathrooms, unitType, unitName) {
 
       //Condition const here updated ones
       const UnitNamecorrected = correctUnitName(unitType, unitName);
+      const dryerBrand = extractDryerManufacturer(yourJsonData);
+      const cableIncluded = detectCableInclusion(data);
       const Unitnumber = detectUnitNumber(unitType,);
       const lawnSnowCare = detectLawnAndSnowCare(data.description || []);
       const buildingType = mapUnitTypeToBuildingType(unitType);
@@ -3403,9 +3674,10 @@ function generateWebsiteTitle(bedrooms, bathrooms, unitType, unitName) {
         gasProvider: detectGasProvider(data.description || []),
         hotWaterTankProvider: detectHotWaterTankProvider(data.description || []), waterProvider: detectWaterProvider(data.description || []),
       });
+      const hydroIncluded = detectHydroProvider(data);
       const BBQ_Area_Final = detectBBQ_Area_Synced();
       const Outdoor_Patio_Final = detectOutdoor_Patio_Synced();
-      const Pets_Allowed = detectPetsAllowed();
+      const waterIncluded = detectWaterInclusion(data);
       const sqFt = extractSqFt(data.vipAttributes?.primary);
       const furnished = detectFurnished(data.description || []);
       const maximumOccupants = detectMaxOccupants(data.description);
@@ -3433,9 +3705,9 @@ function generateWebsiteTitle(bedrooms, bathrooms, unitType, unitName) {
       const utilityShare = extractUtilityResponsibility(data.description || []);
       const insuranceCompany = detectHomeInsurance(data.description || []);
       const insurancePolicyNumber = extractInsurancePolicyNumber(data.description || []);
-      const AC_Inclusion = detectACInclusion(data.description || [], data.attributes || []);
-      const Heat_Inclusion = detectHeatInclusion(data.description || [], data.attributes || []);
-      const Internet_Inclusion = detectInternetInclusion(data.description || [], data.attributes || []);
+      const AC_Inclusion = detectACInclusionFromText();
+      const Heat_Inclusion = detectHeatInclusionFromText();
+      const Internet_Inclusion = detectInternetInclusionFromText();
       const utilityNotes = extractUtilityNotes(data.description || []);
       const buildingCategory = detectBuildingCategoryFromText(data.title, data.description);
       const condoCorpNumber = extractCondoCorpNumber();
@@ -3445,6 +3717,7 @@ function generateWebsiteTitle(bedrooms, bathrooms, unitType, unitName) {
       const mgmtPhone = extractMgmtPhone();
       const officeAddress = extractOfficeAddress();
       const developerName = detectDeveloperName();
+      const Laundary= detectOnSiteLaundry(data);
       const dateOfConstructionISO = detectDateOfConstruction();
       document.getElementById("Year_Last_Renovated").value = Lastyearrenovated;
       document.getElementById("Unit_name").value = UnitNamecorrected || "";
@@ -3625,11 +3898,11 @@ const adDescription = generateAdDescription({
 });
 const { locationDescription, incentives } = generateLocationAndIncentives();
 
-console.log("📍 Location Description:", locationDescription);
-console.log("🎁 Incentives:", incentives);
+// console.log("📍 Location Description:", locationDescription);
+// console.log("🎁 Incentives:", incentives);
 
 
-console.log("🚀 Generated Ad Description:\n", adDescription);
+// console.log("🚀 Generated Ad Description:\n", adDescription);
 
 
 
@@ -3640,6 +3913,7 @@ console.log("🚀 Generated Ad Description:\n", adDescription);
       Last_Name: LastName,
       Mobile: Mobile,
       Phone: Mobile,
+      Email: Email,
       City: city,
       Lead_Source: "Kijiji",
       Asking_Price: numericPrice,
@@ -3647,17 +3921,23 @@ console.log("🚀 Generated Ad Description:\n", adDescription);
       URL: document.getElementById("unitUrl").value,
       Available_Date: scrapedDate,
       Ad_ID_New: listingId,
+      Kijiji_Data_Importer:true,
+    };
+     unitData = {
+      Name: UnitNamecorrected,
       Posting_Title_With_Parking_and_Locker: websiteTitle,
-      Posting_Title:websiteTitle,
+      Unit_Type: unitType,
+      Incentives: incentives,
+      Market_Price_With_Parking_and_Locker: numericPrice,
+      Marketed_Price:numericPrice,
+      Dryer_Manufacture:dryerBrand,
+      Washer_Manufacture:washerManufacturer,
+      Washer_and_Dryer:washerAndDryer,
       Ad_Description: adDescription,
       Ad_Description_Long: adDescription,
       Meta_Description: adDescription,
       Location_Description: locationDescription,
-      Incentives: incentives,
-    };
-     unitData = {
-      Name: UnitNamecorrected,
-      Unit_Type: unitType,
+      Posting_Title:websiteTitle,
       Total_Area_Sq_Ft: sqFt,
       Max_Occupants: maximumOccupants,
       Property_Condition: propertyCondition,
@@ -3692,6 +3972,9 @@ console.log("🚀 Generated Ad Description:\n", adDescription);
       Parking_Details: parkingDetails,
       parking_level_num: ParkingLevelNumber,
       View: view,
+      Cable_Inclusion:cableIncluded,
+      Water_Inclusion:waterIncluded,
+      Electricity_Inclusion:hydroIncluded,
       Number_of_Lockers: numberOfLockers,
       Storage_Details: lockerDetails,
       locker_level_and_number: lockerLevelAndNumber,
@@ -3703,6 +3986,7 @@ console.log("🚀 Generated Ad Description:\n", adDescription);
       Street_Number: Street_Number,
       Address: Street_Name,
       City: city,
+      On_site_Laundry:Laundary,
       Province: Province,
       Postal_Code: PostalCode,
       Mail_Box_Number: Mailbox_Number,
@@ -3730,6 +4014,7 @@ console.log("🚀 Generated Ad Description:\n", adDescription);
       Private_Garage: Private_Garage,
       Walk_out_to_Garage: Walkout_to_Garage,
       Owner: { id: loggedInUserId },
+      Kijiji_Data_Importer:true,
     };
       building_data = {
       Date_of_Construction: dateOfConstructionISO,
@@ -3798,6 +4083,7 @@ console.log("🚀 Generated Ad Description:\n", adDescription);
       has_golf_range: Golf_Range,
       Piano_Lounge: Piano_Lounge,
       Day_Care_Centre: Daycare,
+      Kijiji_Data_Importer:true,
 
     };
 
@@ -3822,12 +4108,12 @@ console.log("🚀 Generated Ad Description:\n", adDescription);
   document.getElementById("createRecordsBtn1").addEventListener("click", async () => {
     const statuscr = document.getElementById("createRecordsBtn1");
     const aid = leasingSel.value;
-    statuscr.disabled = true;
-    if (!validateAllFields()) {
-    // Stop the function if validation fails
-    return;
-}
-
+    
+//     if (!validateAllFields()) {
+//     // Stop the function if validation fails
+//     return;
+// }
+statuscr.disabled = true;
     document.getElementById("pageLoader2").style.display = "flex";
 
     console.log("Lead Data:", leadData);
@@ -4212,6 +4498,7 @@ console.log("🚀 Generated Ad Description:\n", adDescription);
       Lead_Source: Source,
       Lead_Priority_Level: "High",
       Available_Date: availableDateValue,
+      Kijiji_Data_Importer:true,
     };
 
     // ✅ Create unitData safely
@@ -4232,6 +4519,7 @@ console.log("🚀 Generated Ad Description:\n", adDescription);
       Bank_Account: "Canada",
       Tons_of_Natural_Light: true,
       Owner: { id: loggedInUserId },
+      Kijiji_Data_Importer:true,
     };
 
     // ✅ Create building_data safely
@@ -4245,6 +4533,7 @@ console.log("🚀 Generated Ad Description:\n", adDescription);
       Province: provinceValue,
       Postal_Code: postalCodeValue,
       Date_of_Construction: constructedon,
+      Kijiji_Data_Importer:true,
     };
     try {
       document.getElementById("pageLoader2").style.display = "flex";
