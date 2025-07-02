@@ -206,88 +206,96 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       console.error("❌ Failed to get user info:", err);
     });
 
-    // validateAllFields();
-    function validateAllFields() {
+  // validateAllFields();
+  function validateAllFields() {
     // List all required field IDs here
     const requiredFieldIds = [
-        "First_Name",
-        "Last_Name",
-        "Available_Date",
-        "Mobile",
-        "Unit_Type",
-        "City",
-        "Province",
-        "Postal_Code",
-        "Bedrooms",
-        "Bathrooms",
-        "number_of_floors",
-        "number_of_units",
-        "Backyard",
-        "Backyard_Fenced",
-        "Year_Last_Renovated",
-        "Parking_Spaces",
-        "Parking_Details",
-        "ownerid",
-        "Unit_name",
-        "Unit_number"
+      "First_Name",
+      "Last_Name",
+      "Available_Date",
+      "Mobile",
+      "Unit_Type",
+      "City",
+      "Province",
+      "Postal_Code",
+      "Bedrooms",
+      "Bathrooms",
+      "number_of_floors",
+      "number_of_units",
+      "Backyard",
+      "Backyard_Fenced",
+      "Year_Last_Renovated",
+      "Parking_Spaces",
+      "Parking_Details",
+      "ownerid",
+      "Unit_name",
+      "Unit_number"
     ];
 
     let missingFields = [];
     requiredFieldIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            // For select elements, check selected value
-            let value = el.value ? el.value.trim() : "";
-            if (!value) {
-                let label = el.previousElementSibling ? el.previousElementSibling.innerText : id;
-                missingFields.push(label);
-            }
+      const el = document.getElementById(id);
+      if (el) {
+        // For select elements, check selected value
+        let value = el.value ? el.value.trim() : "";
+        if (!value) {
+          let label = el.previousElementSibling ? el.previousElementSibling.innerText : id;
+          missingFields.push(label);
         }
+      }
     });
 
     if (missingFields.length > 0) {
-        Swal.fire({
-            icon: "warning",
-            title: "Please fill all required fields",
-            html: `<ul style="text-align:left;">${missingFields.map(f => `<li>${f}</li>`).join("")}</ul>`,
-        });
-        return false;
+      Swal.fire({
+        icon: "warning",
+        title: "Please fill all required fields",
+        html: `<ul style="text-align:left;">${missingFields.map(f => `<li>${f}</li>`).join("")}</ul>`,
+      });
+      return false;
     }
     return true;
-}
+  }
+
+  function capitalizeNamePart(name) {
+    return name
+      .split(" ")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  }
 
   // Get First Name
-function extractFirstName(fullName) {
-  const nameParts = fullName.trim().split(/\s+/);
-  return nameParts[0] || "";
-}
-  //get Last Name
+  function extractFirstName(fullName) {
+    const nameParts = fullName.trim().split(/\s+/);
+    return capitalizeNamePart(nameParts[0] || "");
+  }
+
+  // Get Last Name
   function extractLastName(fullName) {
     const nameParts = fullName.trim().split(/\s+/);
-    return nameParts.length > 1
+    const lastName = nameParts.length > 1
       ? nameParts.slice(1).join(" ")
       : fullName.trim();
+    return capitalizeNamePart(lastName);
   }
- function extractPhoneNumberFromText(data) {
-  const text = JSON.stringify(data).toLowerCase();
 
-  // This will match most North American phone formats (with dashes, spaces, +1, etc.)
-  const matches = text.match(/(\+?1[\s\-\.]?)?(\d{3})[\s\-\.]?\d{3}[\s\-\.]?\d{4}/g);
+  function extractPhoneNumberFromText(data) {
+    const text = JSON.stringify(data).toLowerCase();
 
-  if (!matches || matches.length === 0) return "";
+    // This will match most North American phone formats (with dashes, spaces, +1, etc.)
+    const matches = text.match(/(\+?1[\s\-\.]?)?(\d{3})[\s\-\.]?\d{3}[\s\-\.]?\d{4}/g);
 
-  // Get the **last** phone-like match
-  const lastMatch = matches[matches.length - 1];
+    if (!matches || matches.length === 0) return "";
 
-  // Extract digits only
-  const digits = lastMatch.replace(/\D/g, "");
+    // Get the **last** phone-like match
+    const lastMatch = matches[matches.length - 1];
 
-  // Always return last 10 digits, with "1" in front
-  const last10 = digits.slice(-10);
-  return last10;
-}
+    // Extract digits only
+    const digits = lastMatch.replace(/\D/g, "");
 
-
+    // Always return last 10 digits, with "1" in front
+    const last10 = digits.slice(-10);
+    return last10;
+  }
   // Helper to parse date from the string
   function parseAvailableDate(text) {
     const dateMatch = text.match(/available\s*(from)?\s*(.*)/i);
@@ -344,71 +352,214 @@ function extractFirstName(fullName) {
 
     const typeMap = [
       {
+        type: "Stacked Townhouse",
+        keywords: [
+          "stacked condo townhouse",
+"stacked condo townhome",
+"2-storey stacked townhouse",
+"3-storey stacked townhome",
+"multi-level townhouse",
+"multi-level townhome",
+"upper unit townhouse",
+"lower unit townhouse",
+"upper level townhouse",
+"lower level townhouse",
+"stacked unit",
+"stacked style townhouse",
+"stacked town",
+"townhouse style condo",
+"townhome style condo",
+"condo townhouse",
+"condo townhome",
+"upper stacked town",
+"lower stacked town",
+"townhouse condo",
+"back to back townhouse",
+"back-to-back stacked townhome",
+"stacked TH",
+"stacked t/h",
+"stacked t.h.",
+"2 level stacked town",
+"stacked town house",
+"stack townhome",
+"stack town house"
+
+        ],
+      },
+      {
         type: "Basement",
         keywords: [
-          "basement",
-          "basement apartment",
-          "lower level",
-          "basement suite",
-          "walkout basement",
+          "Basement apartment for rent",
+          "Basement unit for rent",
+          "Separate entrance basement apartment",
+          "Separate entrance basement unit",
+          "Private basement apartment",
+          "Private basement unit",
+          "Walkout basement apartment",
+          "Legal basement apartment",
+          "Finished basement apartment",
+          "Renovated basement apartment",
+          "Newly renovated basement unit",
+          "Bright basement apartment",
+          "Above ground basement apartment",
+          "Spacious basement apartment",
+          "Basement bachelor apartment",
+          "1 bedroom basement apartment",
+          "2 bedroom basement apartment",
+          "Studio basement apartment",
+          "Fully furnished basement apartment"
+
         ],
       },
       {
         type: "Condominium",
         keywords: [
-          "condo",
-          "luxury condo",
-          "condominium",
-          "condo unit",
-          "condo apartment",
+          "condo suite",
+"condo flat",
+"condo residence",
+"condo loft",
+"condo studio",
+"condo property",
+"high-rise condo",
+"low-rise condo",
+"mid-rise condo",
+"luxury condominium",
+"modern condo",
+"new condo",
+"brand new condo",
+"condo building",
+"condo complex",
+"condo rental",
+"condo for rent",
+"condo for lease",
+"condo accommodation",
+"apartment condo",
+"condo apartments",
+"condo style apartment",
+"apartment style condo",
+"condo townhouse",
+"condo townhome",
+"condo living",
+"executive condo",
+"premium condo",
+"upscale condo",
+"boutique condo",
+"Condozet run"
         ],
       },
       {
         type: "Unit - Apartment Building",
         keywords: [
+          "mid-rise",
           "apartment",
-          "unit",
-          "suite",
-          "corner unit",
-          "high-rise",
-          "low-rise",
+"apartment building",
+"apartment unit",
+"apartment suite",
+"apartment flat",
+"apartment residence",
+"apartment rental",
+"apartment for rent",
+"apartment for lease",
+"apartment complex",
+"unit apartment",
+"unit for rent",
+"unit for lease",
+"rental unit",
+"rental apartment",
+"residential unit",
+"residential apartment",
+"building apartment",
+"building unit",
+"building suite",
+"corner apartment",
+"corner suite",
+"high-rise apartment",
+"high-rise unit",
+"low-rise apartment",
+"low-rise unit",
+"mid-rise apartment",
+"mid-rise unit",
+"multi-unit building",
+"multi-unit apartment",
+"multi residential building",
+"multi family apartment",
+"multi family unit",
+"apartment tower",
+"apartment block",
+"unit in apartment building"
         ],
       },
       {
         type: "Single Unit - House",
         keywords: [
-          "Private home",
-          "house",
-          "Home",
-          "home",
-          "detached",
-          "bungalow",
-          "single family",
-          "entire house",
+          "single family home",
+"single family house",
+"single detached",
+"detached house",
+"detached home",
+"freehold house",
+"freehold home",
+"standalone house",
+"standalone home",
+"private house",
+"private detached",
+"private detached house",
+"private detached home",
+"single dwelling",
+"single unit home",
+"single unit detached",
+"bungalow house",
+"bungalow home",
+"entire home",
+"entire detached house",
+"entire detached home",
+"house for rent",
+"home for rent",
+"detached for rent",
+"single family detached",
+"single family detached house",
+"single family detached home",
+"single residence",
+"private residence",
+"stand alone house",
+"stand alone home"
         ],
       },
       {
         type: "Multi Unit - Above Ground",
         keywords: [
-          "triplex",
-          "fourplex",
-          "main floor",
-          "upstairs unit",
-          "upper level in house",
-          "corner suite",
-        ],
-      },
-      {
-        type: "Stacked Townhouse",
-        keywords: [
-          "stacked townhouse",
-          "stacked townhome",
-          "upper stacked",
-          "lower stacked",
-          "townhouse",
-          "townhome",
-          "end unit townhouse",
-          "3-storey townhouse",
+          "duplex",
+"triplex unit",
+"fourplex unit",
+"multi-plex",
+"multi unit house",
+"multi unit building",
+"multi family home",
+"multi family house",
+"main floor unit",
+"upper unit",
+"upper floor unit",
+"upper suite",
+"second floor unit",
+"third floor unit",
+"top floor unit",
+"above ground unit",
+"above grade unit",
+"above ground suite",
+"above grade suite",
+"upstairs suite",
+"upstairs apartment",
+"upper level suite",
+"upper level apartment",
+"main level unit",
+"main level suite",
+"main floor apartment",
+"corner unit apartment",
+"corner unit suite",
+"corner apartment",
+"multi unit above ground",
+"multi unit residence",
+"multi storey unit"
         ],
       },
       {
@@ -417,6 +568,32 @@ function extractFirstName(fullName) {
           "student room",
           "student housing",
           "room near college",
+"student rental",
+"student accommodation",
+"student residence",
+"student dorm",
+"student dormitory",
+"room for student",
+"student room for rent",
+"student housing rental",
+"student housing room",
+"student suite",
+"student unit",
+"room for university student",
+"room for college student",
+"room close to college",
+"room close to university",
+"room near campus",
+"room by campus",
+"student room rental",
+"student lease",
+"student living",
+"all inclusive student housing",
+"all inclusive student accommodation",
+"shared student housing",
+"shared student room",
+"private student room",
+"furnished student room",
           "room near university",
           "all-inclusive student room",
         ],
@@ -434,27 +611,27 @@ function extractFirstName(fullName) {
     return "";
   }
   // Paste your city list here
-const cityList = [
-  "Acton","Ajax","Aligarh","Allensville","Alton","Alwar","Amherstburg","Amigo Beach","Ancaster","Angus","Athens","Aurora","Aylmer","Ayr","Bala","Balton","Barrie","Beamsville","Belle River","Belleville","Binbrook","Bloomington","Blue Mountains","Bolton","Bothwell","Bowmanville","Bracebridge","Bradford","Brampton","Brantford","Breslau","Bridgenorth","Brockville","Brooklin","Brucefield","Burlington","Burnaby","Caledon","Caledon East","Caledon Village","Caledonia","Cambridge","Campbellville","Chatham","Clarington","Cobourg","Coldwater","Collingwood","Comber","Concord","Coquitlam","Cornwall","Corunna","Courtice","Craighurst","Crystal Beach","Crystal Rock","Deerbrook","Delete","Delhi","Dundas","East Gwillimbury","East York","Elmstead","Embro","Essex","Etobicoke","Fallingbrook","Ficko","Fisherville","Fonthill","Forest Harbour","Fort Erie","Gananoque","Georgetown","Georgina","Gravenhurst","Greater Napanee","Green River","Grimsby","Guelph","Gwalior","Haldimand","Halton Hills","Hamilton","Hannon","Harrisburg","Hathras","Holland Landing","Honey Harbour","Horseshoe Valley","Huntsville","Ilderton","Ingersoll","Innisfil","Jaipur","Jarvis","Jasper","Jerseyville","Jodhpur","Johnstown","Kanata","Katowice","Kattleby","Kemptville","Kennedy Acres","Keswick","Kimberley","Kimberly","King City","Kingston","Kingsville","Kitchener","Kleinburg","Klondyke","Komoka","Krakow","Lakefield","LaSalle","Leamington","Lefroy","Lincoln","Lindsay","Lindsy","Listowel","Little Britain","London","Mallorytown","Malton","Maple","Markham","Merlin","Metcalfe","Milbrook","Millbrook","Milton","Mississauga","Mount Hope","Muskoka","Nagaur","Nashville","Navan","New Delhi","New Tecumseth","New Westminster","Newcastle","Newmarket","Newtonville","Niagara Falls","Niagara-on-the-Lake","Nobleton","North Vancouver","North York","Norwood","Oakville","Oakwood","Odessa","Oldcastle","Orangeville","Orillia","Osgoode","Oshawa","Ottawa","Owen Sound","Paris","Pefferlaw","Peterborough","Pickering","Pinkerton","Pittsburgh","Point Edward","Port Colborne","Port Coquitlam","Port Hope","Port Moody","Port Perry","Port Rowan","Portservain","Prince Edward","Prishtine","Pushkar","Richmond Hill","Rosseau","Saint Catharines","Saint George","Saint Joachim","Saint Thomas","Sarnia","Scarborough","Schomberg","Shannonville","Sikar","Simcoe","South Woodslee","Spencerville","Springdale Park","Springwater","St Catharines","St Thomas","St. Catharines","St. Thomas","Staples","Stevensville","Stittsville","Stoney Creek","Stoney Point","Stouffville","Stratford","Strathroy","Sunderland","Surrey","Taunton","Tecumseh","Test City","Thamesford","Thompsonville","Thornhill","Thornton","Thorold","Thousand Islands","Tillbury","Tillsonburg","Tirana","Toronto","Unionville","Uxbridge","Vancouver","Vanier","Vaughan","Warsaw","Wasaga Beach","Waterdown","Waterloo","Welland","West Gwillimbury","West Vancouver","Wheatley","Whitby","Whitchurch-Stouffville","Willowdale","Windsor","Windsville","Woodbridge","Woodstock","Wyoming","York"
-];
+  const cityList = [
+    "Acton", "Ajax", "Aligarh", "Allensville", "Alton", "Alwar", "Amherstburg", "Amigo Beach", "Ancaster", "Angus", "Athens", "Aurora", "Aylmer", "Ayr", "Bala", "Balton", "Barrie", "Beamsville", "Belle River", "Belleville", "Binbrook", "Bloomington", "Blue Mountains", "Bolton", "Bothwell", "Bowmanville", "Bracebridge", "Bradford", "Brampton", "Brantford", "Breslau", "Bridgenorth", "Brockville", "Brooklin", "Brucefield", "Burlington", "Burnaby", "Caledon", "Caledon East", "Caledon Village", "Caledonia", "Cambridge", "Campbellville", "Chatham", "Clarington", "Cobourg", "Coldwater", "Collingwood", "Comber", "Concord", "Coquitlam", "Cornwall", "Corunna", "Courtice", "Craighurst", "Crystal Beach", "Crystal Rock", "Deerbrook", "Delete", "Delhi", "Dundas", "East Gwillimbury", "East York", "Elmstead", "Embro", "Essex", "Etobicoke", "Fallingbrook", "Ficko", "Fisherville", "Fonthill", "Forest Harbour", "Fort Erie", "Gananoque", "Georgetown", "Georgina", "Gravenhurst", "Greater Napanee", "Green River", "Grimsby", "Guelph", "Gwalior", "Haldimand", "Halton Hills", "Hamilton", "Hannon", "Harrisburg", "Hathras", "Holland Landing", "Honey Harbour", "Horseshoe Valley", "Huntsville", "Ilderton", "Ingersoll", "Innisfil", "Jaipur", "Jarvis", "Jasper", "Jerseyville", "Jodhpur", "Johnstown", "Kanata", "Katowice", "Kattleby", "Kemptville", "Kennedy Acres", "Keswick", "Kimberley", "Kimberly", "King City", "Kingston", "Kingsville", "Kitchener", "Kleinburg", "Klondyke", "Komoka", "Krakow", "Lakefield", "LaSalle", "Leamington", "Lefroy", "Lincoln", "Lindsay", "Lindsy", "Listowel", "Little Britain", "London", "Mallorytown", "Malton", "Maple", "Markham", "Merlin", "Metcalfe", "Milbrook", "Millbrook", "Milton", "Mississauga", "Mount Hope", "Muskoka", "Nagaur", "Nashville", "Navan", "New Delhi", "New Tecumseth", "New Westminster", "Newcastle", "Newmarket", "Newtonville", "Niagara Falls", "Niagara-on-the-Lake", "Nobleton", "North Vancouver", "North York", "Norwood", "Oakville", "Oakwood", "Odessa", "Oldcastle", "Orangeville", "Orillia", "Osgoode", "Oshawa", "Ottawa", "Owen Sound", "Paris", "Pefferlaw", "Peterborough", "Pickering", "Pinkerton", "Pittsburgh", "Point Edward", "Port Colborne", "Port Coquitlam", "Port Hope", "Port Moody", "Port Perry", "Port Rowan", "Portservain", "Prince Edward", "Prishtine", "Pushkar", "Richmond Hill", "Rosseau", "Saint Catharines", "Saint George", "Saint Joachim", "Saint Thomas", "Sarnia", "Scarborough", "Schomberg", "Shannonville", "Sikar", "Simcoe", "South Woodslee", "Spencerville", "Springdale Park", "Springwater", "St Catharines", "St Thomas", "St. Catharines", "St. Thomas", "Staples", "Stevensville", "Stittsville", "Stoney Creek", "Stoney Point", "Stouffville", "Stratford", "Strathroy", "Sunderland", "Surrey", "Taunton", "Tecumseh", "Test City", "Thamesford", "Thompsonville", "Thornhill", "Thornton", "Thorold", "Thousand Islands", "Tillbury", "Tillsonburg", "Tirana", "Toronto", "Unionville", "Uxbridge", "Vancouver", "Vanier", "Vaughan", "Warsaw", "Wasaga Beach", "Waterdown", "Waterloo", "Welland", "West Gwillimbury", "West Vancouver", "Wheatley", "Whitby", "Whitchurch-Stouffville", "Willowdale", "Windsor", "Windsville", "Woodbridge", "Woodstock", "Wyoming", "York"
+  ];
 
-function extractCityFromAddress(data) {
-  const text = JSON.stringify(data).toLowerCase();
+  function extractCityFromAddress(data) {
+    const text = JSON.stringify(data).toLowerCase();
 
-  // For best matching, sort by length (to match "St. Catharines" before "St Catharines")
-  const sortedCities = cityList.slice().sort((a, b) => b.length - a.length);
+    // For best matching, sort by length (to match "St. Catharines" before "St Catharines")
+    const sortedCities = cityList.slice().sort((a, b) => b.length - a.length);
 
-  for (const city of sortedCities) {
-    // Allow matching ignoring periods/commas (St. Catharines ~ St Catharines)
-    const cityPattern = city.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // escape regex
-                            .replace(/[\.\,]/g, '[\\.\\,\\s]?'); // period/comma/space flexible
-    const regex = new RegExp(`\\b${cityPattern}\\b`, 'i');
-    if (regex.test(text)) {
-      return city; // Return the first matched city
+    for (const city of sortedCities) {
+      // Allow matching ignoring periods/commas (St. Catharines ~ St Catharines)
+      const cityPattern = city.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // escape regex
+        .replace(/[\.\,]/g, '[\\.\\,\\s]?'); // period/comma/space flexible
+      const regex = new RegExp(`\\b${cityPattern}\\b`, 'i');
+      if (regex.test(text)) {
+        return city; // Return the first matched city
+      }
     }
+    return ""; // Nothing found
   }
-  return ""; // Nothing found
-}
 
   // Detect number of floors based on description
   function detectNumberOfFloors() {
@@ -534,26 +711,26 @@ function extractCityFromAddress(data) {
     return "No";
   }
   // Extract parking spaces from vipPrimary and text content
-function extractParkingSpacesFromText() {
-  // Lowercase for easier matching
-  const text = JSON.stringify(data).toLowerCase();
-  // 1. Highest priority: detect "no parking"
-  if (text.includes("no parking")) return 0;
+  function extractParkingSpacesFromText() {
+    // Lowercase for easier matching
+    const text = JSON.stringify(data).toLowerCase();
+    // 1. Highest priority: detect "no parking"
+    if (text.includes("no parking")) return 0;
 
-  // 2. Look for "#+ parking" (e.g. "3+ parking included")
-  let match = text.match(/(\d+)\s*\+\s*parking/);
-  if (match) return parseInt(match[1]);
+    // 2. Look for "#+ parking" (e.g. "3+ parking included")
+    let match = text.match(/(\d+)\s*\+\s*parking/);
+    if (match) return parseInt(match[1]);
 
-  // 3. Look for "# parking" (e.g. "2 parking included", "1 parking included")
-  match = text.match(/(\d+)\s*parking/);
-  if (match) return parseInt(match[1]);
+    // 3. Look for "# parking" (e.g. "2 parking included", "1 parking included")
+    match = text.match(/(\d+)\s*parking/);
+    if (match) return parseInt(match[1]);
 
-  // 4. "parking included" (just says included, but not how many: return 1 as default)
-  if (text.includes("parking included")) return 1;
+    // 4. "parking included" (just says included, but not how many: return 1 as default)
+    if (text.includes("parking included")) return 1;
 
-  // 5. Fallback: no info
-  return "";
-}
+    // 5. Fallback: no info
+    return "";
+  }
   // Detect parking details based on description and title
   function detectParkingDetails(descriptionArray = [], title = "") {
     const text = (title + " " + descriptionArray.join(" ")).toLowerCase();
@@ -1098,73 +1275,75 @@ function extractParkingSpacesFromText() {
   }
   // Detect corner unit based on description
   function detectCornerUnit() {
-  const text = JSON.stringify(data).toLowerCase();
-  return text.includes("corner unit");
-}
+    const text = JSON.stringify(data).toLowerCase();
+    return text.includes("corner unit");
+  }
 
-function detectCentralVacuum() {
-  const text = JSON.stringify(data).toLowerCase();
-  return text.includes("central vacuum");
-}
+  function detectCentralVacuum() {
+    const text = JSON.stringify(data).toLowerCase();
+    return text.includes("central vacuum");
+  }
 
-function detectPenthouse() {
-  const text = JSON.stringify(data).toLowerCase();
-  return text.includes("penthouse") || text.includes("top floor");
-}
+  function detectPenthouse() {
+    const text = JSON.stringify(data).toLowerCase();
+    return text.includes("penthouse") || text.includes("top floor");
+  }
 
-function detectFireplaceCommonArea() {
-  const text = JSON.stringify(data).toLowerCase();
-  return text.includes("fireplace") || text.includes("living room fireplace");
-}
+  function detectFireplaceCommonArea() {
+    const text = JSON.stringify(data).toLowerCase();
+    return text.includes("fireplace") || text.includes("living room fireplace");
+  }
 
-function detectFireplaceBedroom() {
-  const text = JSON.stringify(data).toLowerCase();
-  return text.includes("fireplace in bedroom");
-}
+  function detectFireplaceBedroom() {
+    const text = JSON.stringify(data).toLowerCase();
+    return text.includes("fireplace in bedroom");
+  }
 
-function detectUpgradedBathrooms() {
-  const text = JSON.stringify(data).toLowerCase();
-  return text.includes("upgraded bathroom") || text.includes("modern bath");
-}
+  function detectUpgradedBathrooms() {
+    const text = JSON.stringify(data).toLowerCase();
+    return text.includes("upgraded bathroom") || text.includes("modern bath");
+  }
 
-function detectUpgradedKitchen() {
-  const text = JSON.stringify(data).toLowerCase();
-  return (
-    text.includes("renovated kitchen") ||
-    text.includes("modern kitchen") ||
-    text.includes("upgraded kitchen")
-  );
-}
+  function detectUpgradedKitchen() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("renovated kitchen") ||
+      text.includes("modern kitchen") ||
+      text.includes("upgraded kitchen")||
+      text.includes("new kitchen") ||
+      text.includes("updated kitchen")
+    );
+  }
 
-function detectBacksplashKitchen() {
-  const text = JSON.stringify(data).toLowerCase();
-  return (
-    text.includes("backsplash") ||
-    text.includes("tile wall behind stove") ||
-    text.includes("tile wall behind sink")
-  );
-}
+  function detectBacksplashKitchen() {
+    const text = JSON.stringify(data).toLowerCase();
+    return (
+      text.includes("backsplash") ||
+      text.includes("tile wall behind stove") ||
+      text.includes("tile wall behind sink")
+    );
+  }
   // Detect dishwasher included based on description and attributes
 
   function detectDishwasherIncludedFromText() {
-  const text = JSON.stringify(data).toLowerCase(); // search everywhere!
+    const text = JSON.stringify(data).toLowerCase(); // search everywhere!
 
-  // Array of possible phrases that indicate a dishwasher is included
-  const dishwasherKeywords = [
-    "dishwasher", // general mention
-    "dishwasher included",
-    "built-in dishwasher",
-    "dishwasher (in unit)",
-    "dishwasher (in building)",
-    "dishwasher provided",
-    "includes dishwasher",
-  ];
+    // Array of possible phrases that indicate a dishwasher is included
+    const dishwasherKeywords = [
+      "dishwasher", // general mention
+      "dishwasher included",
+      "built-in dishwasher",
+      "dishwasher (in unit)",
+      "dishwasher (in building)",
+      "dishwasher provided",
+      "includes dishwasher",
+    ];
 
-  for (let keyword of dishwasherKeywords) {
-    if (text.includes(keyword)) return true;
+    for (let keyword of dishwasherKeywords) {
+      if (text.includes(keyword)) return true;
+    }
+    return false;
   }
-  return false;
-}
 
   function detectBuilding_AC_Incl() {
     const text = JSON.stringify(data).toLowerCase();
@@ -1497,38 +1676,38 @@ function detectBacksplashKitchen() {
   }
 
   function extractWasherManufacturer(data) {
-  // 1. Lowercase the entire data text
-  const text = JSON.stringify(data).toLowerCase();
+    // 1. Lowercase the entire data text
+    const text = JSON.stringify(data).toLowerCase();
 
-  // 2. Define your picklist in lowercase for easier matching
-  const washerManufacturers = [
-    "galanz", "aeg", "allure", "amana", "asko", "avg", "bertazzoni", "best", "bloomberg", "bluestar",
-    "bosch", "braoa", "brgan", "broan", "caloric", "cavavin", "chambers", "cyclone", "dacor", "danby",
-    "direct drive", "electrolux", "elica", "faber", "fisher & paykel", "forester", "frigidaire",
-    "fulgor", "gaggenau", "gasland", "general electric", "ge appliances", "gorenje", "haier", "hamilton beach",
-    "hisense", "homestyles", "huebsch", "iflow", "ikea", "inglis", "jennair", "kenmore", "kitchenaid", "kobe",
-    "krupps", "kucht", "la cornue", "lg", "liebherr", "lotus", "lynx", "marvel", "maxima", "maytag", "midea",
-    "miele", "moffat", "monogram", "napoleon", "nca", "not mentioned", "nutone", "panasonic",
-    "porter & charles", "roper", "sakura", "samsung", "sanyo", "sharp", "silhouette", "sirius", "smeg",
-    "sub-zero", "sunbeam", "thermador", "unique appliances", "venmar", "vent a hood", "vesta", "vitara",
-    "whirlpool", "wolf", "z-air", "zephyr"
-  ];
+    // 2. Define your picklist in lowercase for easier matching
+    const washerManufacturers = [
+      "galanz", "aeg", "allure", "amana", "asko", "avg", "bertazzoni", "best", "bloomberg", "bluestar",
+      "bosch", "braoa", "brgan", "broan", "caloric", "cavavin", "chambers", "cyclone", "dacor", "danby",
+      "direct drive", "electrolux", "elica", "faber", "fisher & paykel", "forester", "frigidaire",
+      "fulgor", "gaggenau", "gasland", "general electric", "ge appliances", "gorenje", "haier", "hamilton beach",
+      "hisense", "homestyles", "huebsch", "iflow", "ikea", "inglis", "jennair", "kenmore", "kitchenaid", "kobe",
+      "krupps", "kucht", "la cornue", "lg", "liebherr", "lotus", "lynx", "marvel", "maxima", "maytag", "midea",
+      "miele", "moffat", "monogram", "napoleon", "nca", "not mentioned", "nutone", "panasonic",
+      "porter & charles", "roper", "sakura", "samsung", "sanyo", "sharp", "silhouette", "sirius", "smeg",
+      "sub-zero", "sunbeam", "thermador", "unique appliances", "venmar", "vent a hood", "vesta", "vitara",
+      "whirlpool", "wolf", "z-air", "zephyr"
+    ];
 
-  // 3. Try to match any manufacturer name in the text (partial/typo-tolerant)
-  for (let brand of washerManufacturers) {
-    // Handle short brands (e.g., LG, GE) with word boundaries
-    const regex = new RegExp(`\\b${brand.replace(/[^a-z0-9]/g, "\\$&")}\\b`, "i");
-    if (regex.test(text)) {
-      // Return with correct CRM casing (from picklist)
-      const crmBrand = brand
-        .split(" ")
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
-      return crmBrand;
+    // 3. Try to match any manufacturer name in the text (partial/typo-tolerant)
+    for (let brand of washerManufacturers) {
+      // Handle short brands (e.g., LG, GE) with word boundaries
+      const regex = new RegExp(`\\b${brand.replace(/[^a-z0-9]/g, "\\$&")}\\b`, "i");
+      if (regex.test(text)) {
+        // Return with correct CRM casing (from picklist)
+        const crmBrand = brand
+          .split(" ")
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+        return crmBrand;
+      }
     }
+    return "Not Mentioned"; // fallback for blank, null, or not found
   }
-  return "Not Mentioned"; // fallback for blank, null, or not found
-}
 
 
   function detectOutdoor_Child_Play_Area() {
@@ -1753,41 +1932,38 @@ function detectBacksplashKitchen() {
     }
     return "No";
   }
- function detectOnSiteLaundry(data) {
-  // Flatten all text, attributes, and descriptions for a global search
-  const text = JSON.stringify(data).toLowerCase();
+  function detectOnSiteLaundry(data) {
+    // Flatten all text, attributes, and descriptions for a global search
+    const text = JSON.stringify(data).toLowerCase();
 
-  // Pay Per Use
-  if (
-    /pay per use|coin(\s|-)?(operated|laundry|machine)|card(\s|-)?operated|paid laundry|pay laundry|pay to use/.test(text)
-  ) return "Pay Per Use";
+    // Pay Per Use
+    if (
+      /pay per use|coin(\s|-)?(operated|laundry|machine)|card(\s|-)?operated|paid laundry|pay laundry|pay to use/.test(text)
+    ) return "Pay Per Use";
 
-  // En-Suite / In-Unit (most specific, most valuable)
-  if (
-    /en(\s|-)?suite laundry|in(\s|-)?suite laundry|private laundry|laundry in unit|in-unit laundry|unit has laundry|in unit (washer|dryer|laundry)|in-apartment laundry|laundry inside unit|apartment laundry|unit laundry|inside unit laundry/.test(text)
-  ) return "En-Suite";
+    // En-Suite / In-Unit (most specific, most valuable)
+    if (
+      /en(\s|-)?suite laundry|in(\s|-)?suite laundry|laundry (in unit)|private laundry|laundry in unit|in-unit laundry|unit has laundry|in unit (washer|dryer|laundry)|in-apartment laundry|laundry inside unit|apartment laundry|unit laundry|inside unit laundry/.test(text)
+    ) return "En-Suite";
 
-  // Shared (building/common)
-  if (
-    /shared laundry|communal laundry|laundry (in building)|building laundry|laundry room|common laundry|laundry in building|shared (washer|dryer)|laundry facilities|community laundry/.test(text)
-    ||
-    /laundry\s?\(in building\)/.test(text) // direct match for your sample
-  ) return "Shared";
+    // Shared (building/common)
+    if (
+      /shared laundry|communal laundry|laundry (in building)|building laundry|laundry room|common laundry|laundry in building|shared (washer|dryer)|laundry facilities|community laundry/.test(text)
+      ||
+      /laundry\s?\(in building\)/.test(text) // direct match for your sample
+    ) return "Shared";
 
-  // No Laundry
-  if (
-    /no laundry|no washer|no dryer|laundry not included|laundry not available|no laundry facilities|no in(\s|-)?building laundry/.test(text)
-  ) return "No";
+    // No Laundry
+    if (
+      /no laundry|no washer|no dryer|laundry not included|laundry not available|no laundry facilities|no in(\s|-)?building laundry/.test(text)
+    ) return "No";
 
-  // If it just says "laundry" but no other details, treat as Shared (weak fallback)
-  if (/laundry/.test(text)) return "Shared";
+    // If it just says "laundry" but no other details, treat as Shared (weak fallback)
+    if (/laundry/.test(text)) return "Shared";
 
-  // Default
-  return "";
-}
-
-
-
+    // Default
+    return "";
+  }
   // detect private terrace
   function detectPrivateTerraceOrBackyard(
     descriptionArray = [],
@@ -1915,11 +2091,11 @@ function detectBacksplashKitchen() {
     return "";
   }
   function extractEmailFromData(data) {
-  const text = JSON.stringify(data).toLowerCase();
-  // Regex for matching most email formats
-  const emailMatch = text.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/);
-  return emailMatch ? emailMatch[0] : "";
-}
+    const text = JSON.stringify(data).toLowerCase();
+    // Regex for matching most email formats
+    const emailMatch = text.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/);
+    return emailMatch ? emailMatch[0] : "";
+  }
 
   // Detect unit facing direction based on description
   function detectUnitFacing(descriptionArray = []) {
@@ -2692,68 +2868,32 @@ function detectBacksplashKitchen() {
 
   // 2. Street Number (e.g., 123 in "123 King St")
   // 1. Extract Street Number: Returns the first number before the street name (works for "10-456 Elm Street" => "456", "123A Main Ave" => "123")
-function extractStreetNumber(location = "") {
-  if (!location) return "";
-  // Only match if the second part after '-' starts with a number
-  const cleaned = location.trim().split('-').pop();
-  const match = cleaned.match(/^(\d{1,5})[A-Za-z]?\b/);
-  return match ? match[1] : "";
-}
-function detectWasherAndDryer(data) {
-  // Combine all text
-  const text = JSON.stringify(data).toLowerCase();
-
-  // Ensuite: In-unit, private, ensuite
-  if (
-    /in-?unit laundry|in-?suite laundry|private laundry|ensuite laundry|laundry in unit|washer and dryer in unit|unit has laundry|apartment laundry|laundry inside unit|in-apartment laundry/.test(text)
-  ) {
-    return "Ensuite";
+  function extractStreetNumber(location = "") {
+    if (!location) return "";
+    // Only match if the second part after '-' starts with a number
+    const cleaned = location.trim().split('-').pop();
+    const match = cleaned.match(/^(\d{1,5})[A-Za-z]?\b/);
+    return match ? match[1] : "";
   }
 
-  // Shared: Shared/common
-  if (
-    /shared laundry|shared washer|shared dryer|common laundry|communal laundry|laundry (in building)|laundry room|building laundry|common laundry room|laundry in building|laundry facilities/.test(text)
-  ) {
-    return "Shared";
+  // 2. Extract Street Name: Gets street name and suffix, stops at comma/city/province/postal
+  function extractStreetName(location = "") {
+    if (!location) return "";
+    const streetTypes = [
+      "street", "st", "road", "rd", "avenue", "ave", "boulevard", "blvd", "drive", "dr",
+      "lane", "ln", "court", "ct", "crescent", "cr", "terrace", "way", "trail", "place", "pkwy"
+    ].join("|");
+    // Pattern: optional number/unit, then name + suffix
+    const regex = new RegExp(
+      `\\d{1,5}(?:-\\d{1,5})?\\s+([\\w\\s']+?\\s(?:${streetTypes}))\\b`,
+      "i"
+    );
+    const match = location.match(regex);
+    if (match && match[1]) {
+      return match[1].replace(/\s+/g, " ").replace(/\b\w/g, c => c.toUpperCase()).trim();
+    }
+    return "";
   }
-
-  // Pay Per Use: Coin, paid, pay per use, card operated
-  if (
-    /coin(-|\s)?laundry|coin(-|\s)?operated|card(-|\s)?operated|pay per use laundry|paid laundry|pay to use/.test(text)
-  ) {
-    return "Pay Per Use";
-  }
-
-  // No: Absence, negative statements
-  if (
-    /no laundry|no washer|no dryer|no laundry available|no laundry facility|laundry not included|laundry not available|no in(-|\s)?building laundry/.test(text)
-  ) {
-    return "No";
-  }
-
-  // If nothing matched, default to "No"
-  return "No";
-}
-
-
-// 2. Extract Street Name: Gets street name and suffix, stops at comma/city/province/postal
-function extractStreetName(location = "") {
-  if (!location) return "";
-  const streetTypes = [
-    "street","st","road","rd","avenue","ave","boulevard","blvd","drive","dr",
-    "lane","ln","court","ct","crescent","cr","terrace","way","trail","place","pkwy"
-  ].join("|");
-  // Pattern: optional number/unit, then name + suffix
-  const regex = new RegExp(
-    `\\d{1,5}(?:-\\d{1,5})?\\s+([\\w\\s']+?\\s(?:${streetTypes}))\\b`,
-    "i"
-  );
-  const match = location.match(regex);
-  if (match && match[1]) {
-    return match[1].replace(/\s+/g, " ").replace(/\b\w/g, c => c.toUpperCase()).trim();
-  }
-  return "";
-}
 
   // Helper function to capitalize words
   function capitalizeWords(str) {
@@ -2781,156 +2921,156 @@ function extractStreetName(location = "") {
   }
   // Detect utility inclusions based on description
   function detectACInclusionFromText() {
-  const text = JSON.stringify(data).toLowerCase(); // search everywhere!
+    const text = JSON.stringify(data).toLowerCase(); // search everywhere!
 
-  const acKeywords = [
-    "air conditioning included",
-    "central ac",
-    "ac provided",
-    "a/c included",
-    "includes air conditioning",
-    "with air conditioning",
-    "air conditioning",
-  ];
+    const acKeywords = [
+      "air conditioning included",
+      "central ac",
+      "ac provided",
+      "a/c included",
+      "includes air conditioning",
+      "with air conditioning",
+      "air conditioning",
+    ];
 
-  for (let keyword of acKeywords) {
-    if (text.includes(keyword)) return true;
+    for (let keyword of acKeywords) {
+      if (text.includes(keyword)) return true;
+    }
+    return false;
   }
-  return false;
-}
 
   function detectHeatInclusionFromText() {
-  const text = JSON.stringify(data).toLowerCase();
+    const text = JSON.stringify(data).toLowerCase();
 
-  const heatKeywords = [
-    "heating included",
-    "heat paid by landlord",
-    "heat included",
-    "includes heating",
-    "with heating"
-  ];
+    const heatKeywords = [
+      "heating included",
+      "heat paid by landlord",
+      "heat included",
+      "includes heating",
+      "with heating"
+    ];
 
-  for (let keyword of heatKeywords) {
-    if (text.includes(keyword)) return true;
+    for (let keyword of heatKeywords) {
+      if (text.includes(keyword)) return true;
+    }
+    return false;
   }
-  return false;
-}
 
   function detectInternetInclusionFromText() {
-  const text = JSON.stringify(data).toLowerCase();
+    const text = JSON.stringify(data).toLowerCase();
 
-  const internetKeywords = [
-    "wifi included",
-    "internet included",
-    "free internet",
-    "with wifi",
-    "with internet",
-    "includes wifi",
-    "includes internet"
-  ];
+    const internetKeywords = [
+      "wifi included",
+      "internet included",
+      "free internet",
+      "with wifi",
+      "with internet",
+      "includes wifi",
+      "includes internet"
+    ];
 
-  for (let keyword of internetKeywords) {
-    if (text.includes(keyword)) return true;
+    for (let keyword of internetKeywords) {
+      if (text.includes(keyword)) return true;
+    }
+    return false;
   }
-  return false;
-}
-function detectWaterInclusion(data) {
-  // Turn the whole object into a string for searching
-  const text = JSON.stringify(data).toLowerCase();
+  function detectWaterInclusion(data) {
+    // Turn the whole object into a string for searching
+    const text = JSON.stringify(data).toLowerCase();
 
-  // List of keywords to check for
-  const waterKeywords = [
-    "water included",
-    "water is included",
-    "water paid by landlord",
-    "hydro and water included",
-    "water utility included",
-    "water bill included",
-    "water softener",
-    "reverse osmosis",
-    "culligan",
-    "rent water system",
-    "filter rental",
-    "water purification",
-    "purified water",
-    "water filter",
-    "drinking water included",
-    "water system rental",
-    "osmosis system",
-    "soft water included",
-    "water & heat included",
-    "hot water included"
-  ];
+    // List of keywords to check for
+    const waterKeywords = [
+      "water included",
+      "water is included",
+      "water paid by landlord",
+      "hydro and water included",
+      "water utility included",
+      "water bill included",
+      "water softener",
+      "reverse osmosis",
+      "culligan",
+      "rent water system",
+      "filter rental",
+      "water purification",
+      "purified water",
+      "water filter",
+      "drinking water included",
+      "water system rental",
+      "osmosis system",
+      "soft water included",
+      "water & heat included",
+      "hot water included"
+    ];
 
-  // If any of the keywords are found, return true
-  return waterKeywords.some(keyword => text.includes(keyword));
-}
+    // If any of the keywords are found, return true
+    return waterKeywords.some(keyword => text.includes(keyword));
+  }
 
-function detectHydroProvider(data) {
-  const text = JSON.stringify(data).toLowerCase();
+  function detectHydroProvider(data) {
+    const text = JSON.stringify(data).toLowerCase();
 
-  // List of common hydro/electricity provider names and related keywords
-  const hydroKeywords = [
-    "hydro",
-    "hydro included",
-    "hydro one",
-    "toronto hydro",
-    "alectra",
-    "enwin",
-    "enmax",
-    "hydro ottawa",
-    "powerstream",
-    "brampton hydro",
-    "oakville hydro",
-    "london hydro",
-    "energy provider",
-    "electricity provider",
-    "electricity included",
-    "utility provider",
-    "utilities included",
-    "electric included"
-  ];
-  const found = hydroKeywords.some(keyword => text.includes(keyword));
-  if (found) return true;
+    // List of common hydro/electricity provider names and related keywords
+    const hydroKeywords = [
+      "hydro",
+      "hydro included",
+      "hydro one",
+      "toronto hydro",
+      "alectra",
+      "enwin",
+      "enmax",
+      "hydro ottawa",
+      "powerstream",
+      "brampton hydro",
+      "oakville hydro",
+      "london hydro",
+      "energy provider",
+      "electricity provider",
+      "electricity included",
+      "utility provider",
+      "utilities included",
+      "electric included"
+    ];
+    const found = hydroKeywords.some(keyword => text.includes(keyword));
+    if (found) return true;
 
 
 
-  return false;
-}
+    return false;
+  }
 
-function detectCableInclusion(data) {
-  const text = JSON.stringify(data).toLowerCase();
+  function detectCableInclusion(data) {
+    const text = JSON.stringify(data).toLowerCase();
 
-  // Cable-related keywords and popular provider terms
-  const cableKeywords = [
-    "cable included",
-    "cable incl",
-    "free cable",
-    "tv package",
-    "rogers tv",
-    "bell fibe",
-    "bell tv",
-    "shaw cable",
-    "cogeco tv",
-    "videotron",
-    "cable ready",
-    "cable provided",
-    "cable tv included",
-    "satellite tv included",
-    "satellite included",
-    "cable service included",
-    "cable service",
-    "cable tv",
-    "cable subscription",
-    "cable television",
-    "cable service provider",
-    "cable provider",
-    "cable and internet included",
-    "tv included",
-  ];
+    // Cable-related keywords and popular provider terms
+    const cableKeywords = [
+      "cable included",
+      "cable incl",
+      "free cable",
+      "tv package",
+      "rogers tv",
+      "bell fibe",
+      "bell tv",
+      "shaw cable",
+      "cogeco tv",
+      "videotron",
+      "cable ready",
+      "cable provided",
+      "cable tv included",
+      "satellite tv included",
+      "satellite included",
+      "cable service included",
+      "cable service",
+      "cable tv",
+      "cable subscription",
+      "cable television",
+      "cable service provider",
+      "cable provider",
+      "cable and internet included",
+      "tv included",
+    ];
 
-  return cableKeywords.some(keyword => text.includes(keyword));
-}
+    return cableKeywords.some(keyword => text.includes(keyword));
+  }
 
 
 
@@ -3013,13 +3153,13 @@ function detectCableInclusion(data) {
 
     // Returns true if *any* restriction is detected
     if (
-        /no pets|no dogs|cats only|service animals only|breed restrictions|small pets/.test(text)
+      /no pets|no dogs|cats only|service animals only|breed restrictions|small pets/.test(text)
     ) {
-        return true;
+      return true;
     }
 
     return false;
-}
+  }
 
   // Detect building management info based on text
   function detectBuildingMgmtInfo() {
@@ -3040,25 +3180,25 @@ function detectCableInclusion(data) {
     return ""; // leave blank if nothing relevant
   }
   function extractDryerManufacturer(data) {
-  const manufacturerList = [
-    "Galanz","AEG","Allure","Amana","Asko","AVG","Bertazzoni","Best","Bloomberg","Bluestar","Bosch","Braoa","Brgan","Broan","Caloric","Cavavin","Chambers","Cyclone","Dacor","Danby","Direct drive","Electrolux","Elica","Faber","Fisher & Paykel","Forester","Frigidaire","Fulgor","Gaggenau","Gasland","General Electric (GE Appliances)","Gorenje","Haier","Hamilton Beach","Hisense","Homestyles","Huebsch","iFlow","Ikea","Inglis","Jennair","Kenmore","KitchenAid","Kobe","Krupps","Kucht","La Cornue","LG","Liebherr","Lotus","Lynx","Marvel","Maxima","Maytag","Midea","Miele","Moffat","Monogram","Napoleon","NCA","Not Mentioned","NuTone","Panasonic","Porter & Charles","Roper","Sakura","Samsung","Sanyo","Sharp","Silhouette","Sirius","Smeg","Sub-Zero","Sunbeam","Thermador","Unique Appliances","Venmar","Vent A Hood","Vesta","Vitara","Whirlpool","Wolf","Z-Air","Zephyr"
-  ];
-  
-  const text = JSON.stringify(data).toLowerCase();
+    const manufacturerList = [
+      "Galanz", "AEG", "Allure", "Amana", "Asko", "AVG", "Bertazzoni", "Best", "Bloomberg", "Bluestar", "Bosch", "Braoa", "Brgan", "Broan", "Caloric", "Cavavin", "Chambers", "Cyclone", "Dacor", "Danby", "Direct drive", "Electrolux", "Elica", "Faber", "Fisher & Paykel", "Forester", "Frigidaire", "Fulgor", "Gaggenau", "Gasland", "General Electric (GE Appliances)", "Gorenje", "Haier", "Hamilton Beach", "Hisense", "Homestyles", "Huebsch", "iFlow", "Ikea", "Inglis", "Jennair", "Kenmore", "KitchenAid", "Kobe", "Krupps", "Kucht", "La Cornue", "LG", "Liebherr", "Lotus", "Lynx", "Marvel", "Maxima", "Maytag", "Midea", "Miele", "Moffat", "Monogram", "Napoleon", "NCA", "Not Mentioned", "NuTone", "Panasonic", "Porter & Charles", "Roper", "Sakura", "Samsung", "Sanyo", "Sharp", "Silhouette", "Sirius", "Smeg", "Sub-Zero", "Sunbeam", "Thermador", "Unique Appliances", "Venmar", "Vent A Hood", "Vesta", "Vitara", "Whirlpool", "Wolf", "Z-Air", "Zephyr"
+    ];
 
-  // Try to match a brand near "dryer"
-  for (let brand of manufacturerList) {
-    const brandPattern = new RegExp(
-      `\\b${brand.toLowerCase()}\\b[^\\w\\d]{0,20}dryer|dryer[^\\w\\d]{0,20}\\b${brand.toLowerCase()}\\b`, 'i'
-    );
-    if (brandPattern.test(text)) {
-      return brand; // Return CRM-style value
+    const text = JSON.stringify(data).toLowerCase();
+
+    // Try to match a brand near "dryer"
+    for (let brand of manufacturerList) {
+      const brandPattern = new RegExp(
+        `\\b${brand.toLowerCase()}\\b[^\\w\\d]{0,20}dryer|dryer[^\\w\\d]{0,20}\\b${brand.toLowerCase()}\\b`, 'i'
+      );
+      if (brandPattern.test(text)) {
+        return brand; // Return CRM-style value
+      }
     }
-  }
 
-  // Not found
-  return "Not Mentioned";
-}
+    // Not found
+    return "Not Mentioned";
+  }
   //
   function extractMgmtEmail() {
     const text = JSON.stringify(data);
@@ -3176,10 +3316,11 @@ function detectCableInclusion(data) {
     statusfc.disabled = true;
     document.getElementById("pageLoader").style.display = "flex";
 
+//"&bypassCache=true"
     try {
       const response = await fetch(
         "https://api.royalyorkpm.com/kijiji-ocr-new?url=" +
-        encodeURIComponent(url)
+        encodeURIComponent(url) 
       );
       data = await response.json();
       const StringData = JSON.stringify(data).toLowerCase();
@@ -3191,7 +3332,6 @@ function detectCableInclusion(data) {
       const LastName = extractLastName(fullName);
       scrapedDate = extractAvailableDate(data.vipAttributes?.attributes);
       const Mobile = extractPhoneNumberFromText(data);
-      console.log("Mobile", Mobile);
       const unitType = detectUnitTypeFromTitleAndDescription(data.title, data.description);
       const city = extractCityFromAddress(data);
       const Province = extractProvince(data.location);
@@ -3203,7 +3343,7 @@ function detectCableInclusion(data) {
       const backyard = detectBackyard();
       const backyardFenced = detectBackyardFenced();
       const Parkingspacs = extractParkingSpacesFromText();
-      const washerManufacturer = extractWasherManufacturer(data); 
+      const washerManufacturer = extractWasherManufacturer(data);
       const parkingDetails = detectParkingDetails() || "";
       const Walkout_to_Garage = detectWalkoutToGarage(data.description || []);
       const Private_Garage = detectPrivateGarage(data.description || []);
@@ -3263,7 +3403,6 @@ function detectCableInclusion(data) {
       const Library = detectLibrary();
       const Squash = detectSquash();
       const Bowling = detectBowling();
-      const washerAndDryer = detectWasherAndDryer(data); // returns "Ensuite", "Shared", "Pay Per Use", or "No"
       const Indoor_Child_Area = detectIndoor_Child_Area();
       const Meeting_Room = detectMeeting_Room();
       const Yoga_Room = detectYoga_Room();
@@ -3275,7 +3414,7 @@ function detectCableInclusion(data) {
       const Golf_Range = detectGolf_Range();
       const Piano_Lounge = detectPiano_Lounge();
       const Daycare = detectDaycare();
-      const Email=extractEmailFromData(data);
+      const Email = extractEmailFromData(data);
       const ParkingLevelNumber = extractParkingLevelNumber();
       document.getElementById("First_Name").value = FirstName;
       document.getElementById("Last_Name").value = LastName;
@@ -3363,7 +3502,6 @@ function detectCableInclusion(data) {
         // If no number, prefix with "Not Listed – {unitName}"
         return ` ${trimmed}`;
       }
-
       // Detect lawn and snow care services based on description
       function detectLawnAndSnowCare(descriptionArray = [], unitType = "") {
         const text = (descriptionArray || []).join(" ").toLowerCase();
@@ -3472,11 +3610,8 @@ function detectCableInclusion(data) {
         }
 
         const basementKeywords = [
-          "basement",
-          "lower level",
-          "shared laundry",
-          "separate entrance",
-          "in basement",
+          
+          "laundary"
         ];
 
         const matches = (descriptionArray || []).filter((line) =>
@@ -3562,7 +3697,6 @@ function detectCableInclusion(data) {
 
         return "";
       }
-
       // Detect if the property is verified by RYPM
       function detectVerifiedByRYPM({
         propertyCondition = "",
@@ -3615,46 +3749,46 @@ function detectCableInclusion(data) {
           text.includes("open patio")
         );
       }
-// website title generation function
-function generateWebsiteTitle(bedrooms, bathrooms, unitType, unitName) {
-    // Format bedrooms
-    let bedPart = bedrooms ? `${bedrooms} BED` : "";
+      // website title generation function
+      function generateWebsiteTitle(bedrooms, bathrooms, unitType, unitName) {
+        // Format bedrooms
+        let bedPart = bedrooms ? `${bedrooms} BED` : "";
 
-    // Format bathrooms
-    let bathPart = bathrooms ? `${bathrooms} BATH` : "";
+        // Format bathrooms
+        let bathPart = bathrooms ? `${bathrooms} BATH` : "";
 
-    // Combine BED + BATH
-    let bedBath = [bedPart, bathPart].filter(Boolean).join(" + ");
+        // Combine BED + BATH
+        let bedBath = [bedPart, bathPart].filter(Boolean).join(" + ");
 
-    // Format unit type
-    let unitTypeFormatted = unitType ? unitType.toUpperCase() : "UNIT";
+        // Format unit type
+        let unitTypeFormatted = unitType ? unitType.toUpperCase() : "UNIT";
 
-    // Remove postal code from unitName
-    let unitNameClean = unitName;
-    if (unitName.includes(",")) {
-        let parts = unitName.split(",");
-        // Remove last part if it looks like a postal code
-        if (parts[parts.length - 1].trim().match(/[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d/)) {
+        // Remove postal code from unitName
+        let unitNameClean = unitName;
+        if (unitName.includes(",")) {
+          let parts = unitName.split(",");
+          // Remove last part if it looks like a postal code
+          if (parts[parts.length - 1].trim().match(/[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d/)) {
             parts.pop();
+          }
+          unitNameClean = parts.join(",").trim();
         }
-        unitNameClean = parts.join(",").trim();
-    }
 
-    // Capitalize each word in unit name
-    function titleCase(str) {
-        return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1));
-    }
+        // Capitalize each word in unit name
+        function titleCase(str) {
+          return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1));
+        }
 
-    // Combine
-    const title = `${bedBath} - ${unitTypeFormatted} FOR RENT - ${titleCase(unitNameClean)}`;
-    return title;
-}
+        // Combine
+        const title = `${bedBath} - ${unitTypeFormatted} FOR RENT - ${titleCase(unitNameClean)}`;
+        return title;
+      }
 
 
 
       //Condition const here updated ones
       const UnitNamecorrected = correctUnitName(unitType, unitName);
-      const dryerBrand = extractDryerManufacturer(yourJsonData);
+      const dryerBrand = extractDryerManufacturer(data);
       const cableIncluded = detectCableInclusion(data);
       const Unitnumber = detectUnitNumber(unitType,);
       const lawnSnowCare = detectLawnAndSnowCare(data.description || []);
@@ -3717,88 +3851,88 @@ function generateWebsiteTitle(bedrooms, bathrooms, unitType, unitName) {
       const mgmtPhone = extractMgmtPhone();
       const officeAddress = extractOfficeAddress();
       const developerName = detectDeveloperName();
-      const Laundary= detectOnSiteLaundry(data);
+      const Laundary = detectOnSiteLaundry(data);
       const dateOfConstructionISO = detectDateOfConstruction();
       document.getElementById("Year_Last_Renovated").value = Lastyearrenovated;
       document.getElementById("Unit_name").value = UnitNamecorrected || "";
       document.getElementById("Unit_number").value = Unitnumber;
 
       function generateAdDescription({
-    FirstName,
-    LastName,
-    Mobile,
-    bedrooms,
-    bathrooms,
-    unitType,
-    unitName,
-    Street_Name,
-    Street_Number,
-    city,
-    Province,
-    PostalCode,
-    price,
-    Parkingspacs,
-    Upgraded_Kitchen,
-    kitchenCountertops,
-    applianceFinish,
-    furnished,
-    flooringBedrooms,
-    ceilingHeight,
-    upgradedBathroom,
-    closetType,
-    enSuiteBathrooms,
-    privateTerraceOrBackyard,
-    Sunlight,
-    Outdoor_Patio_Final,
-    BBQ_Area_Final,
-    Parking_Garage,
-    Remote_Garage,
-    Subway_Access,
-    dateOfConstructionISO,
-}) {
-    const phoneDisplay = Mobile || "(437) 561-9900"; // fallback to call number
+        FirstName,
+        LastName,
+        Mobile,
+        bedrooms,
+        bathrooms,
+        unitType,
+        unitName,
+        Street_Name,
+        Street_Number,
+        city,
+        Province,
+        PostalCode,
+        price,
+        Parkingspacs,
+        Upgraded_Kitchen,
+        kitchenCountertops,
+        applianceFinish,
+        furnished,
+        flooringBedrooms,
+        ceilingHeight,
+        upgradedBathroom,
+        closetType,
+        enSuiteBathrooms,
+        privateTerraceOrBackyard,
+        Sunlight,
+        Outdoor_Patio_Final,
+        BBQ_Area_Final,
+        Parking_Garage,
+        Remote_Garage,
+        Subway_Access,
+        dateOfConstructionISO,
+      }) {
+        const phoneDisplay = Mobile || "(437) 561-9900"; // fallback to call number
 
-    // Address block
-    const addressFull = `${Street_Number ? Street_Number + " " : ""}${Street_Name}, ${city}, ${Province} ${PostalCode}`.trim();
+        // Address block
+        const addressFull = `${Street_Number ? Street_Number + " " : ""}${Street_Name}, ${city}, ${Province} ${PostalCode}`.trim();
 
-    // Intersection placeholder (can enhance to extract if needed)
-    const intersection = `${city} Main Intersection`;
+        // Intersection placeholder (can enhance to extract if needed)
+        const intersection = `${city} Main Intersection`;
 
-    // Price and parking
-    const priceDisplay = price ? `$${price.toLocaleString()}/mo` : "Price Upon Request";
-    const parkingDisplay = Parkingspacs ? `(${Parkingspacs} Parking Spots Available)` : "";
+        // Price and parking
+        const priceDisplay = price ? `$${price.toLocaleString()}/mo` : "Price Upon Request";
+        const parkingDisplay = Parkingspacs ? `(${Parkingspacs} Parking Spots Available)` : "";
 
-    // Building amenities
-    const amenities = []
-    if (Outdoor_Patio_Final) amenities.push("Outdoor Patio");
-    if (BBQ_Area_Final) amenities.push("Barbecue Area");
-    if (Parking_Garage) amenities.push("Parking Garage");
-    if (Remote_Garage) amenities.push("Remote Garage");
-    if (Subway_Access) amenities.push("Public Transit");
+        // Building amenities
+        const amenities = []
+        if (Outdoor_Patio_Final) amenities.push("Outdoor Patio");
+        if (BBQ_Area_Final) amenities.push("Barbecue Area");
+        if (Parking_Garage) amenities.push("Parking Garage");
+        if (Remote_Garage) amenities.push("Remote Garage");
+        if (Subway_Access) amenities.push("Public Transit");
 
-    const amenitiesDisplay = amenities.length > 0 ? `- ${amenities.join(" - ")} -` : "Inquire for building amenities.";
+        const amenitiesDisplay = amenities.length > 0 ? `- ${amenities.join(" - ")} -` : "Inquire for building amenities.";
 
-    // Unit Features
-    const features = [];
+        // Unit Features
+        const features = [];
 
-    if (bedrooms) features.push(`${bedrooms} Bedrooms`);
-    if (bathrooms) features.push(`${bathrooms} Bathrooms`);
-    if (dateOfConstructionISO) features.push(`Built: ${dateOfConstructionISO}`);
-    if (Upgraded_Kitchen) features.push("Upgraded Kitchen");
-    if (kitchenCountertops) features.push(`${kitchenCountertops} Countertops`);
-    if (applianceFinish) features.push(`${applianceFinish} Appliances`);
-    if (furnished) features.push("Furnished");
-    if (flooringBedrooms) features.push(`${flooringBedrooms} Floors`);
-    if (ceilingHeight) features.push(`${ceilingHeight} Ceilings`);
-    if (upgradedBathroom) features.push("Upgraded Bathrooms");
-    if (closetType) features.push(`${closetType} Closets`);
-    if (enSuiteBathrooms) features.push("En-suite Bathroom");
-    if (privateTerraceOrBackyard) features.push("Private Terrace/Backyard");
-    if (Sunlight) features.push("Tons of Natural Light");
+        if (bedrooms) features.push(`${bedrooms} Bedrooms`);
+        if (bathrooms) features.push(`${bathrooms} Bathrooms`);
+        if (dateOfConstructionISO) features.push(`Built: ${dateOfConstructionISO}`);
+        if (Upgraded_Kitchen) features.push("Upgraded Kitchen");
+        if (kitchenCountertops) features.push(`${kitchenCountertops} Countertops`);
+        if (applianceFinish) features.push(`${applianceFinish} Appliances`);
+        if (furnished) features.push("Furnished");
+        if (flooringBedrooms) features.push(`${flooringBedrooms} Floors`);
+        if (ceilingHeight) features.push(`${ceilingHeight} Ceilings`);
+        if (upgradedBathroom) features.push("Upgraded Bathrooms");
+        if (closetType) features.push(`${closetType} Closets`);
+        if (enSuiteBathrooms) features.push("En-suite Bathroom");
+        if (privateTerraceOrBackyard) features.push("Private Terrace/Backyard");
+        if (Sunlight) features.push("Tons of Natural Light");
 
-    const featuresDisplay = features.map(f => `- ${f}`).join("\n");
+        const featuresDisplay = features.map(f => `- ${f}`).join("\n");
 
-    return `** OPEN 24/7 - CALL: ${phoneDisplay} **
+        return `** OPEN 24/7 - CALL: ${phoneDisplay} **
 
 ${bedrooms || "Multiple"} Bedrooms, ${bathrooms || "Multiple"} Bathrooms, Near Parks, Public Transportation, Bus Stops, Schools, Shopping Malls, Grocery Stores, Restaurants, Bars and Sport Clubs. The unit also has ${Upgraded_Kitchen ? "an Upgraded Kitchen, " : ""}${kitchenCountertops ? `${kitchenCountertops} Countertops, ` : ""}${flooringBedrooms ? `${flooringBedrooms} Floors, ` : ""}${upgradedBathroom ? "Upgraded Bathrooms, " : ""}${privateTerraceOrBackyard ? "Private Terrace/Backyard, " : ""}${Sunlight ? "and Tons of Natural Light." : ""}
 
@@ -3820,272 +3954,266 @@ Available Immediately!!
 
 ** OPEN 24/7 - CALL: ${phoneDisplay} **
 READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
-}
-function generateLocationAndIncentives({
-    locationFeatures = [],
-    hasParks = true,
-    hasTransit = true,
-    hasSchools = true,
-    hasShopping = true,
-    hasRestaurants = true,
-    incentivesPartners = ["Rogers", "Bell", "Apollo Insurance", "The Brick"],
-    customIncentives = [],
-} = {}) {
-    // 📍 Location Description Assembly
-    const features = [];
+      }
+      function generateLocationAndIncentives({
+        locationFeatures = [],
+        hasParks = true,
+        hasTransit = true,
+        hasSchools = true,
+        hasShopping = true,
+        hasRestaurants = true,
+        incentivesPartners = ["Rogers", "Bell", "Apollo Insurance", "The Brick"],
+        customIncentives = [],
+      } = {}) {
+        // 📍 Location Description Assembly
+        const features = [];
 
-    if (hasParks) features.push("Parks");
-    if (hasTransit) features.push("Public Transportation, Bus Stops");
-    if (hasSchools) features.push("Schools");
-    if (hasShopping) features.push("Shopping Malls, Grocery Stores");
-    if (hasRestaurants) features.push("Restaurants, Bars and Sports Clubs");
+        if (hasParks) features.push("Parks");
+        if (hasTransit) features.push("Public Transportation, Bus Stops");
+        if (hasSchools) features.push("Schools");
+        if (hasShopping) features.push("Shopping Malls, Grocery Stores");
+        if (hasRestaurants) features.push("Restaurants, Bars and Sports Clubs");
 
-    if (locationFeatures.length > 0) {
-        features.push(...locationFeatures);
-    }
+        if (locationFeatures.length > 0) {
+          features.push(...locationFeatures);
+        }
 
-    const locationDescription = `Near ${features.join(", ")}.`;
+        const locationDescription = `Near ${features.join(", ")}.`;
 
-    // 🎁 Incentives Assembly
-    const partners = incentivesPartners.length > 0
-        ? incentivesPartners.join(", ")
-        : "our trusted partners";
+        // 🎁 Incentives Assembly
+        const partners = incentivesPartners.length > 0
+          ? incentivesPartners.join(", ")
+          : "our trusted partners";
 
-    const incentives = customIncentives.length > 0
-        ? `Enjoy Special Rates and Offers: ${customIncentives.join(", ")}.`
-        : `Enjoy Special Rates From Our Partners: ${partners}.`;
+        const incentives = customIncentives.length > 0
+          ? `Enjoy Special Rates and Offers: ${customIncentives.join(", ")}.`
+          : `Enjoy Special Rates From Our Partners: ${partners}.`;
 
-    return {
-        locationDescription,
-        incentives
-    };
-}
-
-
-
-const adDescription = generateAdDescription({
-    FirstName,
-    LastName,
-    Mobile,
-    bedrooms,
-    bathrooms,
-    unitType,
-    unitName,
-    Street_Name,
-    Street_Number,
-    city,
-    Province,
-    PostalCode,
-    price: numericPrice,
-    Parkingspacs,
-    Upgraded_Kitchen,
-    kitchenCountertops,
-    applianceFinish,
-    furnished,
-    flooringBedrooms,
-    ceilingHeight,
-    upgradedBathroom,
-    closetType,
-    enSuiteBathrooms,
-    privateTerraceOrBackyard,
-    Sunlight,
-    Outdoor_Patio_Final,
-    BBQ_Area_Final,
-    Parking_Garage,
-    Remote_Garage,
-    Subway_Access,
-    dateOfConstructionISO,
-});
-const { locationDescription, incentives } = generateLocationAndIncentives();
-
-// console.log("📍 Location Description:", locationDescription);
-// console.log("🎁 Incentives:", incentives);
-
-
-// console.log("🚀 Generated Ad Description:\n", adDescription);
+        return {
+          locationDescription,
+          incentives
+        };
+      }
 
 
 
+      const adDescription = generateAdDescription({
+        FirstName,
+        LastName,
+        Mobile,
+        bedrooms,
+        bathrooms,
+        unitType,
+        unitName,
+        Street_Name,
+        Street_Number,
+        city,
+        Province,
+        PostalCode,
+        price: numericPrice,
+        Parkingspacs,
+        Upgraded_Kitchen,
+        kitchenCountertops,
+        applianceFinish,
+        furnished,
+        flooringBedrooms,
+        ceilingHeight,
+        upgradedBathroom,
+        closetType,
+        enSuiteBathrooms,
+        privateTerraceOrBackyard,
+        Sunlight,
+        Outdoor_Patio_Final,
+        BBQ_Area_Final,
+        Parking_Garage,
+        Remote_Garage,
+        Subway_Access,
+        dateOfConstructionISO,
+      });
+      const { locationDescription, incentives } = generateLocationAndIncentives();
 
-  
-       leadData = {
-      First_Name: FirstName,
-      Last_Name: LastName,
-      Mobile: Mobile,
-      Phone: Mobile,
-      Email: Email,
-      City: city,
-      Lead_Source: "Kijiji",
-      Asking_Price: numericPrice,
-      Lead_Priority_Level: "High",
-      URL: document.getElementById("unitUrl").value,
-      Available_Date: scrapedDate,
-      Ad_ID_New: listingId,
-      Kijiji_Data_Importer:true,
-    };
-     unitData = {
-      Name: UnitNamecorrected,
-      Posting_Title_With_Parking_and_Locker: websiteTitle,
-      Unit_Type: unitType,
-      Incentives: incentives,
-      Market_Price_With_Parking_and_Locker: numericPrice,
-      Marketed_Price:numericPrice,
-      Dryer_Manufacture:dryerBrand,
-      Washer_Manufacture:washerManufacturer,
-      Washer_and_Dryer:washerAndDryer,
-      Ad_Description: adDescription,
-      Ad_Description_Long: adDescription,
-      Meta_Description: adDescription,
-      Location_Description: locationDescription,
-      Posting_Title:websiteTitle,
-      Total_Area_Sq_Ft: sqFt,
-      Max_Occupants: maximumOccupants,
-      Property_Condition: propertyCondition,
-      Year_Built: Lastyearrenovated,
-      Number_of_Floors: numberOfFloors,
-      Unit_Facing: unitFacing,
-      Lawn_and_Snow_Care: lawnSnowCare,
-      Basement_Entrance: entranceType,
-      Furnished: furnished,
-      Basement_Included: basement,
-      Basement_Details: basementDetails,
-      Earliest_Move_in_Date: scrapedDate,
-      Flooring_Common_Area: flooringCommonArea,
-      Ceiling_Hight: ceilingHeight,
-      Window_Coverings: windowCoveringsCommon,
-      Window_Coverings_Common_Area: windowCoveringsBedroom,
-      Bedrooms: bedrooms,
-      Bedroom_Layout: bedroomLayout,
-      Den_can_be_used_as_a_bedroom: denAsBedroom,
-      Closets: closetType,
-      En_Suite_Bathrooms: enSuiteBathrooms,
-      Bathrooms: bathrooms,
-      Countertops_Bathroom: bathroomCountertop,
-      Shower_Type: showerType,
-      Appliances: applianceFinish,
-      Countertops: kitchenCountertops,
-      Flooring_in_Bedrooms: flooringBedrooms,
-      Location_of_Balcony: balconyLocation,
-      Backyard: backyard,
-      Is_the_backyard_fenced: backyardFenced,
-      Number_of_Parking_Spaces: Parkingspacs,
-      Parking_Details: parkingDetails,
-      parking_level_num: ParkingLevelNumber,
-      View: view,
-      Cable_Inclusion:cableIncluded,
-      Water_Inclusion:waterIncluded,
-      Electricity_Inclusion:hydroIncluded,
-      Number_of_Lockers: numberOfLockers,
-      Storage_Details: lockerDetails,
-      locker_level_and_number: lockerLevelAndNumber,
-      How_are_utilities_split: utilityShare,
-      Insurance_Home_Owner: insuranceCompany,
-      Insurance_Home_Owners: insuranceCompany,
-      Insurance_Policy_Number: insurancePolicyNumber,
-      Address_Line_2: Unitnumber,
-      Street_Number: Street_Number,
-      Address: Street_Name,
-      City: city,
-      On_site_Laundry:Laundary,
-      Province: Province,
-      Postal_Code: PostalCode,
-      Mail_Box_Number: Mailbox_Number,
-      Bank_Account: "Canada",
-      Hydro_Provider: electricityProvider,
-      Water_Provider: waterProvider,
-      Gas_Provider: gasProvider,
-      Hot_Water_Tank_Provider: hotWaterTankProvider,
-      AC_Inclusion: AC_Inclusion,
-      Heat_Inclusion: Heat_Inclusion,
-      Internet_Inclusion: Internet_Inclusion,
-      Cable_Inclusion: Building_Cable_Incl,
-      Utility_Notes: utilityNotes,
-      Corner_Unit: Corner_Unit,
-      Central_Vaccum: Central_Vacuum,
-      Penthouse: Penthouse,
-      Tons_of_Natural_Light: true,
-      Fireplace: Fireplace_Common_Area,
-      Fireplace_Bedroom: Fireplace_Bedroom,
-      Upgraded_Bathrooms: Upgraded_Bathrooms,
-      Upgraded_Back_Splash: Backsplash_Kitchen,
-      Upgraded_Kitchen: Upgraded_Kitchen,
-      Dishwasher: Dishwasher_Included,
-      Huge_Private_Terrace: isPrivateTerrace,
-      Private_Garage: Private_Garage,
-      Walk_out_to_Garage: Walkout_to_Garage,
-      Owner: { id: loggedInUserId },
-      Kijiji_Data_Importer:true,
-    };
+
+      leadData = {
+        First_Name: FirstName,
+        Last_Name: LastName,
+        Mobile: Mobile,
+        Phone: Mobile,
+        Email: Email,
+        City: city,
+        Lead_Source: "Kijiji",
+        Asking_Price: numericPrice,
+        Lead_Priority_Level: "High",
+        URL: document.getElementById("unitUrl").value,
+        Available_Date: scrapedDate,
+        Ad_ID_New: listingId,
+        Kijiji_Data_Importer: true,
+      };
+      unitData = {
+        Name: UnitNamecorrected,
+        Posting_Title_With_Parking_and_Locker: websiteTitle,
+        Unit_Type: unitType,
+        Incentives: incentives,
+        Market_Price_With_Parking_and_Locker: numericPrice,
+        Marketed_Price: numericPrice,
+        Dryer_Manufacture: dryerBrand,
+        Washer_Manufacture: washerManufacturer,
+        Washer_and_Dryer: Laundary,
+        Ad_Description: adDescription,
+        Ad_Description_Long: adDescription,
+        Meta_Description: adDescription,
+        Location_Description: locationDescription,
+        Posting_Title: websiteTitle,
+        Total_Area_Sq_Ft: sqFt,
+        Max_Occupants: maximumOccupants,
+        Property_Condition: propertyCondition,
+        Year_Built: Lastyearrenovated,
+        Number_of_Floors: numberOfFloors,
+        Unit_Facing: unitFacing,
+        Lawn_and_Snow_Care: lawnSnowCare,
+        Basement_Entrance: entranceType,
+        Furnished: furnished,
+        Basement_Included: basement,
+        Basement_Details: basementDetails,
+        Earliest_Move_in_Date: scrapedDate,
+        Flooring_Common_Area: flooringCommonArea,
+        Ceiling_Hight: ceilingHeight,
+        Window_Coverings: windowCoveringsCommon,
+        Window_Coverings_Common_Area: windowCoveringsBedroom,
+        Bedrooms: bedrooms,
+        Bedroom_Layout: bedroomLayout,
+        Den_can_be_used_as_a_bedroom: denAsBedroom,
+        Closets: closetType,
+        En_Suite_Bathrooms: enSuiteBathrooms,
+        Bathrooms: bathrooms,
+        Countertops_Bathroom: bathroomCountertop,
+        Shower_Type: showerType,
+        Appliances: applianceFinish,
+        Countertops: kitchenCountertops,
+        Flooring_in_Bedrooms: flooringBedrooms,
+        Location_of_Balcony: balconyLocation,
+        Backyard: backyard,
+        Is_the_backyard_fenced: backyardFenced,
+        Number_of_Parking_Spaces: Parkingspacs,
+        Parking_Details: parkingDetails,
+        parking_level_num: ParkingLevelNumber,
+        View: view,
+        Cable_Inclusion: cableIncluded,
+        Water_Inclusion: waterIncluded,
+        Electricity_Inclusion: hydroIncluded,
+        Number_of_Lockers: numberOfLockers,
+        Storage_Details: lockerDetails,
+        locker_level_and_number: lockerLevelAndNumber,
+        How_are_utilities_split: utilityShare,
+        Insurance_Home_Owner: insuranceCompany,
+        Insurance_Home_Owners: insuranceCompany,
+        Insurance_Policy_Number: insurancePolicyNumber,
+        Address_Line_2: Unitnumber,
+        Street_Number: Street_Number,
+        Address: Street_Name,
+        City: city,
+        On_site_Laundry: Laundary,
+        Province: Province,
+        Postal_Code: PostalCode,
+        Mail_Box_Number: Mailbox_Number,
+        Bank_Account: "Canada",
+        Hydro_Provider: electricityProvider,
+        Water_Provider: waterProvider,
+        Gas_Provider: gasProvider,
+        Hot_Water_Tank_Provider: hotWaterTankProvider,
+        AC_Inclusion: AC_Inclusion,
+        Heat_Inclusion: Heat_Inclusion,
+        Internet_Inclusion: Internet_Inclusion,
+        Cable_Inclusion: Building_Cable_Incl,
+        Utility_Notes: utilityNotes,
+        Corner_Unit: Corner_Unit,
+        Central_Vaccum: Central_Vacuum,
+        Penthouse: Penthouse,
+        Tons_of_Natural_Light: true,
+        Fireplace: Fireplace_Common_Area,
+        Fireplace_Bedroom: Fireplace_Bedroom,
+        Upgraded_Bathrooms: Upgraded_Bathrooms,
+        Upgraded_Back_Splash: Backsplash_Kitchen,
+        Upgraded_Kitchen: Upgraded_Kitchen,
+        Dishwasher: Dishwasher_Included,
+        Huge_Private_Terrace: isPrivateTerrace,
+        Private_Garage: Private_Garage,
+        Walk_out_to_Garage: Walkout_to_Garage,
+        Owner: { id: loggedInUserId },
+        Kijiji_Data_Importer: true,
+      };
       building_data = {
-      Date_of_Construction: dateOfConstructionISO,
-      Developer_Name: developerName,
-      Concierge_Building_Management_Info: mgmtInfo,
-      Category: buildingCategory,
-      Property_Type: unitType,
-      Property_Management_Contact_Email: mgmtEmail,
-      Office_Phone_Number: mgmtPhone,
-      Office_Address: officeAddress,
-      floor_count: numberOfFloors,
-      unit_count: numberOfUnits,
-      Corporation_Number: condoCorpNumber,
-      Pet_Restrictions: petRestrictions,
-      Address: UnitNamecorrected,
-      Name: UnitNamecorrected,
-      City: city,
-      Province: Province,
-      Postal_Code: PostalCode,
-      ac_included: Building_AC_Incl,
-      heat_included: Building_Heat_Incl,
-      cable_inclusion: Building_Cable_Incl,
-      internet_inclusion: Building_Internet_Incl,
-      Water_Filtration_Softener_Rental: Building_Water_Filtration_Rental,
-      Parking_Garage: Parking_Garage,
-      Remote_Garage: Remote_Garage,
-      Visitor_Parking: Visitor_Parking,
-      Electric_Car_Charging_Stations: EV_Charging,
-      Car_Wash: Car_Wash,
-      has_subway_access: Subway_Access,
-      Laundry_Facilities: Laundry_Building,
-      has_lobby_lounge: Lobby_Lounge,
-      Wheelchair_Access: Wheelchair_Access,
-      Onsite_Staff: Onsite_Staff,
-      has_security: Concierge_24_7,
-      has_guest_suites: Guest_Suites,
-      has_bicycle_storage: Bicycle_Storage,
-      Elevators: Elevators,
-      Enter_Phone_System: Buzzer_System,
-      Security_Onsite: Security,
-      Keyless_Entry: Keyless_Entry,
-      Pet_Spa: Pet_Spa,
-      has_bbq_terrace: BBQ_Area_Final,
-      has_rooftop_patio: Rooftop_Patio,
-      has_cabana: Cabanas,
-      has_tennis_court: Tennis_Court,
-      Outdoor_Patio: Outdoor_Patio_Final,
-      has_outdoor_pool: Outdoor_Pool,
-      Outdoor_Child_Play_Area: Outdoor_Child_Play_Area,
-      has_fitness_center: Gym_Fitness,
-      Rec_Room: Rec_Room,
-      has_billiards_room: Billiards,
-      has_pool: Indoor_Pool,
-      has_sauna: Sauna,
-      Library: Library,
-      has_squash_court: Squash,
-      has_bowling_alley: Bowling,
-      Indoor_Child_Play_Area: Indoor_Child_Area,
-      has_business_centre: Meeting_Room,
-      has_yoga_room: Yoga_Room,
-      has_movie_theater: Movie_Room,
-      has_game_room: Games_Room,
-      has_whirlpool: Whirlpool,
-      has_steam_room: Steam_Room,
-      has_basketball_court: Basketball,
-      has_golf_range: Golf_Range,
-      Piano_Lounge: Piano_Lounge,
-      Day_Care_Centre: Daycare,
-      Kijiji_Data_Importer:true,
+        Date_of_Construction: dateOfConstructionISO,
+        Developer_Name: developerName,
+        AC_Included1: AC_Inclusion,
+        Heat_Included1: Heat_Inclusion,
+        Internet_Included: Internet_Inclusion,
+        Concierge_Building_Management_Info: mgmtInfo,
+        Category: buildingCategory,
+        Property_Type: unitType,
+        Property_Management_Contact_Email: mgmtEmail,
+        Office_Phone_Number: Mobile,
+        Office_Address: officeAddress,
+        floor_count: numberOfFloors,
+        unit_count: numberOfUnits,
+        Corporation_Number: condoCorpNumber,
+        Pet_Restrictions: petRestrictions,
+        Address: UnitNamecorrected,
+        Name: UnitNamecorrected,
+        City: city,
+        Province: Province,
+        Postal_Code: PostalCode,
+        ac_included: Building_AC_Incl,
+        heat_included: Building_Heat_Incl,
+        cable_inclusion: Building_Cable_Incl,
+        internet_inclusion: Building_Internet_Incl,
+        Water_Filtration_Softener_Rental: Building_Water_Filtration_Rental,
+        Parking_Garage: Parking_Garage,
+        Remote_Garage: Remote_Garage,
+        Visitor_Parking: Visitor_Parking,
+        Electric_Car_Charging_Stations: EV_Charging,
+        Car_Wash: Car_Wash,
+        has_subway_access: Subway_Access,
+        Laundry_Facilities: Laundry_Building,
+        has_lobby_lounge: Lobby_Lounge,
+        Wheelchair_Access: Wheelchair_Access,
+        Onsite_Staff: Onsite_Staff,
+        has_security: Concierge_24_7,
+        has_guest_suites: Guest_Suites,
+        has_bicycle_storage: Bicycle_Storage,
+        Elevators: Elevators,
+        Enter_Phone_System: Buzzer_System,
+        Security_Onsite: Security,
+        Keyless_Entry: Keyless_Entry,
+        Pet_Spa: Pet_Spa,
+        has_bbq_terrace: BBQ_Area_Final,
+        has_rooftop_patio: Rooftop_Patio,
+        has_cabana: Cabanas,
+        has_tennis_court: Tennis_Court,
+        Outdoor_Patio: Outdoor_Patio_Final,
+        has_outdoor_pool: Outdoor_Pool,
+        Outdoor_Child_Play_Area: Outdoor_Child_Play_Area,
+        has_fitness_center: Gym_Fitness,
+        Rec_Room: Rec_Room,
+        has_billiards_room: Billiards,
+        has_pool: Indoor_Pool,
+        has_sauna: Sauna,
+        Library: Library,
+        has_squash_court: Squash,
+        has_bowling_alley: Bowling,
+        Indoor_Child_Play_Area: Indoor_Child_Area,
+        has_business_centre: Meeting_Room,
+        has_yoga_room: Yoga_Room,
+        has_movie_theater: Movie_Room,
+        has_game_room: Games_Room,
+        has_whirlpool: Whirlpool,
+        has_steam_room: Steam_Room,
+        has_basketball_court: Basketball,
+        has_golf_range: Golf_Range,
+        Piano_Lounge: Piano_Lounge,
+        Day_Care_Centre: Daycare,
+        Kijiji_Data_Importer: true,
 
-    };
+      };
 
       // ✅ Hide loader and update button status
       document.getElementById("pageLoader").style.display = "none";
@@ -4108,12 +4236,12 @@ const { locationDescription, incentives } = generateLocationAndIncentives();
   document.getElementById("createRecordsBtn1").addEventListener("click", async () => {
     const statuscr = document.getElementById("createRecordsBtn1");
     const aid = leasingSel.value;
-    
-//     if (!validateAllFields()) {
-//     // Stop the function if validation fails
-//     return;
-// }
-statuscr.disabled = true;
+
+    //     if (!validateAllFields()) {
+    //     // Stop the function if validation fails
+    //     return;
+    // }
+    statuscr.disabled = true;
     document.getElementById("pageLoader2").style.display = "flex";
 
     console.log("Lead Data:", leadData);
@@ -4457,9 +4585,9 @@ statuscr.disabled = true;
     const statuscr = document.getElementById("createRecordsBtn2");
     const aid = leasingSel.value;
     if (!validateAllFields()) {
-    // Stop the function if validation fails
-    return;
-}
+      // Stop the function if validation fails
+      return;
+    }
     statuscr.disabled = true;
     document.getElementById("pageLoader2").style.display = "flex";
     Source = document.getElementById("prospectSource").value;
@@ -4484,7 +4612,7 @@ statuscr.disabled = true;
     const provinceValue = document.getElementById("Province")?.value || "";
     const postalCodeValue = document.getElementById("Postal_Code")?.value || "";
     const unitCountValue = document.getElementById("number_of_units")?.value || "";
-    const constructedon=document.getElementById("Date_of_Construction")?.value || "";
+    const constructedon = document.getElementById("Date_of_Construction")?.value || "";
 
     ;
 
@@ -4498,7 +4626,7 @@ statuscr.disabled = true;
       Lead_Source: Source,
       Lead_Priority_Level: "High",
       Available_Date: availableDateValue,
-      Kijiji_Data_Importer:true,
+      Kijiji_Data_Importer: true,
     };
 
     // ✅ Create unitData safely
@@ -4519,7 +4647,7 @@ statuscr.disabled = true;
       Bank_Account: "Canada",
       Tons_of_Natural_Light: true,
       Owner: { id: loggedInUserId },
-      Kijiji_Data_Importer:true,
+      Kijiji_Data_Importer: true,
     };
 
     // ✅ Create building_data safely
@@ -4533,7 +4661,7 @@ statuscr.disabled = true;
       Province: provinceValue,
       Postal_Code: postalCodeValue,
       Date_of_Construction: constructedon,
-      Kijiji_Data_Importer:true,
+      Kijiji_Data_Importer: true,
     };
     try {
       document.getElementById("pageLoader2").style.display = "flex";
