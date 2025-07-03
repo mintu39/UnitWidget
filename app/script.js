@@ -159,7 +159,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 //  let selectedSource =document.getElementById("prospectSource").value;
 //  console.log("Selected Source:", selectedSource);
  
-  
   const leasingSel = document.getElementById("ownerid");
   ///users data
   try {
@@ -196,6 +195,64 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
   } catch (err) {
     console.error("❌ Error loading users or user info:", err);
     document.getElementById("ownerid").innerHTML =
+      "<option>Error loading users</option>";
+  }
+  ZOHO.CRM.CONFIG.getCurrentUser()
+    .then(function (userInfo) {
+      loggedInUserId = userInfo.users[0].id;
+      const userEmail = userInfo.users[0].email;
+      const fullName = userInfo.users[0].full_name;
+
+      console.log("✅ Logged-in User ID:", loggedInUserId);
+      console.log("📧 Email:", userEmail);
+      console.log("👤 Name:", fullName);
+    })
+    .catch(function (err) {
+      console.error("❌ Failed to get user info:", err);
+    });
+
+
+
+
+
+
+
+    const leasingSel1 = document.getElementById("ownerid1");
+  ///users data
+  try {
+    const leasingSel1 = document.getElementById("ownerid1"); // Make sure it's defined first
+
+    // Fetch users
+    const resp = await ZOHO.CRM.API.getAllUsers({ Type: "ActiveUsers" });
+    leasingSel1.innerHTML = "";
+
+    // Get current user
+    const userInfo = await ZOHO.CRM.CONFIG.getCurrentUser();
+    const loggedInUserId = userInfo.users[0].id;
+
+    if (resp.users?.length) {
+      resp.users.forEach((u) => {
+        const opt = document.createElement("option");
+        opt.value = u.id;
+        opt.text = u.full_name || u.email;
+
+        // ✅ Auto-select current user
+        if (u.id === loggedInUserId) {
+          opt.selected = true;
+        }
+
+        leasingSel1.appendChild(opt);
+      });
+    } else {
+      leasingSel1.innerHTML = "<option>No active users</option>";
+    }
+
+    console.log("✅ Logged-in User ID:", loggedInUserId);
+    console.log("📧 Email:", userInfo.users[0].email);
+    console.log("👤 Name:", userInfo.users[0].full_name);
+  } catch (err) {
+    console.error("❌ Error loading users or user info:", err);
+    document.getElementById("ownerid1").innerHTML =
       "<option>Error loading users</option>";
   }
   ZOHO.CRM.CONFIG.getCurrentUser()
@@ -261,6 +318,63 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     }
     return true;
   }
+  function validateAllFields1() {
+    // List all required field IDs here
+    const requiredFieldIds = [
+    "First_Name1",
+    "Last_Name1",
+    "Mobile1",
+    "Email1",
+    "ownerid1",
+    "Unitaddress1",
+    "Unit_Type1",
+    "City1",
+    "Available_Date1",
+    "Province1",
+    "Postal_Code1",
+    "Bedrooms1",
+    "Bathrooms1",
+    "number_of_floors1",
+    "number_of_units1",
+    "Backyard1",
+    "Backyard_Fenced1",
+    "Year_Last_Renovated1",
+    "Parking_Spaces1",
+    "Asking_Price1",
+    "Parking_Details1",
+    "Unit_number1",
+    "Date_of_Construction1",
+    "sqrfeet1",
+    "Unit_Description1"
+];
+
+    let missingFields = [];
+    requiredFieldIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        // For select elements, check selected value
+        let value = el.value ? el.value.trim() : "";
+        if (!value) {
+          let label = el.previousElementSibling ? el.previousElementSibling.innerText : id;
+          missingFields.push(label);
+        }
+      }
+    });
+
+    if (missingFields.length > 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Please fill all required fields",
+        html: `<ul style="text-align:left;">${missingFields.map(f => `<li>${f}</li>`).join("")}</ul>`,
+      });
+      return false;
+    }
+    return true;
+  }
+
+
+  
+
 
   function capitalizeNamePart(name) {
     return name
@@ -4529,7 +4643,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
   document.getElementById("createRecordsBtn2").addEventListener("click", async () => {
     const statuscr = document.getElementById("createRecordsBtn2");
     const aid = leasingSel.value;
-    if (!validateAllFields()) {
+    if (!validateAllFields1()) {
       // Stop the function if validation fails
       return;
     }
@@ -4539,25 +4653,31 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
     console.log("Source", Source);
 
     // ✅ Fetch values safely once
-    const firstNameValue = document.getElementById("First_Name")?.value || "";
-    const lastNameValue = document.getElementById("Last_Name")?.value || "";
-    const mobileValue = document.getElementById("Mobile")?.value || "";
-    const cityValue = document.getElementById("City")?.value || "";
-    const availableDateValue = document.getElementById("Available_Date")?.value || "";
-    const unitNameValue = document.getElementById("Unit_name")?.value || "";
-    const unitTypeValue = document.getElementById("Unit_Type")?.value || "";
-    const floorsValue = document.getElementById("number_of_floors")?.value || "";
-    const bedroomsValue = document.getElementById("Bedrooms")?.value || "";
-    const bathroomsValue = document.getElementById("Bathrooms")?.value || "";
-    const backyardValue = document.getElementById("Backyard")?.value || "";
-    const backyardFencedValue = document.getElementById("Backyard_Fenced")?.value || "";
-    const parkingSpacesValue = document.getElementById("Parking_Spaces")?.value || "";
-    const parkingDetailsValue = document.getElementById("Parking_Details")?.value || "";
-    const unitNumberValue = document.getElementById("Unit_number")?.value || "";
-    const provinceValue = document.getElementById("Province")?.value || "";
-    const postalCodeValue = document.getElementById("Postal_Code")?.value || "";
-    const unitCountValue = document.getElementById("number_of_units")?.value || "";
-    const constructedon = document.getElementById("Date_of_Construction")?.value || "";
+    const firstNameValue = document.getElementById("First_Name1")?.value || "";
+    const lastNameValue = document.getElementById("Last_Name1")?.value || "";
+    const mobileValue = document.getElementById("Mobile1")?.value || "";
+    const cityValue = document.getElementById("City1")?.value || "";
+    const availableDateValue = document.getElementById("Available_Date1")?.value || "";
+    const unitTypeValue = document.getElementById("Unit_Type1")?.value || "";
+    const floorsValue = document.getElementById("number_of_floors1")?.value || "";
+    const bedroomsValue = document.getElementById("Bedrooms1")?.value || "";
+    const bathroomsValue = document.getElementById("Bathrooms1")?.value || "";
+    const backyardValue = document.getElementById("Backyard1")?.value || "";
+    const backyardFencedValue = document.getElementById("Backyard_Fenced1")?.value || "";
+    const parkingSpacesValue = document.getElementById("Parking_Spaces1")?.value || "";
+    const parkingDetailsValue = document.getElementById("Parking_Details1")?.value || "";
+    const unitNumberValue = document.getElementById("Unit_number1")?.value || "";
+    const provinceValue = document.getElementById("Province1")?.value || "";
+    const postalCodeValue = document.getElementById("Postal_Code1")?.value || "";
+    const unitCountValue = document.getElementById("number_of_units1")?.value || "";
+    const constructedon = document.getElementById("Date_of_Construction1")?.value || "";
+    const sqfeet=document.getElementById("sqrfeet1")?.value || "";
+    const unitdes=document.getElementById("Unit_Description1")?.value || "";
+    const askingprice= document.getElementById("Asking_Price1")?.value || "";
+    const lastrenovated=document.getElementById("Year_Last_Renovated1")?.value || "";
+    const Unit_Address= document.getElementById("Unitaddress1")?.value || "";
+    const Email1= document.getElementById("Email1")?.value || "";
+
 
     ;
 
@@ -4567,6 +4687,9 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
       Last_Name: lastNameValue,
       Mobile: mobileValue,
       Phone: mobileValue,
+      Unit_Address: Unit_Address,
+      Email1: Email1,
+      Asking_Price: askingprice,
       City: cityValue,
       Lead_Source: Source,
       Lead_Priority_Level: "High",
@@ -4576,8 +4699,11 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
 
     // ✅ Create unitData safely
     unitData = {
-      Name: unitNameValue,
+      Name: Unit_Address,
+      Location_Description:unitdes,
+      Total_Area_Sq_Ft:sqfeet,
       Unit_Type: unitTypeValue,
+      Year_Built:lastrenovated,
       Number_of_Floors: floorsValue,
       Bedrooms: bedroomsValue,
       Bathrooms: bathroomsValue,
@@ -4585,7 +4711,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
       Is_the_backyard_fenced: backyardFencedValue,
       Number_of_Parking_Spaces: parkingSpacesValue,
       Parking_Details: parkingDetailsValue,
-      Address_Line_2: unitNumberValue,
+      Address_Line_2: Unit_Address,
       City: cityValue,
       Province: provinceValue,
       Postal_Code: postalCodeValue,
@@ -4600,8 +4726,8 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
       Property_Type: unitTypeValue,
       floor_count: floorsValue,
       unit_count: unitCountValue,
-      Address: unitNameValue,
-      Name: unitNameValue,
+      Address: Unit_Address,
+      Name: Unit_Address,
       City: cityValue,
       Province: provinceValue,
       Postal_Code: postalCodeValue,

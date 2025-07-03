@@ -17,7 +17,7 @@
         $(document).ready(function () {
             $('#prospectSource').on('change', function () {
                 const selectedSource = $(this).val().toLowerCase();
-console.log("Selected Source:", selectedSource);
+                console.log("Selected Source:", selectedSource);
 
                 // Show if it contains 'kijiji' anywhere
                 if (selectedSource == 'kijiji') {
@@ -27,8 +27,8 @@ console.log("Selected Source:", selectedSource);
                     $('#notKijijiSection1').hide();
                     $('#bt1').show();
                     $('#bt2').hide();
-                    
-                } else{
+
+                } else {
                     $('#kijijiSection').hide();
                     $('#kijijiSection1').hide();
                     $('#notKijijiSection').show();
@@ -112,6 +112,11 @@ console.log("Selected Source:", selectedSource);
 
             <p style="margin-top: 1rem; font-weight: 800; color: #1a1a1a;">Creating Records...</p>
         </div>
+
+
+
+
+
         <!-- Leads Section For Kijiji-->
         <div class="card mb-4" id="kijijiSection1" style="display: none;">
             <div class="card-header bg-primary text-white">
@@ -127,18 +132,18 @@ console.log("Selected Source:", selectedSource);
                     </div>
                     <div class="col-md-6">
                         <label for="Last_Name" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="Last_Name" value=""/>
+                        <input type="text" class="form-control" id="Last_Name" value="" />
                     </div>
 
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Available_Date" class="form-label">Available Date</label>
-                        <input type="date" class="form-control" id="Available_Date" value="" required/>
+                        <input type="date" class="form-control" id="Available_Date" value="" required />
                     </div>
                     <div class="col-md-6">
                         <label for="Mobile" class="form-label">Mobile</label>
-                        <input type="text" class="form-control" id="Mobile" value=""/>
+                        <input type="text" class="form-control" id="Mobile" value="" />
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -157,7 +162,7 @@ console.log("Selected Source:", selectedSource);
                     </div>
                     <div class="col-md-6">
                         <label for="City" class="form-label">City</label>
-                        <input type="text" class="form-control" id="City" value=""/>
+                        <input type="text" class="form-control" id="City" value="" />
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -168,7 +173,7 @@ console.log("Selected Source:", selectedSource);
                     </div>
                     <div class="col-md-6">
                         <label for="Postal_Code" class="form-label">Postal Code</label>
-                        <input type="text" class="form-control" id="Postal_Code" value=""/>
+                        <input type="text" class="form-control" id="Postal_Code" value="" />
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -230,11 +235,11 @@ console.log("Selected Source:", selectedSource);
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Interested_Unit_Title" class="form-label">Number of Floors</label>
-                        <input type="text" class="form-control" id="number_of_floors" value=""/>
+                        <input type="text" class="form-control" id="number_of_floors" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Available_Date_Unit" class="form-label">Number of Units</label>
-                        <input type="text" class="form-control" id="number_of_units" value=""/>
+                        <input type="text" class="form-control" id="number_of_units" value="" />
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -261,11 +266,11 @@ console.log("Selected Source:", selectedSource);
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Year_Last_Renovated" class="form-label">Year Last Renovated</label>
-                        <input type="text" class="form-control" id="Year_Last_Renovated" value=""/>
+                        <input type="text" class="form-control" id="Year_Last_Renovated" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Parking_Spaces" class="form-label">Number of Parking Spaces</label>
-                        <input type="text" class="form-control" id="Parking_Spaces" value=""/>
+                        <input type="text" class="form-control" id="Parking_Spaces" value="" />
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -297,11 +302,11 @@ console.log("Selected Source:", selectedSource);
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Maximum_Occupants" class="form-label">Unit Name</label>
-                        <input type="text" class="form-control" id="Unit_name" value=""/>
+                        <input type="text" class="form-control" id="Unit_name" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Maximum_Occupants" class="form-label">Unit Number</label>
-                        <input type="text" class="form-control" id="Unit_number" value=""/>
+                        <input type="text" class="form-control" id="Unit_number" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Backyard_Fenced" class="form-label">Constructed On</label>
@@ -315,8 +320,10 @@ console.log("Selected Source:", selectedSource);
             </div>
         </div>
 
-<!-- Leads Section For Not Kijiji-->
-        <div class="card mb-4"  id="notKijijiSection" style="display: none;">
+
+
+        <!-- Leads Section For Not Kijiji-->
+        <div class="card mb-4" id="notKijijiSection" style="display: none;">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">Contact Information</h5>
             </div>
@@ -326,53 +333,53 @@ console.log("Selected Source:", selectedSource);
 
                     <div class="col-md-6">
                         <label for="Last_Name" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="First_Name" value="" />
+                        <input type="text" class="form-control" id="First_Name1" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Last_Name" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="Last_Name" value=""/>
+                        <input type="text" class="form-control" id="Last_Name1" value="" />
                     </div>
 
 
                 </div>
                 <div class="row mb-3">
-                    
+
                     <div class="col-md-6">
                         <label for="Mobile" class="form-label">Mobile</label>
-                        <input type="text" class="form-control" id="Mobile" value=""/>
+                        <input type="text" class="form-control" id="Mobile1" value="" />
                     </div>
                     <div class="col-md-6" id="Email_Section">
                         <label for="Available_Date" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="Email" value="" required/>
+                        <input type="email" class="form-control" id="Email1" value="" required />
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="ownerid" class="form-label">Assign to</label>
-                        <select id="ownerid" class="form-control">
+                        <select id="ownerid1" class="form-control">
                             <option>Loading…</option>
                         </select>
                     </div>
                 </div>
-               
+
             </div>
         </div>
 
-        <div class="card mb-4"  id="notKijijiSection1" style="display: none;">
+        <div class="card mb-4" id="notKijijiSection1" style="display: none;">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">Property Information</h5>
             </div>
             <div class="card-body">
 
-               
+
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Mobile" class="form-label">Unit Address</label>
-                        <input type="text" class="form-control" id="Unitaddress" value=""/>
+                        <input type="text" class="form-control" id="Unitaddress1" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Unit_Type" class="form-label">Unit Type</label>
-                        <select class="form-control" id="Unit_Type" value="">
+                        <select class="form-control" id="Unit_Type1" value="">
                             <option value="">Select</option>
                             <option value="Condominium">Condominium</option>
                             <option value="Unit - Apartment Building">Unit - Apartment Building</option>
@@ -383,34 +390,280 @@ console.log("Selected Source:", selectedSource);
                             <option value="Basement">Basement</option>
                         </select>
                     </div>
-            
+
                 </div>
                 <div class="row mb-3">
-                    
+
                     <div class="col-md-6">
-                        <label for="City" class="form-label">City</label>
-                        <input type="text" class="form-control" id="City" value=""/>
+                        <label for="City1" class="form-label">City</label>
+                        <select class="form-select" id="City1" name="City1">
+                            <option value="">Select City</option>
+                            <option value="Acton">Acton</option>
+                            <option value="Ajax">Ajax</option>
+                            <option value="Aligarh">Aligarh</option>
+                            <option value="Allensville">Allensville</option>
+                            <option value="Alton">Alton</option>
+                            <option value="Alwar">Alwar</option>
+                            <option value="Amherstburg">Amherstburg</option>
+                            <option value="Amigo Beach">Amigo Beach</option>
+                            <option value="Ancaster">Ancaster</option>
+                            <option value="Angus">Angus</option>
+                            <option value="Athens">Athens</option>
+                            <option value="Aurora">Aurora</option>
+                            <option value="Aylmer">Aylmer</option>
+                            <option value="Ayr">Ayr</option>
+                            <option value="Bala">Bala</option>
+                            <option value="Balton">Balton</option>
+                            <option value="Barrie">Barrie</option>
+                            <option value="Beamsville">Beamsville</option>
+                            <option value="Belle River">Belle River</option>
+                            <option value="Belleville">Belleville</option>
+                            <option value="Binbrook">Binbrook</option>
+                            <option value="Bloomington">Bloomington</option>
+                            <option value="Blue Mountains">Blue Mountains</option>
+                            <option value="Bolton">Bolton</option>
+                            <option value="Bothwell">Bothwell</option>
+                            <option value="Bowmanville">Bowmanville</option>
+                            <option value="Bracebridge">Bracebridge</option>
+                            <option value="Bradford">Bradford</option>
+                            <option value="Brampton">Brampton</option>
+                            <option value="Brantford">Brantford</option>
+                            <option value="Breslau">Breslau</option>
+                            <option value="Bridgenorth">Bridgenorth</option>
+                            <option value="Brockville">Brockville</option>
+                            <option value="Brooklin">Brooklin</option>
+                            <option value="Brucefield">Brucefield</option>
+                            <option value="Burlington">Burlington</option>
+                            <option value="Burnaby">Burnaby</option>
+                            <option value="Caledon">Caledon</option>
+                            <option value="Caledon East">Caledon East</option>
+                            <option value="Caledon Village">Caledon Village</option>
+                            <option value="Caledonia">Caledonia</option>
+                            <option value="Cambridge">Cambridge</option>
+                            <option value="Campbellville">Campbellville</option>
+                            <option value="Chatham">Chatham</option>
+                            <option value="Clarington">Clarington</option>
+                            <option value="Cobourg">Cobourg</option>
+                            <option value="Coldwater">Coldwater</option>
+                            <option value="Collingwood">Collingwood</option>
+                            <option value="Comber">Comber</option>
+                            <option value="Concord">Concord</option>
+                            <option value="Coquitlam">Coquitlam</option>
+                            <option value="Cornwall">Cornwall</option>
+                            <option value="Corunna">Corunna</option>
+                            <option value="Courtice">Courtice</option>
+                            <option value="Craighurst">Craighurst</option>
+                            <option value="Crystal Beach">Crystal Beach</option>
+                            <option value="Crystal Rock">Crystal Rock</option>
+                            <option value="Deerbrook">Deerbrook</option>
+                            <option value="Delete">Delete</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Dundas">Dundas</option>
+                            <option value="East Gwillimbury">East Gwillimbury</option>
+                            <option value="East York">East York</option>
+                            <option value="Elmstead">Elmstead</option>
+                            <option value="Embro">Embro</option>
+                            <option value="Essex">Essex</option>
+                            <option value="Etobicoke">Etobicoke</option>
+                            <option value="Fallingbrook">Fallingbrook</option>
+                            <option value="Ficko">Ficko</option>
+                            <option value="Fisherville">Fisherville</option>
+                            <option value="Fonthill">Fonthill</option>
+                            <option value="Forest Harbour">Forest Harbour</option>
+                            <option value="Fort Erie">Fort Erie</option>
+                            <option value="Gananoque">Gananoque</option>
+                            <option value="Georgetown">Georgetown</option>
+                            <option value="Georgina">Georgina</option>
+                            <option value="Gravenhurst">Gravenhurst</option>
+                            <option value="Greater Napanee">Greater Napanee</option>
+                            <option value="Green River">Green River</option>
+                            <option value="Grimsby">Grimsby</option>
+                            <option value="Guelph">Guelph</option>
+                            <option value="Gwalior">Gwalior</option>
+                            <option value="Haldimand">Haldimand</option>
+                            <option value="Halton Hills">Halton Hills</option>
+                            <option value="Hamilton">Hamilton</option>
+                            <option value="Hannon">Hannon</option>
+                            <option value="Harrisburg">Harrisburg</option>
+                            <option value="Hathras">Hathras</option>
+                            <option value="Holland Landing">Holland Landing</option>
+                            <option value="Honey Harbour">Honey Harbour</option>
+                            <option value="Horseshoe Valley">Horseshoe Valley</option>
+                            <option value="Huntsville">Huntsville</option>
+                            <option value="Ilderton">Ilderton</option>
+                            <option value="Ingersoll">Ingersoll</option>
+                            <option value="Innisfil">Innisfil</option>
+                            <option value="Jaipur">Jaipur</option>
+                            <option value="Jarvis">Jarvis</option>
+                            <option value="Jasper">Jasper</option>
+                            <option value="Jerseyville">Jerseyville</option>
+                            <option value="Jodhpur">Jodhpur</option>
+                            <option value="Johnstown">Johnstown</option>
+                            <option value="Kanata">Kanata</option>
+                            <option value="Katowice">Katowice</option>
+                            <option value="Kattleby">Kattleby</option>
+                            <option value="Kemptville">Kemptville</option>
+                            <option value="Kennedy Acres">Kennedy Acres</option>
+                            <option value="Keswick">Keswick</option>
+                            <option value="Kimberley">Kimberley</option>
+                            <option value="Kimberly">Kimberly</option>
+                            <option value="King City">King City</option>
+                            <option value="Kingston">Kingston</option>
+                            <option value="Kingsville">Kingsville</option>
+                            <option value="Kitchener">Kitchener</option>
+                            <option value="Kleinburg">Kleinburg</option>
+                            <option value="Klondyke">Klondyke</option>
+                            <option value="Komoka">Komoka</option>
+                            <option value="Krakow">Krakow</option>
+                            <option value="Lakefield">Lakefield</option>
+                            <option value="LaSalle">LaSalle</option>
+                            <option value="Leamington">Leamington</option>
+                            <option value="Lefroy">Lefroy</option>
+                            <option value="Lincoln">Lincoln</option>
+                            <option value="Lindsay">Lindsay</option>
+                            <option value="Lindsy">Lindsy</option>
+                            <option value="Listowel">Listowel</option>
+                            <option value="Little Britain">Little Britain</option>
+                            <option value="London">London</option>
+                            <option value="Mallorytown">Mallorytown</option>
+                            <option value="Malton">Malton</option>
+                            <option value="Maple">Maple</option>
+                            <option value="Markham">Markham</option>
+                            <option value="Merlin">Merlin</option>
+                            <option value="Metcalfe">Metcalfe</option>
+                            <option value="Milbrook">Milbrook</option>
+                            <option value="Millbrook">Millbrook</option>
+                            <option value="Milton">Milton</option>
+                            <option value="Mississauga">Mississauga</option>
+                            <option value="Mount Hope">Mount Hope</option>
+                            <option value="Muskoka">Muskoka</option>
+                            <option value="Nagaur">Nagaur</option>
+                            <option value="Nashville">Nashville</option>
+                            <option value="Navan">Navan</option>
+                            <option value="New Delhi">New Delhi</option>
+                            <option value="New Tecumseth">New Tecumseth</option>
+                            <option value="New Westminster">New Westminster</option>
+                            <option value="Newcastle">Newcastle</option>
+                            <option value="Newmarket">Newmarket</option>
+                            <option value="Newtonville">Newtonville</option>
+                            <option value="Niagara Falls">Niagara Falls</option>
+                            <option value="Niagara-on-the-Lake">Niagara-on-the-Lake</option>
+                            <option value="Nobleton">Nobleton</option>
+                            <option value="North Vancouver">North Vancouver</option>
+                            <option value="North York">North York</option>
+                            <option value="Norwood">Norwood</option>
+                            <option value="Oakville">Oakville</option>
+                            <option value="Oakwood">Oakwood</option>
+                            <option value="Odessa">Odessa</option>
+                            <option value="Oldcastle">Oldcastle</option>
+                            <option value="Orangeville">Orangeville</option>
+                            <option value="Orillia">Orillia</option>
+                            <option value="Osgoode">Osgoode</option>
+                            <option value="Oshawa">Oshawa</option>
+                            <option value="Ottawa">Ottawa</option>
+                            <option value="Owen Sound">Owen Sound</option>
+                            <option value="Paris">Paris</option>
+                            <option value="Pefferlaw">Pefferlaw</option>
+                            <option value="Peterborough">Peterborough</option>
+                            <option value="Pickering">Pickering</option>
+                            <option value="Pinkerton">Pinkerton</option>
+                            <option value="Pittsburgh">Pittsburgh</option>
+                            <option value="Point Edward">Point Edward</option>
+                            <option value="Port Colborne">Port Colborne</option>
+                            <option value="Port Coquitlam">Port Coquitlam</option>
+                            <option value="Port Hope">Port Hope</option>
+                            <option value="Port Moody">Port Moody</option>
+                            <option value="Port Perry">Port Perry</option>
+                            <option value="Port Rowan">Port Rowan</option>
+                            <option value="Portservain">Portservain</option>
+                            <option value="Prince Edward">Prince Edward</option>
+                            <option value="Prishtine">Prishtine</option>
+                            <option value="Pushkar">Pushkar</option>
+                            <option value="Richmond Hill">Richmond Hill</option>
+                            <option value="Rosseau">Rosseau</option>
+                            <option value="Saint Catharines">Saint Catharines</option>
+                            <option value="Saint George">Saint George</option>
+                            <option value="Saint Joachim">Saint Joachim</option>
+                            <option value="Saint Thomas">Saint Thomas</option>
+                            <option value="Sarnia">Sarnia</option>
+                            <option value="Scarborough">Scarborough</option>
+                            <option value="Schomberg">Schomberg</option>
+                            <option value="Shannonville">Shannonville</option>
+                            <option value="Sikar">Sikar</option>
+                            <option value="Simcoe">Simcoe</option>
+                            <option value="South Woodslee">South Woodslee</option>
+                            <option value="Spencerville">Spencerville</option>
+                            <option value="Springdale Park">Springdale Park</option>
+                            <option value="Springwater">Springwater</option>
+                            <option value="St Catharines">St Catharines</option>
+                            <option value="St Thomas">St Thomas</option>
+                            <option value="Staples">Staples</option>
+                            <option value="Stevensville">Stevensville</option>
+                            <option value="Stittsville">Stittsville</option>
+                            <option value="Stoney Creek">Stoney Creek</option>
+                            <option value="Stoney Point">Stoney Point</option>
+                            <option value="Stouffville">Stouffville</option>
+                            <option value="Stratford">Stratford</option>
+                            <option value="Strathroy">Strathroy</option>
+                            <option value="Sunderland">Sunderland</option>
+                            <option value="Surrey">Surrey</option>
+                            <option value="Taunton">Taunton</option>
+                            <option value="Tecumseh">Tecumseh</option>
+                            <option value="Test City">Test City</option>
+                            <option value="Thamesford">Thamesford</option>
+                            <option value="Thompsonville">Thompsonville</option>
+                            <option value="Thornhill">Thornhill</option>
+                            <option value="Thornton">Thornton</option>
+                            <option value="Thorold">Thorold</option>
+                            <option value="Thousand Islands">Thousand Islands</option>
+                            <option value="Tillbury">Tillbury</option>
+                            <option value="Tillsonburg">Tillsonburg</option>
+                            <option value="Tirana">Tirana</option>
+                            <option value="Toronto">Toronto</option>
+                            <option value="Unionville">Unionville</option>
+                            <option value="Uxbridge">Uxbridge</option>
+                            <option value="Vancouver">Vancouver</option>
+                            <option value="Vanier">Vanier</option>
+                            <option value="Vaughan">Vaughan</option>
+                            <option value="Warsaw">Warsaw</option>
+                            <option value="Wasaga Beach">Wasaga Beach</option>
+                            <option value="Waterdown">Waterdown</option>
+                            <option value="Waterloo">Waterloo</option>
+                            <option value="Welland">Welland</option>
+                            <option value="West Gwillimbury">West Gwillimbury</option>
+                            <option value="West Vancouver">West Vancouver</option>
+                            <option value="Wheatley">Wheatley</option>
+                            <option value="Whitby">Whitby</option>
+                            <option value="Whitchurch-Stouffville">Whitchurch-Stouffville</option>
+                            <option value="Willowdale">Willowdale</option>
+                            <option value="Windsor">Windsor</option>
+                            <option value="Windsville">Windsville</option>
+                            <option value="Woodbridge">Woodbridge</option>
+                            <option value="Woodstock">Woodstock</option>
+                            <option value="Wyoming">Wyoming</option>
+                            <option value="York">York</option>
+                            </select>
                     </div>
                     <div class="col-md-6">
                         <label for="Available_Date" class="form-label">Available Date</label>
-                        <input type="date" class="form-control" id="Available_Date" value="" required/>
+                        <input type="date" class="form-control" id="Available_Date1" value="" required />
                     </div>
                 </div>
                 <div class="row mb-3">
 
                     <div class="col-md-6">
                         <label for="Province" class="form-label">Province</label>
-                        <input type="text" class="form-control" id="Province" value="" />
+                        <input type="text" class="form-control" id="Province1" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Postal_Code" class="form-label">Postal Code</label>
-                        <input type="text" class="form-control" id="Postal_Code" value=""/>
+                        <input type="text" class="form-control" id="Postal_Code1" value="" />
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Bedrooms" class="form-label">Bedrooms</label>
-                        <select class="form-control" id="Bedrooms" value="">
+                        <select class="form-control" id="Bedrooms1" value="">
                             <option value="">Select</option>
                             <option value="Studio">Studio</option>
                             <option value="1">1</option>
@@ -438,7 +691,7 @@ console.log("Selected Source:", selectedSource);
                     </div>
                     <div class="col-md-6">
                         <label for="Bathrooms" class="form-label">Bathrooms</label>
-                        <select class="form-control" id="Bathrooms" value="">
+                        <select class="form-control" id="Bathrooms1" value="">
                             <option value="">Select</option>
                             <option value="0">0</option>
                             <option value="1">1</option>
@@ -466,17 +719,17 @@ console.log("Selected Source:", selectedSource);
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Interested_Unit_Title" class="form-label">Number of Floors</label>
-                        <input type="text" class="form-control" id="number_of_floors" value=""/>
+                        <input type="text" class="form-control" id="number_of_floors1" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Available_Date_Unit" class="form-label">Number of Units</label>
-                        <input type="text" class="form-control" id="number_of_units" value=""/>
+                        <input type="text" class="form-control" id="number_of_units1" value="" />
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Backyard" class="form-label">Backyard</label>
-                        <select class="form-control" id="Backyard" value="">
+                        <select class="form-control" id="Backyard1" value="">
                             <option value="">Select</option>
                             <option value="Included">Included</option>
                             <option value="Shared">Shared</option>
@@ -486,7 +739,7 @@ console.log("Selected Source:", selectedSource);
                     </div>
                     <div class="col-md-6">
                         <label for="Backyard_Fenced" class="form-label">Is the Backyard Fenced?</label>
-                        <select class="form-control" id="Backyard_Fenced" value="">
+                        <select class="form-control" id="Backyard_Fenced1" value="">
                             <option value="">Select</option>
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
@@ -497,22 +750,22 @@ console.log("Selected Source:", selectedSource);
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Year_Last_Renovated" class="form-label">Year Last Renovated</label>
-                        <input type="text" class="form-control" id="Year_Last_Renovated" value=""/>
+                        <input type="text" class="form-control" id="Year_Last_Renovated1" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Parking_Spaces" class="form-label">Number of Parking Spaces</label>
-                        <input type="text" class="form-control" id="Parking_Spaces" value=""/>
+                        <input type="text" class="form-control" id="Parking_Spaces1" value="" />
                     </div>
                 </div>
                 <div class="row mb-3">
 
                     <div class="col-md-6">
                         <label for="asking_price" class="form-label">Asking Price</label>
-                        <input type="text" class="form-control" id="asking_price" value=""/>
+                        <input type="text" class="form-control" id="Asking_Price1" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Parking_Details" class="form-label">Parking Details</label>
-                        <select class="form-control" id="Parking_Details">
+                        <select class="form-control" id="Parking_Details1">
                             <option value="">Select</option>
                             <option value="No Parking Available">No Parking Available</option>
                             <option value="Building Parking Garage">Building Parking Garage</option>
@@ -530,14 +783,14 @@ console.log("Selected Source:", selectedSource);
                     </div>
                 </div>
                 <div class="row mb-3">
-                    
+
                     <div class="col-md-6">
                         <label for="Maximum_Occupants" class="form-label">Unit Number</label>
-                        <input type="text" class="form-control" id="Unit_number" value=""/>
+                        <input type="text" class="form-control" id="Unit_number1" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Backyard_Fenced" class="form-label">Constructed On</label>
-                        <select class="form-control" id="Date_of_Construction" value="">
+                        <select class="form-control" id="Date_of_Construction1" value="">
                             <option value="">Select</option>
                             <option value="Yes">Before November 15th 2018</option>
                             <option value="No">After November 15th 2018</option>
@@ -548,32 +801,32 @@ console.log("Selected Source:", selectedSource);
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="sqrfeet" class="form-label">Approximate Sq Ft</label>
-                        <input type="text" class="form-control" id="sqrfeet" value=""/>
+                        <input type="text" class="form-control" id="sqrfeet1" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Maximum_Occupants" class="form-label">Unit Description</label>
-                        <textarea class="form-control" id="Unit_Description" rows="3"></textarea>
+                        <textarea class="form-control" id="Unit_Description1" rows="3"></textarea>
                     </div>
-                
+
+                </div>
             </div>
+
+
+
+
+
+
+            <!-- Final Part: Create Records Button -->
+            <div id="bt1" class="text-end mt-4" style="display: none;">
+                <button class="btn btn-success px-4" id="createRecordsBtn1">Create Records</button>
+            </div>
+            <div id="bt2" class="text-end mt-4" style="display: none;">
+                <button class="btn btn-success px-4" id="createRecordsBtn2">Create Records</button>
+            </div>
+
         </div>
 
-
-
-
-
-
-        <!-- Final Part: Create Records Button -->
-        <div id="bt1" class="text-end mt-4" style="display: none;">
-            <button class="btn btn-success px-4" id="createRecordsBtn1">Create Records</button>
-        </div>
-        <div id="bt2" class="text-end mt-4" style="display: none;"> 
-            <button class="btn btn-success px-4" id="createRecordsBtn2">Create Records</button>
-        </div>
-
-    </div>
-
-    <script src="script.js"></script>
+        <script src="script.js"></script>
 </body>
 
 </html>
