@@ -433,6 +433,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 "condo for rent",
 "condo for lease",
 "condo accommodation",
+"condo",
 "apartment condo",
 "condo apartments",
 "condo style apartment",
@@ -2894,15 +2895,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     }
     return "";
   }
-
-  // Helper function to capitalize words
-  function capitalizeWords(str) {
-    return str.replace(/\b\w/g, (char) => char.toUpperCase());
-  }
-  // Capitalize first letter of each word in a string
-  function capitalizeWords(str) {
-    return str.replace(/\b\w/g, (char) => char.toUpperCase());
-  }
   // 5. Province (3rd part of location)
   function extractProvince(location = "") {
     const parts = location.split(",");
@@ -3320,7 +3312,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     try {
       const response = await fetch(
         "https://api.royalyorkpm.com/kijiji-ocr-new?url=" +
-        encodeURIComponent(url) 
+        encodeURIComponent(url) +"&api_key=12345" + "&bypassCache=true"
       );
       data = await response.json();
       const StringData = JSON.stringify(data).toLowerCase();
@@ -3524,21 +3516,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
         return "Not Included";
       }
-      // building type mapping based on unit type
-      function mapUnitTypeToBuildingType(unitType = "") {
-        const mapping = {
-          condominium: "Condominium",
-          "unit - apartment building": "Apartment Building",
-          "single unit house": "Single Unit House",
-          "multi unit - above ground": "Multi Unit House",
-          "stacked townhouse": "Condo Townhouse",
-          "student room": "Multi Unit House",
-          basement: "Multi Unit House",
-        };
-
-        const normalized = unitType.toLowerCase().trim();
-        return mapping[normalized] || "";
-      }
       // Detect basement type based on title and description
       function detectBasementIncluded(
         title = "",
@@ -3697,36 +3674,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
         return "";
       }
-      // Detect if the property is verified by RYPM
-      function detectVerifiedByRYPM({
-        propertyCondition = "",
-        electricityProvider = "",
-        gasProvider = "",
-        hotWaterTankProvider = "",
-        waterProvider = "",
-      } = {}) {
-        const isVerified = propertyCondition.trim() !== "";
-
-        return {
-          verifiedByRYPM: isVerified ? "Yes" : "",
-          electricityProvider:
-            isVerified && !electricityProvider
-              ? "To be Determined (TBD)"
-              : electricityProvider,
-          gasProvider:
-            isVerified && !gasProvider
-              ? "To be Determined (TBD)"
-              : gasProvider,
-          hotWaterTankProvider:
-            isVerified && !hotWaterTankProvider
-              ? "To be Determined (TBD)"
-              : hotWaterTankProvider,
-          waterProvider:
-            isVerified && !waterProvider
-              ? "To be Determined (TBD)"
-              : waterProvider,
-        };
-      }
       function detectBBQ_Area_Synced() {
         if (Outdoor_Patio) return true;
 
@@ -3792,22 +3739,15 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       const cableIncluded = detectCableInclusion(data);
       const Unitnumber = detectUnitNumber(unitType,);
       const lawnSnowCare = detectLawnAndSnowCare(data.description || []);
-      const buildingType = mapUnitTypeToBuildingType(unitType);
       const basement = detectBasementIncluded(data.title || "", data.description || [], data.unitType || "");
       const basementDetails = extractBasementDetails(data.description || [], data.unitType || "");
       const upgradedBathroom = checkUpgradedBathroom(propertyCondition);
-      const upgradedKitchen = checkUpgradedBathroom(propertyCondition);
       const Lastyearrenovated = extractLastRenovatedYear(propertyCondition) || "";
       const Sunlight = true;
       const websiteTitle = generateWebsiteTitle(bedrooms, bathrooms, unitType, unitName);
       const privateTerraceOrBackyard = detectPrivateTerraceOrBackyardFromBackyardValue(backyard);
       const view = detectViewCombined(data.unitType || "");
       const numericPrice = data.price ? Number(data.price.replace(/[$,]/g, "")) : "";
-      const result = detectVerifiedByRYPM({
-        propertyCondition: detectPropertyCondition(data.description || []), electricityProvider: detectElectricityProvider(data.description || []),
-        gasProvider: detectGasProvider(data.description || []),
-        hotWaterTankProvider: detectHotWaterTankProvider(data.description || []), waterProvider: detectWaterProvider(data.description || []),
-      });
       const hydroIncluded = detectHydroProvider(data);
       const BBQ_Area_Final = detectBBQ_Area_Synced();
       const Outdoor_Patio_Final = detectOutdoor_Patio_Synced();
@@ -3816,7 +3756,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       const furnished = detectFurnished(data.description || []);
       const maximumOccupants = detectMaxOccupants(data.description);
       const entranceType = detectEntranceType(data.title || "", data.description || []);
-      const numberOfLevels = detectNumberOfLevels(data.description, data.title);
       const unitFacing = detectUnitFacing(data.description);
       const flooringCommonArea = detectFlooringCommonArea(data.description || []);
       const ceilingHeight = detectCeilingHeight(data.description || []);
@@ -3848,7 +3787,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       const petRestrictions = detectPetRestrictions();
       const mgmtInfo = detectBuildingMgmtInfo();
       const mgmtEmail = extractMgmtEmail();
-      const mgmtPhone = extractMgmtPhone();
       const officeAddress = extractOfficeAddress();
       const developerName = detectDeveloperName();
       const Laundary = detectOnSiteLaundry(data);
@@ -4031,6 +3969,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
         dateOfConstructionISO,
       });
       const { locationDescription, incentives } = generateLocationAndIncentives();
+
 
 
       leadData = {
