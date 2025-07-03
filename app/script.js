@@ -154,6 +154,12 @@ let parkingDetails = "";
 
 ZOHO.embeddedApp.on("PageLoad", async function () {
   console.log("✅ Widget ready");
+
+
+//  let selectedSource =document.getElementById("prospectSource").value;
+//  console.log("Selected Source:", selectedSource);
+ 
+  
   const leasingSel = document.getElementById("ownerid");
   ///users data
   try {
