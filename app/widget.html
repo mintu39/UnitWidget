@@ -40,6 +40,51 @@
                 }
             });
         });
+
+        $(document).ready(function () {
+    $('#Unit_Type1').on('change', function () {
+        const selectedtype = $(this).val().toLowerCase();
+        console.log("Selected Type:", selectedtype);
+
+        if (
+            selectedtype === 'condominium' ||
+            selectedtype === 'unit - apartment building' ||
+            selectedtype === 'stacked townhouse'
+        ) {
+            $('#Backyard1').val('No Backyard');
+            $('#Backyard_Fenced1').val('No Backyard');
+        }
+    });
+});
+
+
+$(document).ready(function () {
+    $('#Parking_Spaces1').on('change', function () {
+        const selectedtype = $(this).val().toLowerCase();
+        console.log("Selected Type:", selectedtype);
+
+        if (
+            selectedtype > 0) {
+            $('#Parking_Details1').val('No Parking Available');
+        }
+    });
+});
+
+
+$(document).ready(function () {
+    $('#numlocker1').on('change', function () {
+        const selectedtype = $(this).val().toLowerCase();
+        console.log("Selected Type:", selectedtype);
+
+        if (
+            selectedtype > 0) {
+            $('#Locker_Details1').val('N/A - No Storage Available');
+        }
+    });
+});
+
+
+        
     </script>
 
     <!-- Part 1: Kijiji URL and Lead Data -->
@@ -370,13 +415,7 @@
                 <h5 class="mb-0">Property Information</h5>
             </div>
             <div class="card-body">
-
-
                 <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="Mobile" class="form-label">Unit Address</label>
-                        <input type="text" class="form-control" id="Unitaddress1" value="" />
-                    </div>
                     <div class="col-md-6">
                         <label for="Unit_Type" class="form-label">Unit Type</label>
                         <select class="form-control" id="Unit_Type1" value="">
@@ -391,9 +430,39 @@
                         </select>
                     </div>
 
+                    <div class="col-md-6">
+                        <label for="Maximum_Occupants" class="form-label">Unit Number(If Applicable)</label>
+                        <input type="text" class="form-control" id="Unit_number1" value="" />
+                    </div>
+                </div>
+                <div class="row mb-3" id="backyarddata">
+
+
+                    <div class="col-md-6">
+                        <label for="Backyard" class="form-label">Backyard</label>
+                        <select class="form-control" id="Backyard1" value="">
+                            <option value="">Select</option>
+                            <option value="Included">Included</option>
+                            <option value="Shared">Shared</option>
+                            <option value="No Backyard">No Backyard</option>
+                            <option value="Not Included">Not Included</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="Backyard_Fenced" class="form-label">Is the Backyard Fenced?</label>
+                        <select class="form-control" id="Backyard_Fenced1" value="">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                            <option value="No Backyard">No Backyard</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="row mb-3">
-
+                    <div class="col-md-6">
+                        <label for="Mobile" class="form-label">Unit Address</label>
+                        <input type="text" class="form-control" id="Unitaddress1" value="" />
+                    </div>
                     <div class="col-md-6">
                         <label for="City1" class="form-label">City</label>
                         <select class="form-select" id="City1" name="City1">
@@ -642,12 +711,9 @@
                             <option value="Woodstock">Woodstock</option>
                             <option value="Wyoming">Wyoming</option>
                             <option value="York">York</option>
-                            </select>
+                        </select>
                     </div>
-                    <div class="col-md-6">
-                        <label for="Available_Date" class="form-label">Available Date</label>
-                        <input type="date" class="form-control" id="Available_Date1" value="" required />
-                    </div>
+
                 </div>
                 <div class="row mb-3">
 
@@ -661,6 +727,11 @@
                     </div>
                 </div>
                 <div class="row mb-3">
+
+                    <div class="col-md-6">
+                        <label for="Available_Date" class="form-label">Available Date</label>
+                        <input type="date" class="form-control" id="Available_Date1" value="" required />
+                    </div>
                     <div class="col-md-6">
                         <label for="Bedrooms" class="form-label">Bedrooms</label>
                         <select class="form-control" id="Bedrooms1" value="">
@@ -689,6 +760,10 @@
                             <option value="13">13</option>
                         </select>
                     </div>
+
+                </div>
+                <div class="row mb-3">
+
                     <div class="col-md-6">
                         <label for="Bathrooms" class="form-label">Bathrooms</label>
                         <select class="form-control" id="Bathrooms1" value="">
@@ -715,53 +790,19 @@
                             <option value="10">10</option>
                         </select>
                     </div>
-                </div>
-                <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="Interested_Unit_Title" class="form-label">Number of Floors</label>
-                        <input type="text" class="form-control" id="number_of_floors1" value="" />
+                        <label for="sqrfeet" class="form-label">Approximate Sq Ft</label>
+                        <input type="text" class="form-control" id="sqrfeet1" value="" />
                     </div>
-                    <div class="col-md-6">
-                        <label for="Available_Date_Unit" class="form-label">Number of Units</label>
-                        <input type="text" class="form-control" id="number_of_units1" value="" />
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="Backyard" class="form-label">Backyard</label>
-                        <select class="form-control" id="Backyard1" value="">
-                            <option value="">Select</option>
-                            <option value="Included">Included</option>
-                            <option value="Shared">Shared</option>
-                            <option value="No Backyard">No Backyard</option>
-                            <option value="Not Included">Not Included</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="Backyard_Fenced" class="form-label">Is the Backyard Fenced?</label>
-                        <select class="form-control" id="Backyard_Fenced1" value="">
-                            <option value="">Select</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                            <option value="No Backyard">No Backyard</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="Year_Last_Renovated" class="form-label">Year Last Renovated</label>
-                        <input type="text" class="form-control" id="Year_Last_Renovated1" value="" />
-                    </div>
-                    <div class="col-md-6">
-                        <label for="Parking_Spaces" class="form-label">Number of Parking Spaces</label>
-                        <input type="text" class="form-control" id="Parking_Spaces1" value="" />
-                    </div>
+
+
                 </div>
                 <div class="row mb-3">
 
+
                     <div class="col-md-6">
-                        <label for="asking_price" class="form-label">Asking Price</label>
-                        <input type="text" class="form-control" id="Asking_Price1" value="" />
+                        <label for="Parking_Spaces" class="form-label">Number of Parking Spaces</label>
+                        <input type="text" class="form-control" id="Parking_Spaces1" value="" />
                     </div>
                     <div class="col-md-6">
                         <label for="Parking_Details" class="form-label">Parking Details</label>
@@ -784,10 +825,106 @@
                 </div>
                 <div class="row mb-3">
 
+
                     <div class="col-md-6">
-                        <label for="Maximum_Occupants" class="form-label">Unit Number</label>
-                        <input type="text" class="form-control" id="Unit_number1" value="" />
+                        <label for="Parking_Spaces" class="form-label">Number of Lockers/Storage</label>
+                        <input type="text" class="form-control" id="numlocker1" value="" />
                     </div>
+                    <div class="col-md-6">
+                        <label for="Parking_Details" class="form-label">Locker/Storage Details</label>
+                        <select class="form-control" id="Locker_Details1">
+                            <option value="">Select</option>
+                            <option value="Condominium Locker">Condominium Locker</option>
+                            <option value="Backyard Shed">Backyard Shed</option>
+                            <option value="N/A - No Storage Available">N/A - No Storage Available</option>
+
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="Washer_and_Dryer1" class="form-label">Washer and Dryer</label>
+                        <select class="form-control" id="Washer_and_Dryer1">
+                            <option value="">Select</option>
+                            <option value="Ensuite">Ensuite</option>
+                            <option value="Shared">Shared</option>
+                            <option value="No">No</option>
+                            <option value="Pay Per Use">Pay Per Use</option>
+                        </select>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <label for="Parking_Details" class="form-label">Furnished</label>
+                        <select class="form-control" id="Furnished1">
+                            <option value="">Select</option>
+                            <option value="No">No</option>
+                            <option value="Fully Furnished">Fully Furnished</option>
+                            <option value="Partially Furnished">Partially Furnished</option>
+                            <option value="Optional - No Cost">Optional - No Cost</option>
+                            <option value="Optional - Extra Cost">Optional - Extra Cost</option>
+
+                        </select>
+                    </div>
+
+                    <div class="row mb-3">
+
+
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="Parking_Details" class="form-label">Utilities - Financial Responsibility</label>
+                        <select class="form-control" id="Utilities">
+                            <option value="">Select</option>
+                            <option value="0%">0%</option>
+                            <option value="10%">10%</option>
+                            <option value="15%">15%</option>
+                            <option value="20%">20%</option>
+                            <option value="25%">25%</option>
+                            <option value="30%">30%</option>
+                            <option value="35%">35%</option>
+                            <option value="40%">40%</option>
+                            <option value="45%">45%</option>
+                            <option value="50%">50%</option>
+                            <option value="55%">55%</option>
+                            <option value="60%">60%</option>
+                            <option value="65%">65%</option>
+                            <option value="70%">70%</option>
+                            <option value="75%">75%</option>
+                            <option value="80%">80%</option>
+                            <option value="85%">85%</option>
+                            <option value="90%">90%</option>
+                            <option value="95%">95%</option>
+                            <option value="100%">100%</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+    <label for="Noe1" class="form-label">
+        NOE Required: (If Occupied = Yes/Owner if Vacant = No)
+    </label>
+    <select class="form-select" id="Noe1" name="Noe1">
+        <option value="">Select</option>
+        <option value="Yes">Yes/Owner</option>
+        <option value="No">No</option>
+    </select>
+</div>
+
+
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="Property_Condition" class="form-label">Property Condition</label>
+                        <select class="form-control" id="Property_Condition1">
+                            <option value="">Select</option>
+                            <option value="Brand New - Never Lived In">Brand New - Never Lived In</option>
+                            <option value="Newly Renovated">Newly Renovated</option>
+                            <option value="Moderate">Moderate</option>
+                            <option value="Needs Renovations">Needs Renovations</option>
+                        </select>
+                    </div>
+
                     <div class="col-md-6">
                         <label for="Backyard_Fenced" class="form-label">Constructed On</label>
                         <select class="form-control" id="Date_of_Construction1" value="">
@@ -800,14 +937,13 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="sqrfeet" class="form-label">Approximate Sq Ft</label>
-                        <input type="text" class="form-control" id="sqrfeet1" value="" />
+                        <label for="Year_Last_Renovated" class="form-label">Year Last Renovated</label>
+                        <input type="text" class="form-control" id="Year_Last_Renovated1" value="" />
                     </div>
                     <div class="col-md-6">
-                        <label for="Maximum_Occupants" class="form-label">Unit Description</label>
-                        <textarea class="form-control" id="Unit_Description1" rows="3"></textarea>
+                        <label for="asking_price" class="form-label">Asking Price</label>
+                        <input type="text" class="form-control" id="Asking_Price1" value="" />
                     </div>
-
                 </div>
             </div>
 
@@ -817,13 +953,14 @@
 
 
             <!-- Final Part: Create Records Button -->
-            <div id="bt1" class="text-end mt-4" style="display: none;">
-                <button class="btn btn-success px-4" id="createRecordsBtn1">Create Records</button>
-            </div>
-            <div id="bt2" class="text-end mt-4" style="display: none;">
-                <button class="btn btn-success px-4" id="createRecordsBtn2">Create Records</button>
-            </div>
 
+
+        </div>
+        <div id="bt1" class="text-end mt-4" style="display: none;">
+            <button class="btn btn-success px-4" id="createRecordsBtn1">Create Records</button>
+        </div>
+        <div id="bt2" class="text-end mt-4" style="display: none;">
+            <button class="btn btn-success px-4" id="createRecordsBtn2">Create Records</button>
         </div>
 
         <script src="script.js"></script>

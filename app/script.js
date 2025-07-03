@@ -155,119 +155,64 @@ let parkingDetails = "";
 ZOHO.embeddedApp.on("PageLoad", async function () {
   console.log("✅ Widget ready");
 
-
-//  let selectedSource =document.getElementById("prospectSource").value;
-//  console.log("Selected Source:", selectedSource);
- 
-  const leasingSel = document.getElementById("ownerid");
-  ///users data
-  try {
-    const leasingSel = document.getElementById("ownerid"); // Make sure it's defined first
-
-    // Fetch users
-    const resp = await ZOHO.CRM.API.getAllUsers({ Type: "ActiveUsers" });
-    leasingSel.innerHTML = "";
-
-    // Get current user
-    const userInfo = await ZOHO.CRM.CONFIG.getCurrentUser();
-    const loggedInUserId = userInfo.users[0].id;
-
-    if (resp.users?.length) {
-      resp.users.forEach((u) => {
-        const opt = document.createElement("option");
-        opt.value = u.id;
-        opt.text = u.full_name || u.email;
-
-        // ✅ Auto-select current user
-        if (u.id === loggedInUserId) {
-          opt.selected = true;
-        }
-
-        leasingSel.appendChild(opt);
-      });
-    } else {
-      leasingSel.innerHTML = "<option>No active users</option>";
+async function populateUserDropdown(selectId) {
+    const leasingSel = document.getElementById(selectId);
+    if (!leasingSel) {
+        console.error(`❌ Element with id ${selectId} not found`);
+        return;
     }
 
-    console.log("✅ Logged-in User ID:", loggedInUserId);
-    console.log("📧 Email:", userInfo.users[0].email);
-    console.log("👤 Name:", userInfo.users[0].full_name);
-  } catch (err) {
-    console.error("❌ Error loading users or user info:", err);
-    document.getElementById("ownerid").innerHTML =
-      "<option>Error loading users</option>";
-  }
-  ZOHO.CRM.CONFIG.getCurrentUser()
-    .then(function (userInfo) {
-      loggedInUserId = userInfo.users[0].id;
-      const userEmail = userInfo.users[0].email;
-      const fullName = userInfo.users[0].full_name;
+    try {
+        const [resp, userInfo] = await Promise.all([
+            ZOHO.CRM.API.getAllUsers({ Type: "ActiveUsers" }),
+            ZOHO.CRM.CONFIG.getCurrentUser()
+        ]);
 
-      console.log("✅ Logged-in User ID:", loggedInUserId);
-      console.log("📧 Email:", userEmail);
-      console.log("👤 Name:", fullName);
-    })
-    .catch(function (err) {
-      console.error("❌ Failed to get user info:", err);
-    });
+        leasingSel.innerHTML = "";
+        loggedInUserId = userInfo.users[0].id;
+        const userEmail = userInfo.users[0].email;
+        const fullName = userInfo.users[0].full_name;
 
+        if (resp.users?.length) {
+            resp.users.forEach((u) => {
+                const opt = document.createElement("option");
+                opt.value = u.id;
+                opt.text = u.full_name || u.email;
 
+                if (u.id === loggedInUserId) {
+                    opt.selected = true;
+                }
 
-
-
-
-
-    const leasingSel1 = document.getElementById("ownerid1");
-  ///users data
-  try {
-    const leasingSel1 = document.getElementById("ownerid1"); // Make sure it's defined first
-
-    // Fetch users
-    const resp = await ZOHO.CRM.API.getAllUsers({ Type: "ActiveUsers" });
-    leasingSel1.innerHTML = "";
-
-    // Get current user
-    const userInfo = await ZOHO.CRM.CONFIG.getCurrentUser();
-    const loggedInUserId = userInfo.users[0].id;
-
-    if (resp.users?.length) {
-      resp.users.forEach((u) => {
-        const opt = document.createElement("option");
-        opt.value = u.id;
-        opt.text = u.full_name || u.email;
-
-        // ✅ Auto-select current user
-        if (u.id === loggedInUserId) {
-          opt.selected = true;
+                leasingSel.appendChild(opt);
+            });
+        } else {
+            leasingSel.innerHTML = "<option>No active users</option>";
         }
 
-        leasingSel1.appendChild(opt);
-      });
-    } else {
-      leasingSel1.innerHTML = "<option>No active users</option>";
+        console.log(`✅ [${selectId}] Logged-in User ID:`, loggedInUserId);
+        console.log(`📧 [${selectId}] Email:`, userEmail);
+        console.log(`👤 [${selectId}] Name:`, fullName);
+
+        // Update loggedInUserId when another user is selected
+        leasingSel.addEventListener("change", function () {
+            loggedInUserId = this.value;
+            const selectedUser = resp.users.find(u => u.id == loggedInUserId);
+
+            console.log(`✅ [${selectId}] Updated User ID:`, loggedInUserId);
+            console.log(`📧 [${selectId}] Email:`, selectedUser?.email || "N/A");
+            console.log(`👤 [${selectId}] Name:`, selectedUser?.full_name || "N/A");
+        });
+
+    } catch (err) {
+        console.error(`❌ Error loading users for ${selectId}:`, err);
+        leasingSel.innerHTML = "<option>Error loading users</option>";
     }
+}
 
-    console.log("✅ Logged-in User ID:", loggedInUserId);
-    console.log("📧 Email:", userInfo.users[0].email);
-    console.log("👤 Name:", userInfo.users[0].full_name);
-  } catch (err) {
-    console.error("❌ Error loading users or user info:", err);
-    document.getElementById("ownerid1").innerHTML =
-      "<option>Error loading users</option>";
-  }
-  ZOHO.CRM.CONFIG.getCurrentUser()
-    .then(function (userInfo) {
-      loggedInUserId = userInfo.users[0].id;
-      const userEmail = userInfo.users[0].email;
-      const fullName = userInfo.users[0].full_name;
+// Usage:
+await populateUserDropdown("ownerid");
+await populateUserDropdown("ownerid1");
 
-      console.log("✅ Logged-in User ID:", loggedInUserId);
-      console.log("📧 Email:", userEmail);
-      console.log("👤 Name:", fullName);
-    })
-    .catch(function (err) {
-      console.error("❌ Failed to get user info:", err);
-    });
 
   // validateAllFields();
   function validateAllFields() {
@@ -4094,6 +4039,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
 
       leadData = {
         First_Name: FirstName,
+        Assigned_to:{id: loggedInUserId},
         Last_Name: LastName,
         Mobile: Mobile,
         Phone: Mobile,
@@ -4677,6 +4623,13 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
     const lastrenovated=document.getElementById("Year_Last_Renovated1")?.value || "";
     const Unit_Address= document.getElementById("Unitaddress1")?.value || "";
     const Email1= document.getElementById("Email1")?.value || "";
+    const propertyCondition=document.getElementById("Property_Condition1")?.value ||"";
+    const Locker=document.getElementById("numlocker1")?.value || "";
+    const lockerd=document.getElementById("Locker_Details1")?.value || "";
+    const washerd=document.getElementById("Washer_and_Dryer1")?.value || "";
+    const Furnished=document.getElementById("Furnished1")?.value || "";
+    const Utilities=document.getElementById("Utilities")?.value || "";
+    const NOE=document.getElementById("Noe1")?.value || "";
 
 
     ;
@@ -4685,14 +4638,17 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
     leadData = {
       First_Name: firstNameValue,
       Last_Name: lastNameValue,
+      Assigned_to:{id:loggedInUserId},
       Mobile: mobileValue,
       Phone: mobileValue,
       Unit_Address: Unit_Address,
       Email1: Email1,
       Asking_Price: askingprice,
       City: cityValue,
+      City_New2:cityValue,
       Lead_Source: Source,
       Lead_Priority_Level: "High",
+
       Available_Date: availableDateValue,
       Kijiji_Data_Importer: true,
     };
@@ -4700,6 +4656,17 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
     // ✅ Create unitData safely
     unitData = {
       Name: Unit_Address,
+      Address_Line_2:unitNumberValue,
+      Property_Condition:propertyCondition,
+      Notice_of_Entry_Required:NOE,
+      Furnished:Furnished,
+      How_are_utilities_split:Utilities,
+      Washer_and_Dryer:washerd,
+      Number_of_Lockers:Locker,
+      Storage_Details:lockerd,
+      Unit_Category:"Residential",
+      Marketed_Price:askingprice,
+      Market_Price_With_Parking_and_Locker:askingprice,
       Location_Description:unitdes,
       Total_Area_Sq_Ft:sqfeet,
       Unit_Type: unitTypeValue,
