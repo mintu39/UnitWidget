@@ -1,5 +1,6 @@
 var userId = "";
 let data = {};
+let leasingSel = "";
 let scrapedDate = "";
 let Source = "";
 let BuildingName = "";
@@ -155,63 +156,63 @@ let parkingDetails = "";
 ZOHO.embeddedApp.on("PageLoad", async function () {
   console.log("✅ Widget ready");
 
-async function populateUserDropdown(selectId) {
+  async function populateUserDropdown(selectId) {
     const leasingSel = document.getElementById(selectId);
     if (!leasingSel) {
-        console.error(`❌ Element with id ${selectId} not found`);
-        return;
+      console.error(`❌ Element with id ${selectId} not found`);
+      return;
     }
 
     try {
-        const [resp, userInfo] = await Promise.all([
-            ZOHO.CRM.API.getAllUsers({ Type: "ActiveUsers" }),
-            ZOHO.CRM.CONFIG.getCurrentUser()
-        ]);
+      const [resp, userInfo] = await Promise.all([
+        ZOHO.CRM.API.getAllUsers({ Type: "ActiveUsers" }),
+        ZOHO.CRM.CONFIG.getCurrentUser()
+      ]);
 
-        leasingSel.innerHTML = "";
-        loggedInUserId = userInfo.users[0].id;
-        const userEmail = userInfo.users[0].email;
-        const fullName = userInfo.users[0].full_name;
+      leasingSel.innerHTML = "";
+      loggedInUserId = userInfo.users[0].id;
+      const userEmail = userInfo.users[0].email;
+      const fullName = userInfo.users[0].full_name;
 
-        if (resp.users?.length) {
-            resp.users.forEach((u) => {
-                const opt = document.createElement("option");
-                opt.value = u.id;
-                opt.text = u.full_name || u.email;
+      if (resp.users?.length) {
+        resp.users.forEach((u) => {
+          const opt = document.createElement("option");
+          opt.value = u.id;
+          opt.text = u.full_name || u.email;
 
-                if (u.id === loggedInUserId) {
-                    opt.selected = true;
-                }
+          if (u.id === loggedInUserId) {
+            opt.selected = true;
+          }
 
-                leasingSel.appendChild(opt);
-            });
-        } else {
-            leasingSel.innerHTML = "<option>No active users</option>";
-        }
-
-        console.log(`✅ [${selectId}] Logged-in User ID:`, loggedInUserId);
-        console.log(`📧 [${selectId}] Email:`, userEmail);
-        console.log(`👤 [${selectId}] Name:`, fullName);
-
-        // Update loggedInUserId when another user is selected
-        leasingSel.addEventListener("change", function () {
-            loggedInUserId = this.value;
-            const selectedUser = resp.users.find(u => u.id == loggedInUserId);
-
-            console.log(`✅ [${selectId}] Updated User ID:`, loggedInUserId);
-            console.log(`📧 [${selectId}] Email:`, selectedUser?.email || "N/A");
-            console.log(`👤 [${selectId}] Name:`, selectedUser?.full_name || "N/A");
+          leasingSel.appendChild(opt);
         });
+      } else {
+        leasingSel.innerHTML = "<option>No active users</option>";
+      }
+
+      console.log(`✅ [${selectId}] Logged-in User ID:`, loggedInUserId);
+      console.log(`📧 [${selectId}] Email:`, userEmail);
+      console.log(`👤 [${selectId}] Name:`, fullName);
+
+      // Update loggedInUserId when another user is selected
+      leasingSel.addEventListener("change", function () {
+        loggedInUserId = this.value;
+        const selectedUser = resp.users.find(u => u.id == loggedInUserId);
+
+        console.log(`✅ [${selectId}] Updated User ID:`, loggedInUserId);
+        console.log(`📧 [${selectId}] Email:`, selectedUser?.email || "N/A");
+        console.log(`👤 [${selectId}] Name:`, selectedUser?.full_name || "N/A");
+      });
 
     } catch (err) {
-        console.error(`❌ Error loading users for ${selectId}:`, err);
-        leasingSel.innerHTML = "<option>Error loading users</option>";
+      console.error(`❌ Error loading users for ${selectId}:`, err);
+      leasingSel.innerHTML = "<option>Error loading users</option>";
     }
-}
+  }
 
-// Usage:
-await populateUserDropdown("ownerid");
-await populateUserDropdown("ownerid1");
+  // Usage:
+  await populateUserDropdown("ownerid");
+  await populateUserDropdown("ownerid1");
 
 
   // validateAllFields();
@@ -266,32 +267,32 @@ await populateUserDropdown("ownerid1");
   function validateAllFields1() {
     // List all required field IDs here
     const requiredFieldIds = [
-    "First_Name1",
-    "Last_Name1",
-    "Mobile1",
-    "Email1",
-    "ownerid1",
-    "Unitaddress1",
-    "Unit_Type1",
-    "City1",
-    "Available_Date1",
-    "Province1",
-    "Postal_Code1",
-    "Bedrooms1",
-    "Bathrooms1",
-    "number_of_floors1",
-    "number_of_units1",
-    "Backyard1",
-    "Backyard_Fenced1",
-    "Year_Last_Renovated1",
-    "Parking_Spaces1",
-    "Asking_Price1",
-    "Parking_Details1",
-    "Unit_number1",
-    "Date_of_Construction1",
-    "sqrfeet1",
-    "Unit_Description1"
-];
+      "First_Name1",
+      "Last_Name1",
+      "Mobile1",
+      "Email1",
+      "ownerid1",
+      "Unitaddress1",
+      "Unit_Type1",
+      "City1",
+      "Available_Date1",
+      "Province1",
+      "Postal_Code1",
+      "Bedrooms1",
+      "Bathrooms1",
+      "number_of_floors1",
+      "number_of_units1",
+      "Backyard1",
+      "Backyard_Fenced1",
+      "Year_Last_Renovated1",
+      "Parking_Spaces1",
+      "Asking_Price1",
+      "Parking_Details1",
+      "Unit_number1",
+      "Date_of_Construction1",
+      "sqrfeet1",
+      "Unit_Description1"
+    ];
 
     let missingFields = [];
     requiredFieldIds.forEach(id => {
@@ -318,7 +319,7 @@ await populateUserDropdown("ownerid1");
   }
 
 
-  
+
 
 
   function capitalizeNamePart(name) {
@@ -420,34 +421,34 @@ await populateUserDropdown("ownerid1");
         type: "Stacked Townhouse",
         keywords: [
           "stacked condo townhouse",
-"stacked condo townhome",
-"2-storey stacked townhouse",
-"3-storey stacked townhome",
-"multi-level townhouse",
-"multi-level townhome",
-"upper unit townhouse",
-"lower unit townhouse",
-"upper level townhouse",
-"lower level townhouse",
-"stacked unit",
-"stacked style townhouse",
-"stacked town",
-"townhouse style condo",
-"townhome style condo",
-"condo townhouse",
-"condo townhome",
-"upper stacked town",
-"lower stacked town",
-"townhouse condo",
-"back to back townhouse",
-"back-to-back stacked townhome",
-"stacked TH",
-"stacked t/h",
-"stacked t.h.",
-"2 level stacked town",
-"stacked town house",
-"stack townhome",
-"stack town house"
+          "stacked condo townhome",
+          "2-storey stacked townhouse",
+          "3-storey stacked townhome",
+          "multi-level townhouse",
+          "multi-level townhome",
+          "upper unit townhouse",
+          "lower unit townhouse",
+          "upper level townhouse",
+          "lower level townhouse",
+          "stacked unit",
+          "stacked style townhouse",
+          "stacked town",
+          "townhouse style condo",
+          "townhome style condo",
+          "condo townhouse",
+          "condo townhome",
+          "upper stacked town",
+          "lower stacked town",
+          "townhouse condo",
+          "back to back townhouse",
+          "back-to-back stacked townhome",
+          "stacked TH",
+          "stacked t/h",
+          "stacked t.h.",
+          "2 level stacked town",
+          "stacked town house",
+          "stack townhome",
+          "stack town house"
 
         ],
       },
@@ -480,37 +481,37 @@ await populateUserDropdown("ownerid1");
         type: "Condominium",
         keywords: [
           "condo suite",
-"condo flat",
-"condo residence",
-"condo loft",
-"condo studio",
-"condo property",
-"high-rise condo",
-"low-rise condo",
-"mid-rise condo",
-"luxury condominium",
-"modern condo",
-"new condo",
-"brand new condo",
-"condo building",
-"condo complex",
-"condo rental",
-"condo for rent",
-"condo for lease",
-"condo accommodation",
-"condo",
-"apartment condo",
-"condo apartments",
-"condo style apartment",
-"apartment style condo",
-"condo townhouse",
-"condo townhome",
-"condo living",
-"executive condo",
-"premium condo",
-"upscale condo",
-"boutique condo",
-"Condozet run"
+          "condo flat",
+          "condo residence",
+          "condo loft",
+          "condo studio",
+          "condo property",
+          "high-rise condo",
+          "low-rise condo",
+          "mid-rise condo",
+          "luxury condominium",
+          "modern condo",
+          "new condo",
+          "brand new condo",
+          "condo building",
+          "condo complex",
+          "condo rental",
+          "condo for rent",
+          "condo for lease",
+          "condo accommodation",
+          "condo",
+          "apartment condo",
+          "condo apartments",
+          "condo style apartment",
+          "apartment style condo",
+          "condo townhouse",
+          "condo townhome",
+          "condo living",
+          "executive condo",
+          "premium condo",
+          "upscale condo",
+          "boutique condo",
+          "Condozet run"
         ],
       },
       {
@@ -518,114 +519,114 @@ await populateUserDropdown("ownerid1");
         keywords: [
           "mid-rise",
           "apartment",
-"apartment building",
-"apartment unit",
-"apartment suite",
-"apartment flat",
-"apartment residence",
-"apartment rental",
-"apartment for rent",
-"apartment for lease",
-"apartment complex",
-"unit apartment",
-"unit for rent",
-"unit for lease",
-"rental unit",
-"rental apartment",
-"residential unit",
-"residential apartment",
-"building apartment",
-"building unit",
-"building suite",
-"corner apartment",
-"corner suite",
-"high-rise apartment",
-"high-rise unit",
-"low-rise apartment",
-"low-rise unit",
-"mid-rise apartment",
-"mid-rise unit",
-"multi-unit building",
-"multi-unit apartment",
-"multi residential building",
-"multi family apartment",
-"multi family unit",
-"apartment tower",
-"apartment block",
-"unit in apartment building"
+          "apartment building",
+          "apartment unit",
+          "apartment suite",
+          "apartment flat",
+          "apartment residence",
+          "apartment rental",
+          "apartment for rent",
+          "apartment for lease",
+          "apartment complex",
+          "unit apartment",
+          "unit for rent",
+          "unit for lease",
+          "rental unit",
+          "rental apartment",
+          "residential unit",
+          "residential apartment",
+          "building apartment",
+          "building unit",
+          "building suite",
+          "corner apartment",
+          "corner suite",
+          "high-rise apartment",
+          "high-rise unit",
+          "low-rise apartment",
+          "low-rise unit",
+          "mid-rise apartment",
+          "mid-rise unit",
+          "multi-unit building",
+          "multi-unit apartment",
+          "multi residential building",
+          "multi family apartment",
+          "multi family unit",
+          "apartment tower",
+          "apartment block",
+          "unit in apartment building"
         ],
       },
       {
         type: "Single Unit - House",
         keywords: [
           "single family home",
-"single family house",
-"single detached",
-"detached house",
-"detached home",
-"freehold house",
-"freehold home",
-"standalone house",
-"standalone home",
-"private house",
-"private detached",
-"private detached house",
-"private detached home",
-"single dwelling",
-"single unit home",
-"single unit detached",
-"bungalow house",
-"bungalow home",
-"entire home",
-"entire detached house",
-"entire detached home",
-"house for rent",
-"home for rent",
-"detached for rent",
-"single family detached",
-"single family detached house",
-"single family detached home",
-"single residence",
-"private residence",
-"stand alone house",
-"stand alone home"
+          "single family house",
+          "single detached",
+          "detached house",
+          "detached home",
+          "freehold house",
+          "freehold home",
+          "standalone house",
+          "standalone home",
+          "private house",
+          "private detached",
+          "private detached house",
+          "private detached home",
+          "single dwelling",
+          "single unit home",
+          "single unit detached",
+          "bungalow house",
+          "bungalow home",
+          "entire home",
+          "entire detached house",
+          "entire detached home",
+          "house for rent",
+          "home for rent",
+          "detached for rent",
+          "single family detached",
+          "single family detached house",
+          "single family detached home",
+          "single residence",
+          "private residence",
+          "stand alone house",
+          "stand alone home"
         ],
       },
       {
         type: "Multi Unit - Above Ground",
         keywords: [
           "duplex",
-"triplex unit",
-"fourplex unit",
-"multi-plex",
-"multi unit house",
-"multi unit building",
-"multi family home",
-"multi family house",
-"main floor unit",
-"upper unit",
-"upper floor unit",
-"upper suite",
-"second floor unit",
-"third floor unit",
-"top floor unit",
-"above ground unit",
-"above grade unit",
-"above ground suite",
-"above grade suite",
-"upstairs suite",
-"upstairs apartment",
-"upper level suite",
-"upper level apartment",
-"main level unit",
-"main level suite",
-"main floor apartment",
-"corner unit apartment",
-"corner unit suite",
-"corner apartment",
-"multi unit above ground",
-"multi unit residence",
-"multi storey unit"
+          "triplex unit",
+          "fourplex unit",
+          "multi-plex",
+          "multi unit house",
+          "multi unit building",
+          "multi family home",
+          "multi family house",
+          "main floor unit",
+          "upper unit",
+          "upper floor unit",
+          "upper suite",
+          "second floor unit",
+          "third floor unit",
+          "top floor unit",
+          "above ground unit",
+          "above grade unit",
+          "above ground suite",
+          "above grade suite",
+          "upstairs suite",
+          "upstairs apartment",
+          "upper level suite",
+          "upper level apartment",
+          "main level unit",
+          "main level suite",
+          "main floor apartment",
+          "corner unit apartment",
+          "corner unit suite",
+          "corner apartment",
+          "multi unit above ground",
+          "multi unit residence",
+          "multi storey unit"
         ],
       },
       {
@@ -634,32 +635,32 @@ await populateUserDropdown("ownerid1");
           "student room",
           "student housing",
           "room near college",
-"student rental",
-"student accommodation",
-"student residence",
-"student dorm",
-"student dormitory",
-"room for student",
-"student room for rent",
-"student housing rental",
-"student housing room",
-"student suite",
-"student unit",
-"room for university student",
-"room for college student",
-"room close to college",
-"room close to university",
-"room near campus",
-"room by campus",
-"student room rental",
-"student lease",
-"student living",
-"all inclusive student housing",
-"all inclusive student accommodation",
-"shared student housing",
-"shared student room",
-"private student room",
-"furnished student room",
+          "student rental",
+          "student accommodation",
+          "student residence",
+          "student dorm",
+          "student dormitory",
+          "room for student",
+          "student room for rent",
+          "student housing rental",
+          "student housing room",
+          "student suite",
+          "student unit",
+          "room for university student",
+          "room for college student",
+          "room close to college",
+          "room close to university",
+          "room near campus",
+          "room by campus",
+          "student room rental",
+          "student lease",
+          "student living",
+          "all inclusive student housing",
+          "all inclusive student accommodation",
+          "shared student housing",
+          "shared student room",
+          "private student room",
+          "furnished student room",
           "room near university",
           "all-inclusive student room",
         ],
@@ -1375,7 +1376,7 @@ await populateUserDropdown("ownerid1");
     return (
       text.includes("renovated kitchen") ||
       text.includes("modern kitchen") ||
-      text.includes("upgraded kitchen")||
+      text.includes("upgraded kitchen") ||
       text.includes("new kitchen") ||
       text.includes("updated kitchen")
     );
@@ -3373,11 +3374,11 @@ await populateUserDropdown("ownerid1");
     statusfc.disabled = true;
     document.getElementById("pageLoader").style.display = "flex";
 
-//"&bypassCache=true"
+    //"&bypassCache=true"
     try {
       const response = await fetch(
         "https://api.royalyorkpm.com/kijiji-ocr-new?url=" +
-        encodeURIComponent(url) +"&api_key=12345" + "&bypassCache=true"
+        encodeURIComponent(url) + "&api_key=12345" + "&bypassCache=true"
       );
       data = await response.json();
       const StringData = JSON.stringify(data).toLowerCase();
@@ -3652,7 +3653,7 @@ await populateUserDropdown("ownerid1");
         }
 
         const basementKeywords = [
-          
+
           "laundary"
         ];
 
@@ -4039,7 +4040,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
 
       leadData = {
         First_Name: FirstName,
-        Assigned_to:{id: loggedInUserId},
+        Assigned_to: { id: loggedInUserId },
         Last_Name: LastName,
         Mobile: Mobile,
         Phone: Mobile,
@@ -4165,6 +4166,8 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
         Address: UnitNamecorrected,
         Name: UnitNamecorrected,
         City: city,
+        Category: "Residential",
+        Country: "Canada",
         Province: Province,
         Postal_Code: PostalCode,
         ac_included: Building_AC_Incl,
@@ -4617,19 +4620,19 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
     const postalCodeValue = document.getElementById("Postal_Code1")?.value || "";
     const unitCountValue = document.getElementById("number_of_units1")?.value || "";
     const constructedon = document.getElementById("Date_of_Construction1")?.value || "";
-    const sqfeet=document.getElementById("sqrfeet1")?.value || "";
-    const unitdes=document.getElementById("Unit_Description1")?.value || "";
-    const askingprice= document.getElementById("Asking_Price1")?.value || "";
-    const lastrenovated=document.getElementById("Year_Last_Renovated1")?.value || "";
-    const Unit_Address= document.getElementById("Unitaddress1")?.value || "";
-    const Email1= document.getElementById("Email1")?.value || "";
-    const propertyCondition=document.getElementById("Property_Condition1")?.value ||"";
-    const Locker=document.getElementById("numlocker1")?.value || "";
-    const lockerd=document.getElementById("Locker_Details1")?.value || "";
-    const washerd=document.getElementById("Washer_and_Dryer1")?.value || "";
-    const Furnished=document.getElementById("Furnished1")?.value || "";
-    const Utilities=document.getElementById("Utilities")?.value || "";
-    const NOE=document.getElementById("Noe1")?.value || "";
+    const sqfeet = document.getElementById("sqrfeet1")?.value || "";
+    const unitdes = document.getElementById("Unit_Description1")?.value || "";
+    const askingprice = document.getElementById("Asking_Price1")?.value || "";
+    const lastrenovated = document.getElementById("Year_Last_Renovated1")?.value || "";
+    const Unit_Address = document.getElementById("Unitaddress1")?.value || "";
+    const Email1 = document.getElementById("Email1")?.value || "";
+    const propertyCondition = document.getElementById("Property_Condition1")?.value || "";
+    const Locker = document.getElementById("numlocker1")?.value || "";
+    const lockerd = document.getElementById("Locker_Details1")?.value || "";
+    const washerd = document.getElementById("Washer_and_Dryer1")?.value || "";
+    const Furnished = document.getElementById("Furnished1")?.value || "";
+    const Utilities = document.getElementById("Utilities")?.value || "";
+    const NOE = document.getElementById("Noe1")?.value || "";
 
 
     ;
@@ -4638,14 +4641,14 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
     leadData = {
       First_Name: firstNameValue,
       Last_Name: lastNameValue,
-      Assigned_to:{id:loggedInUserId},
+      Assigned_to: { id: loggedInUserId },
       Mobile: mobileValue,
       Phone: mobileValue,
       Unit_Address: Unit_Address,
       Email1: Email1,
       Asking_Price: askingprice,
       City: cityValue,
-      City_New2:cityValue,
+      City_New2: cityValue,
       Lead_Source: Source,
       Lead_Priority_Level: "High",
 
@@ -4656,21 +4659,21 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
     // ✅ Create unitData safely
     unitData = {
       Name: Unit_Address,
-      Address_Line_2:unitNumberValue,
-      Property_Condition:propertyCondition,
-      Notice_of_Entry_Required:NOE,
-      Furnished:Furnished,
-      How_are_utilities_split:Utilities,
-      Washer_and_Dryer:washerd,
-      Number_of_Lockers:Locker,
-      Storage_Details:lockerd,
-      Unit_Category:"Residential",
-      Marketed_Price:askingprice,
-      Market_Price_With_Parking_and_Locker:askingprice,
-      Location_Description:unitdes,
-      Total_Area_Sq_Ft:sqfeet,
+      Address_Line_2: unitNumberValue,
+      Property_Condition: propertyCondition,
+      Notice_of_Entry_Required: NOE,
+      Furnished: Furnished,
+      How_are_utilities_split: Utilities,
+      Washer_and_Dryer: washerd,
+      Number_of_Lockers: Locker,
+      Storage_Details: lockerd,
+      Unit_Category: "Residential",
+      Marketed_Price: askingprice,
+      Market_Price_With_Parking_and_Locker: askingprice,
+      Location_Description: unitdes,
+      Total_Area_Sq_Ft: sqfeet,
       Unit_Type: unitTypeValue,
-      Year_Built:lastrenovated,
+      Year_Built: lastrenovated,
       Number_of_Floors: floorsValue,
       Bedrooms: bedroomsValue,
       Bathrooms: bathroomsValue,
@@ -4694,8 +4697,10 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
       floor_count: floorsValue,
       unit_count: unitCountValue,
       Address: Unit_Address,
-      Name: Unit_Address,
+      Name: Unit_Address + "," + cityValue + "," + provinceValue + "," + postalCodeValue,
       City: cityValue,
+      Category: "Residential",
+      Country: "Canada",
       Province: provinceValue,
       Postal_Code: postalCodeValue,
       Date_of_Construction: constructedon,

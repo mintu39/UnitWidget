@@ -64,7 +64,7 @@ $(document).ready(function () {
         console.log("Selected Type:", selectedtype);
 
         if (
-            selectedtype > 0) {
+            selectedtype == 0) {
             $('#Parking_Details1').val('No Parking Available');
         }
     });
@@ -77,7 +77,7 @@ $(document).ready(function () {
         console.log("Selected Type:", selectedtype);
 
         if (
-            selectedtype > 0) {
+            selectedtype == 0) {
             $('#Locker_Details1').val('N/A - No Storage Available');
         }
     });
@@ -435,29 +435,7 @@ $(document).ready(function () {
                         <input type="text" class="form-control" id="Unit_number1" value="" />
                     </div>
                 </div>
-                <div class="row mb-3" id="backyarddata">
-
-
-                    <div class="col-md-6">
-                        <label for="Backyard" class="form-label">Backyard</label>
-                        <select class="form-control" id="Backyard1" value="">
-                            <option value="">Select</option>
-                            <option value="Included">Included</option>
-                            <option value="Shared">Shared</option>
-                            <option value="No Backyard">No Backyard</option>
-                            <option value="Not Included">Not Included</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="Backyard_Fenced" class="form-label">Is the Backyard Fenced?</label>
-                        <select class="form-control" id="Backyard_Fenced1" value="">
-                            <option value="">Select</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                            <option value="No Backyard">No Backyard</option>
-                        </select>
-                    </div>
-                </div>
+                
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Mobile" class="form-label">Unit Address</label>
@@ -841,6 +819,7 @@ $(document).ready(function () {
                         </select>
                     </div>
                 </div>
+                
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Washer_and_Dryer1" class="form-label">Washer and Dryer</label>
@@ -870,6 +849,29 @@ $(document).ready(function () {
                     <div class="row mb-3">
 
 
+                    </div>
+                </div>
+                <div class="row mb-3" id="backyarddata">
+
+
+                    <div class="col-md-6">
+                        <label for="Backyard" class="form-label">Backyard</label>
+                        <select class="form-control" id="Backyard1" value="">
+                            <option value="">Select</option>
+                            <option value="Included">Included</option>
+                            <option value="Shared">Shared</option>
+                            <option value="No Backyard">No Backyard</option>
+                            <option value="Not Included">Not Included</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="Backyard_Fenced" class="form-label">Is the Backyard Fenced?</label>
+                        <select class="form-control" id="Backyard_Fenced1" value="">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                            <option value="No Backyard">No Backyard</option>
+                        </select>
                     </div>
                 </div>
                 <div class="row mb-3">
