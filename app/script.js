@@ -216,54 +216,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
 
   // validateAllFields();
-  function validateAllFields() {
-    // List all required field IDs here
-    const requiredFieldIds = [
-      "First_Name",
-      "Last_Name",
-      "Available_Date",
-      "Mobile",
-      "Unit_Type",
-      "City",
-      "Province",
-      "Postal_Code",
-      "Bedrooms",
-      "Bathrooms",
-      "number_of_floors",
-      "number_of_units",
-      "Backyard",
-      "Backyard_Fenced",
-      "Year_Last_Renovated",
-      "Parking_Spaces",
-      "Parking_Details",
-      "ownerid",
-      "Unit_name",
-      "Unit_number"
-    ];
 
-    let missingFields = [];
-    requiredFieldIds.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        // For select elements, check selected value
-        let value = el.value ? el.value.trim() : "";
-        if (!value) {
-          let label = el.previousElementSibling ? el.previousElementSibling.innerText : id;
-          missingFields.push(label);
-        }
-      }
-    });
-
-    if (missingFields.length > 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "Please fill all required fields",
-        html: `<ul style="text-align:left;">${missingFields.map(f => `<li>${f}</li>`).join("")}</ul>`,
-      });
-      return false;
-    }
-    return true;
-  }
   function validateAllFields1() {
     // List all required field IDs here
     const requiredFieldIds = [
@@ -3381,10 +3334,16 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
         encodeURIComponent(url) + "&api_key=12345" + "&bypassCache=true"
       );
       data = await response.json();
+      data=data.data;
+
+      console.log("Data",data);
+      
       const StringData = JSON.stringify(data).toLowerCase();
       console.log("StringData", StringData);
       //25th June start New -
       const obj = { firstName: data.firstName || "" };
+      console.log("Obj",obj);
+      
       const fullName = obj.firstName || "";
       const FirstName = extractFirstName(fullName);
       const LastName = extractLastName(fullName);
@@ -4667,6 +4626,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
       Washer_and_Dryer: washerd,
       Number_of_Lockers: Locker,
       Storage_Details: lockerd,
+      Earliest_Move_in_Date:availableDateValue,
       Unit_Category: "Residential",
       Marketed_Price: askingprice,
       Market_Price_With_Parking_and_Locker: askingprice,
