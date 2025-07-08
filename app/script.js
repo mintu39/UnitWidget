@@ -241,7 +241,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       "Parking_Spaces1",
       "Asking_Price1",
       "Parking_Details1",
-      "Unit_number1",
       "Date_of_Construction1",
       "sqrfeet1",
       "Unit_Description1"
@@ -4604,7 +4603,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
       Mobile: mobileValue,
       Phone: mobileValue,
       Unit_Address: Unit_Address,
-      Email1: Email1,
+      Email: Email1,
       Asking_Price: askingprice,
       City: cityValue,
       City_New2: cityValue,
@@ -4617,7 +4616,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
 
     // ✅ Create unitData safely
     unitData = {
-      Name: Unit_Address,
+      Name: Unit_Address + "," + cityValue + "," + provinceValue + "," + postalCodeValue,
       Address_Line_2: unitNumberValue,
       Property_Condition: propertyCondition,
       Notice_of_Entry_Required: NOE,
@@ -4667,159 +4666,159 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
       Kijiji_Data_Importer: true,
     };
     try {
-      document.getElementById("pageLoader2").style.display = "flex";
+  document.getElementById("pageLoader2").style.display = "flex";
 
-      let buildingid = null;
-      let existingBuilding = null;
+  let buildingid = null;
+  let existingBuilding = null;
 
-      const BuildingName = document.getElementById("Unit_name").value?.trim();
+  const BuildingName = document.getElementById("Unit_name").value?.trim();
 
-      if (BuildingName) {
-        const buildingQuery = `(Name:equals:${BuildingName})`;
-        console.log("🔍 Building Query:", buildingQuery);
+  if (BuildingName) {
+    const buildingQuery = `(Name:equals:${BuildingName})`;
+    console.log("🔍 Building Query:", buildingQuery);
 
-        const searchResp = await ZOHO.CRM.API.searchRecord({
-          Entity: "Buildings",
-          Type: "criteria",
-          Query: buildingQuery,
-        });
-        console.log("Building Search Response:", searchResp);
+    const searchResp = await ZOHO.CRM.API.searchRecord({
+      Entity: "Buildings",
+      Type: "criteria",
+      Query: buildingQuery,
+    });
+    console.log("Building Search Response:", searchResp);
 
-        if (searchResp?.data?.length > 0) {
-          existingBuilding = searchResp.data[0];
-          buildingid = existingBuilding.id;
-        }
-      }
+    if (searchResp?.data?.length > 0) {
+      existingBuilding = searchResp.data[0];
+      buildingid = existingBuilding.id;
+    }
+  }
 
-      const unitName = document.getElementById("Unit_name").value?.trim();
+  const unitName = document.getElementById("Unit_name").value?.trim();
 
-      if (unitName) {
-        const unitQuery = `(Name:equals:${unitName})`;
-        console.log("🔍 Unit Query:", unitQuery);
+  if (unitName) {
+    const unitQuery = `(Name:equals:${unitName})`;
+    console.log("🔍 Unit Query:", unitQuery);
 
-        const unitDupCheck = await ZOHO.CRM.API.searchRecord({
-          Entity: "Units",
-          Type: "criteria",
-          Query: unitQuery,
-        });
-        console.log("Unit Search Response:", unitDupCheck);
+    const unitDupCheck = await ZOHO.CRM.API.searchRecord({
+      Entity: "Units",
+      Type: "criteria",
+      Query: unitQuery,
+    });
+    console.log("Unit Search Response:", unitDupCheck);
 
-        if (unitDupCheck?.data?.length > 0) {
-          throw {
-            module: "Units",
-            message: "Duplicate Unit Name",
-            details: {
-              id: unitDupCheck.data[0].id,
-              field: "Name",
-            },
-          };
-        }
-      }
-
-      if (!buildingid) {
-        const buildingResp = await ZOHO.CRM.API.insertRecord({
-          Entity: "Buildings",
-          APIData: building_data,
-          Trigger: ["workflow"],
-        });
-        console.log("Building Response:", buildingResp);
-        if (!buildingResp || buildingResp.data[0].code !== "SUCCESS") {
-          throw {
-            module: "Buildings",
-            message: buildingResp.data[0].message || "Error creating building",
-            details: {
-              id: null,
-              field: "Insert Error",
-            },
-            data: buildingResp.data,
-          };
-        }
-        buildingid = buildingResp.data[0].details.id;
-      }
-
-      const leadResp = await ZOHO.CRM.API.insertRecord({
-        Entity: "Leads",
-        APIData: leadData,
-        Trigger: ["workflow"],
-      });
-      if (!leadResp || leadResp.data[0].code !== "SUCCESS") {
-        throw {
-          module: "Leads",
-          message: leadResp.data[0].message || "Error creating lead",
-          details: {
-            id: null,
-            field: "Insert Error",
-          },
-          data: leadResp.data,
-        };
-      }
-      const leadId = leadResp.data[0].details.id;
-      const unitResp = await ZOHO.CRM.API.insertRecord({
-        Entity: "Units",
-        APIData: unitData,
-        Trigger: ["workflow"],
-      });
-      if (!unitResp || unitResp.data[0].code !== "SUCCESS") {
-        throw {
-          module: "Units",
-          message: unitResp.data[0].message || "Error creating unit",
-          details: {
-            id: null,
-            field: "Insert Error",
-          },
-          data: unitResp.data,
-        };
-      }
-      const unitId = unitResp.data[0].details.id;
-
-      const updateLeadResp = await ZOHO.CRM.API.updateRecord({
-        Entity: "Leads",
-        RecordID: leadId,
-        Trigger: ["workflow"],
-        APIData: {
-          id: leadId,
-          Associated_Unit: { id: unitId },
-          Owner: { id: aid },
+    if (unitDupCheck?.data?.length > 0) {
+      throw {
+        module: "Units",
+        message: "Duplicate Unit Name",
+        details: {
+          id: unitDupCheck.data[0].id,
+          field: "Name",
         },
-      });
-      if (!updateLeadResp || updateLeadResp.data[0].code !== "SUCCESS") {
-        throw {
-          module: "Leads",
-          message: updateLeadResp.data[0].message || "Error updating lead",
-          details: {
-            id: leadId,
-            field: "Update Error",
-          },
-          data: updateLeadResp.data,
-        };
-      }
+      };
+    }
+  }
 
-      const updateUnitResp = await ZOHO.CRM.API.updateRecord({
-        Entity: "Units",
-        RecordID: unitId,
-        Trigger: ["workflow"],
-        APIData: {
-          id: unitId,
-          Associated_Building: { id: buildingid },
+  if (!buildingid) {
+    const buildingResp = await ZOHO.CRM.API.insertRecord({
+      Entity: "Buildings",
+      APIData: building_data,
+      Trigger: ["workflow"],
+    });
+    console.log("Building Response:", buildingResp);
+    if (!buildingResp || buildingResp.data[0].code !== "SUCCESS") {
+      throw {
+        module: "Buildings",
+        message: buildingResp.data[0].message || "Error creating building",
+        details: {
+          id: null,
+          field: "Insert Error",
         },
-      });
-      if (!updateUnitResp || updateUnitResp.data[0].code !== "SUCCESS") {
-        throw {
-          module: "Units",
-          message: updateUnitResp.data[0].message || "Error updating unit",
-          details: {
-            id: unitId,
-            field: "Update Error",
-          },
-          data: updateUnitResp.data,
-        };
-      }
+        data: buildingResp.data,
+      };
+    }
+    buildingid = buildingResp.data[0].details.id;
+  }
 
-      // 🎉 Success summary popup
-      Swal.fire({
-        icon: "success",
-        title: "✅ Records Created Successfully",
-        html: `
+  const leadResp = await ZOHO.CRM.API.insertRecord({
+    Entity: "Leads",
+    APIData: leadData,
+    Trigger: ["workflow"],
+  });
+  if (!leadResp || leadResp.data[0].code !== "SUCCESS") {
+    throw {
+      module: "Leads",
+      message: leadResp.data[0].message || "Error creating lead",
+      details: {
+        id: null,
+        field: "Insert Error",
+      },
+      data: leadResp.data,
+    };
+  }
+  const leadId = leadResp.data[0].details.id;
+  const unitResp = await ZOHO.CRM.API.insertRecord({
+    Entity: "Units",
+    APIData: unitData,
+    Trigger: ["workflow"],
+  });
+  if (!unitResp || unitResp.data[0].code !== "SUCCESS") {
+    throw {
+      module: "Units",
+      message: unitResp.data[0].message || "Error creating unit",
+      details: {
+        id: null,
+        field: "Insert Error",
+      },
+      data: unitResp.data,
+    };
+  }
+  const unitId = unitResp.data[0].details.id;
+
+  const updateLeadResp = await ZOHO.CRM.API.updateRecord({
+    Entity: "Leads",
+    RecordID: leadId,
+    Trigger: ["workflow"],
+    APIData: {
+      id: leadId,
+      Associated_Unit: { id: unitId },
+      Owner: { id: aid },
+    },
+  });
+  if (!updateLeadResp || updateLeadResp.data[0].code !== "SUCCESS") {
+    throw {
+      module: "Leads",
+      message: updateLeadResp.data[0].message || "Error updating lead",
+      details: {
+        id: leadId,
+        field: "Update Error",
+      },
+      data: updateLeadResp.data,
+    };
+  }
+
+  const updateUnitResp = await ZOHO.CRM.API.updateRecord({
+    Entity: "Units",
+    RecordID: unitId,
+    Trigger: ["workflow"],
+    APIData: {
+      id: unitId,
+      Associated_Building: { id: buildingid },
+    },
+  });
+  if (!updateUnitResp || updateUnitResp.data[0].code !== "SUCCESS") {
+    throw {
+      module: "Units",
+      message: updateUnitResp.data[0].message || "Error updating unit",
+      details: {
+        id: unitId,
+        field: "Update Error",
+      },
+      data: updateUnitResp.data,
+    };
+  }
+
+  // 🎉 Success summary popup
+  Swal.fire({
+    icon: "success",
+    title: "✅ Records Created Successfully",
+    html: `
     <style>
       .summary-container {
         font-family: 'Segoe UI', sans-serif;
@@ -4869,107 +4868,124 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
           <td class="summary-cell">
             <span class="summary-label">Prospect Name</span>
             <a href="https://crm.zoho.com/crm/org680397761/tab/Leads/${leadId}" target="_blank">${leadData.Last_Name || "N/A"
-          }</a>
+    }</a>
           </td>
           <td class="summary-cell"><span class="summary-label">Mobile</span>${leadData.Mobile || "N/A"
-          }</td>
+    }</td>
           <td class="summary-cell"><span class="summary-label">City</span>CAD ${leadData.City || "N/A"
-          }</td>
+    }</td>
           <td class="summary-cell"><span class="summary-label">Available Date</span>${leadData.Available_Date || "N/A"
-          }</td>
+    }</td>
         </tr>
         <tr>
           <td class="summary-header">🏠 Unit</td>
           <td class="summary-cell">
             <span class="summary-label">Unit Name</span>
             <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${unitId}" target="_blank">${unitData.Name || "N/A"
-          }</a>
+    }</a>
           </td>
           <td class="summary-cell"><span class="summary-label">Bathroom</span>${unitData.Bathrooms || "N/A"
-          }</td>
+    }</td>
           <td class="summary-cell"><span class="summary-label">Bedrooms</span>${unitData.Bedrooms || "N/A"
-          }</td>
+    }</td>
           <td class="summary-cell"><span class="summary-label">Unit Type</span>${unitData.Unit_Type || "N/A"
-          }</td>
+    }</td>
         </tr>
         <tr>
           <td class="summary-header">🏢 Building</td>
           <td class="summary-cell">
             <span class="summary-label">Building Name</span>
             <a href="https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${buildingid}" target="_blank">${existingBuilding?.Name || building_data.Name || "N/A"
-          }</a>
+    }</a>
           </td>
           <td class="summary-cell"><span class="summary-label">Property Type</span>${building_data.Property_Type || "N/A"
-          }</td>
+    }</td>
           <td class="summary-cell"><span class="summary-label">Number of Floors</span>${building_data.floor_count || "N/A"
-          }</td>
+    }</td>
           <td class="summary-cell"><span class="summary-label">City</span>${building_data.City || "N/A"
-          }</td>
+    }</td>
         </tr>
       </table>
     </div>
   `,
-        width: 750,
-        confirmButtonText: "Done",
-        confirmButtonColor: "#0d6efd",
-      }).then(() => {
-        location.reload();
-      });
+    width: 750,
+    confirmButtonText: "Done",
+    confirmButtonColor: "#0d6efd",
+  }).then(() => {
+    location.reload();
+  });
+}
+catch (err) {
+  document.getElementById("pageLoader2").style.display = "none";
+  console.error("❌ Full Error Object:", err);
+
+  let title = "❌ Operation Failed";
+  let html = `<p>Something went wrong. Please review the message below.</p>`;
+
+  // ✅ This will now trigger correctly:
+  if (err?.module && err?.details) {
+    const moduleName = err.module;
+    const field = err.details.field || "Field";
+    const id = err.details.id;
+    const message = err.message || "Error";
+
+    const moduleLinks = {
+      Units: id ? `https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${id}` : "#",
+      Leads: id ? `https://crm.zoho.com/crm/org680397761/tab/Leads/${id}` : "#",
+      Buildings: id ? `https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${id}` : "#",
+    };
+
+    // ---------- Duplicate-specific enhancement starts here ----------
+    if (message && message.toLowerCase().includes("duplicate")) {
+      // Special popup for duplicate
+      title = `🚫 Duplicate ${moduleName} Found`;
+      html = `
+        <p style="color:#c00;"><strong>A ${moduleName.slice(0, -1)} with this name already exists!</strong></p>
+        <p><strong>Field:</strong> ${field}</p>
+        <p>
+          <a href="${moduleLinks[moduleName]}" target="_blank" style="font-size:16px; color:#0d6efd; font-weight:bold; text-decoration:underline;">
+            🔗 View Existing ${moduleName.slice(0, -1)}
+          </a>
+        </p>
+      `;
+    } else {
+      // ---------- End enhancement ----------
+      title = "🚫 Duplicate Entry or API Error";
+      html = `
+          <p><strong>Module:</strong> ${moduleName}</p>
+          <p><strong>Field:</strong> ${field}</p>
+          <p><strong>Message:</strong> ${message}</p>
+          ${id ? `<p><a href="${moduleLinks[moduleName]}" target="_blank">🔗 View Record</a></p>` : ""}
+      `;
     }
-    catch (err) {
-      document.getElementById("pageLoader2").style.display = "none";
-      console.error("❌ Full Error Object:", err);
+  }
+  // For Zoho API errors
+  else if (err?.data?.[0]?.message) {
+    const message = err.data[0].message;
+    const reason = err.data[0]?.details?.[0]?.api_name || "Unknown Field";
+    title = "⚠️ API Validation Error";
+    html = `
+        <p><strong>Error Message:</strong> ${message}</p>
+        <p><strong>Problem Field:</strong> ${reason}</p>
+    `;
+  } else {
+    html = `
+        <p>An unexpected error occurred.</p>
+        <pre>${err?.message || JSON.stringify(err)}</pre>
+    `;
+  }
 
-      let title = "❌ Operation Failed";
-      let html = `<p>Something went wrong. Please review the message below.</p>`;
-
-      // ✅ This will now trigger correctly:
-      if (err?.module && err?.details) {
-        const moduleName = err.module;
-        const field = err.details.field || "Field";
-        const id = err.details.id;
-        const message = err.message || "Error";
-
-        const moduleLinks = {
-          Units: id ? `https://crm.zoho.com/crm/org680397761/tab/CustomModule10/${id}` : "#",
-          Leads: id ? `https://crm.zoho.com/crm/org680397761/tab/Leads/${id}` : "#",
-          Buildings: id ? `https://crm.zoho.com/crm/org680397761/tab/CustomModule2/${id}` : "#",
-        };
-
-        title = "🚫 Duplicate Entry or API Error";
-        html = `
-            <p><strong>Module:</strong> ${moduleName}</p>
-            <p><strong>Field:</strong> ${field}</p>
-            <p><strong>Message:</strong> ${message}</p>
-            ${id ? `<p><a href="${moduleLinks[moduleName]}" target="_blank">🔗 View Record</a></p>` : ""}
-        `;
-      }
-      // For Zoho API errors
-      else if (err?.data?.[0]?.message) {
-        const message = err.data[0].message;
-        const reason = err.data[0]?.details?.[0]?.api_name || "Unknown Field";
-        title = "⚠️ API Validation Error";
-        html = `
-            <p><strong>Error Message:</strong> ${message}</p>
-            <p><strong>Problem Field:</strong> ${reason}</p>
-        `;
-      } else {
-        html = `
-            <p>An unexpected error occurred.</p>
-            <pre>${err?.message || JSON.stringify(err)}</pre>
-        `;
-      }
-
-      Swal.fire({
-        icon: "error",
-        title: title,
-        html: html,
-        confirmButtonText: "Close",
-        confirmButtonColor: "#d33",
-      }).then(() => {
-        location.reload();
-      });
-    } finally {
+  Swal.fire({
+    icon: "error",
+    title: title,
+    html: html,
+    confirmButtonText: "Close",
+    confirmButtonColor: "#d33",
+  }).then(() => {
+    location.reload();
+  });
+}
+ finally {
       document.getElementById("pageLoader").style.display = "none";
       document.getElementById("pageLoader2").style.display = "none";
     }

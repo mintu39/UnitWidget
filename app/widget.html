@@ -5,6 +5,23 @@
     <title>Kijiji Scraper Widget (Web Tab)</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <style>
+        /* Add spacing after all fields for mobile view only */
+        @media (max-width: 767.98px) {
+
+            .form-control,
+            .form-select {
+                margin-bottom: 1.25rem !important;
+                /* 20px space after every field */
+            }
+
+            /* Also give some space after label if needed */
+            label.form-label {
+                margin-bottom: 0.35rem;
+            }
+        }
+    </style>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
@@ -42,49 +59,76 @@
         });
 
         $(document).ready(function () {
-    $('#Unit_Type1').on('change', function () {
-        const selectedtype = $(this).val().toLowerCase();
-        console.log("Selected Type:", selectedtype);
+            $('#Unit_Type1').on('change', function () {
+                const selectedtype = $(this).val().toLowerCase();
+                console.log("Selected Type:", selectedtype);
 
-        if (
-            selectedtype === 'condominium' ||
-            selectedtype === 'unit - apartment building' ||
-            selectedtype === 'stacked townhouse'
-        ) {
-            $('#Backyard1').val('No Backyard');
-            $('#Backyard_Fenced1').val('No Backyard');
-        }
-    });
-});
-
-
-$(document).ready(function () {
-    $('#Parking_Spaces1').on('change', function () {
-        const selectedtype = $(this).val().toLowerCase();
-        console.log("Selected Type:", selectedtype);
-
-        if (
-            selectedtype == 0) {
-            $('#Parking_Details1').val('No Parking Available');
-        }
-    });
-});
-
+                if (
+                    selectedtype === 'condominium' ||
+                    selectedtype === 'unit - apartment building' ||
+                    selectedtype === 'stacked townhouse'
+                ) {
+                    $('#backyarddata').hide();
+                    $('#Backyard1').val('No Backyard');
+                    $('#Backyard_Fenced1').val('No Backyard');
+                }else{
+                    $('#backyarddata').show();
+                    $('#Backyard1').val('');
+                    $('#Backyard_Fenced1').val('');
+                }
+                if (
+                    selectedtype == 'single unit - house'
+                ) {
+                    $('#uithide').hide();
+                }else{
+                    $('#uithide').show();
+                }
+            });
+        });
 
 $(document).ready(function () {
-    $('#numlocker1').on('change', function () {
-        const selectedtype = $(this).val().toLowerCase();
-        console.log("Selected Type:", selectedtype);
+            $('#Noe2').on('change', function () {
+                const selectedtype = $(this).val().toLowerCase();
+                console.log("Selected Type:", selectedtype);
 
-        if (
-            selectedtype == 0) {
-            $('#Locker_Details1').val('N/A - No Storage Available');
-        }
-    });
-});
+                if (
+                    selectedtype ==='vacant') {
+                    $('#Noe1').val('No');
+                }
+                if (
+                    selectedtype ==='occupied') {
+                    $('#Noe1').val("Yes/Owner");
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            $('#Parking_Spaces1').on('change', function () {
+                const selectedtype = $(this).val().toLowerCase();
+                console.log("Selected Type:", selectedtype);
+
+                if (
+                    selectedtype == 0) {
+                    $('#Parking_Details1').val('No Parking Available');
+                }
+            });
+        });
 
 
-        
+        $(document).ready(function () {
+            $('#numlocker1').on('change', function () {
+                const selectedtype = $(this).val().toLowerCase();
+                console.log("Selected Type:", selectedtype);
+
+                if (
+                    selectedtype == 0) {
+                    $('#Locker_Details1').val('N/A - No Storage Available');
+                }
+            });
+        });
+
+
+
     </script>
 
     <!-- Part 1: Kijiji URL and Lead Data -->
@@ -281,11 +325,11 @@ $(document).ready(function () {
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Interested_Unit_Title" class="form-label">Number of Floors</label>
-                        <input type="text" class="form-control" id="number_of_floors" value="" />
+                        <input type="number" class="form-control" id="number_of_floors" value=""  inputmode="numeric" pattern="[0-9]*"/>
                     </div>
                     <div class="col-md-6">
                         <label for="Available_Date_Unit" class="form-label">Number of Units</label>
-                        <input type="text" class="form-control" id="number_of_units" value="" />
+                        <input type="number" class="form-control" id="number_of_units" value="" inputmode="numeric" pattern="[0-9]*"/>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -316,7 +360,7 @@ $(document).ready(function () {
                     </div>
                     <div class="col-md-6">
                         <label for="Parking_Spaces" class="form-label">Number of Parking Spaces</label>
-                        <input type="text" class="form-control" id="Parking_Spaces" value="" />
+                        <input type="number" class="form-control" id="Parking_Spaces" value="" inputmode="numeric" pattern="[0-9]*"/>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -396,7 +440,7 @@ $(document).ready(function () {
                     </div>
                     <div class="col-md-6" id="Email_Section">
                         <label for="Available_Date" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="Email1" value="" required />
+                        <input type="text" class="form-control" id="Email1" value="" required />
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -431,12 +475,12 @@ $(document).ready(function () {
                         </select>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-6" id="uithide">
                         <label for="Maximum_Occupants" class="form-label">Unit Number(If Applicable)</label>
                         <input type="text" class="form-control" id="Unit_number1" value="" />
                     </div>
                 </div>
-                
+
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Mobile" class="form-label">Unit Address</label>
@@ -697,9 +741,22 @@ $(document).ready(function () {
                 <div class="row mb-3">
 
                     <div class="col-md-6">
-                        <label for="Province" class="form-label">Province</label>
-                        <input type="text" class="form-control" id="Province1" value="" />
+                        <label for="Province1" class="form-label">Province</label>
+                        <select class="form-control" id="Province1" name="Province1">
+                            <option value="">-- Select Province --</option>
+                            <option value="Ontario">Ontario</option>
+                            <option value="Quebec">Quebec</option>
+                            <option value="British Columbia">British Columbia</option>
+                            <option value="Alberta">Alberta</option>
+                            <option value="Manitoba">Manitoba</option>
+                            <option value="Saskatchewan">Saskatchewan</option>
+                            <option value="Nova Scotia">Nova Scotia</option>
+                            <option value="New Brunswick">New Brunswick</option>
+                            <option value="Newfoundland and Labrador">Newfoundland and Labrador</option>
+                            <option value="Prince Edward Island">Prince Edward Island</option>
+                        </select>
                     </div>
+
                     <div class="col-md-6">
                         <label for="Postal_Code" class="form-label">Postal Code</label>
                         <input type="text" class="form-control" id="Postal_Code1" value="" />
@@ -771,7 +828,7 @@ $(document).ready(function () {
                     </div>
                     <div class="col-md-6">
                         <label for="sqrfeet" class="form-label">Approximate Sq Ft</label>
-                        <input type="text" class="form-control" id="sqrfeet1" value="" />
+                        <input type="number" class="form-control" id="sqrfeet1" value="" inputmode="numeric" pattern="[0-9]*" />
                     </div>
 
 
@@ -781,7 +838,7 @@ $(document).ready(function () {
 
                     <div class="col-md-6">
                         <label for="Parking_Spaces" class="form-label">Number of Parking Spaces</label>
-                        <input type="text" class="form-control" id="Parking_Spaces1" value="" />
+                        <input type="number" class="form-control" id="Parking_Spaces1" value="" inputmode="numeric" pattern="[0-9]*"/>
                     </div>
                     <div class="col-md-6">
                         <label for="Parking_Details" class="form-label">Parking Details</label>
@@ -807,7 +864,7 @@ $(document).ready(function () {
 
                     <div class="col-md-6">
                         <label for="Parking_Spaces" class="form-label">Number of Lockers/Storage</label>
-                        <input type="text" class="form-control" id="numlocker1" value="" />
+                        <input type="number" class="form-control" id="numlocker1" value="" inputmode="numeric" pattern="[0-9]*"/>
                     </div>
                     <div class="col-md-6">
                         <label for="Parking_Details" class="form-label">Locker/Storage Details</label>
@@ -820,7 +877,7 @@ $(document).ready(function () {
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Washer_and_Dryer1" class="form-label">Washer and Dryer</label>
@@ -903,16 +960,23 @@ $(document).ready(function () {
                         </select>
                     </div>
 
-                    <div class="col-md-6">
-    <label for="Noe1" class="form-label">
-        Occupancy status: (If Occupied = Yes/Owner if Vacant = No)
-    </label>
-    <select class="form-select" id="Noe1" name="Noe1">
-        <option value="">Select</option>
-        <option value="Yes">Yes/Owner</option>
-        <option value="No">No</option>
-    </select>
-</div>
+                    <div class="col-md-6" >
+                        <label for="2" class="form-label">Occupancy status</label>
+                        <select class="form-select" id="Noe2" name="Noe2">
+                            <option value="">Select</option>
+                            <option value="Occupied">Occupied</option>
+                            <option value="Vacant">Vacant</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6"  style="display: none;">
+                        <label for="Noe1" class="form-label" >
+                        Occu</label>
+                        <select class="form-select" id="Noe1" name="Noe1">
+                            <option value="">Select</option>
+                            <option value="Yes/Owner">Yes/Owner</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
 
 
                 </div>
@@ -940,12 +1004,12 @@ $(document).ready(function () {
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="Year_Last_Renovated" class="form-label">Year Last Renovated</label>
-                        <input type="number" class="form-control" id="Year_Last_Renovated1" value="" />
+                        <label for="Year_Last_Renovated" class="form-label">Year the unit was last renovated</label>
+                        <input type="number" class="form-control" id="Year_Last_Renovated1" value="" inputmode="numeric" pattern="[0-9]*"/>
                     </div>
                     <div class="col-md-6">
                         <label for="asking_price" class="form-label">Asking Price</label>
-                        <input type="number" class="form-control" id="Asking_Price1" value="" />
+                        <input type="number" class="form-control" id="Asking_Price1" value="" inputmode="numeric" pattern="[0-9]*"/>
                     </div>
                 </div>
             </div>
