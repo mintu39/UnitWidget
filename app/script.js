@@ -408,6 +408,8 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
         type: "Basement",
         keywords: [
           "Basement apartment for rent",
+          "Basement",
+          "basement apartment",
           "Basement unit for rent",
           "Separate entrance basement apartment",
           "Separate entrance basement unit",
@@ -4616,7 +4618,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
 
     // ✅ Create unitData safely
     unitData = {
-      Name: Unit_Address + "," + cityValue + "," + provinceValue + "," + postalCodeValue,
+      Name: Unit_Address,
       Address_Line_2: unitNumberValue,
       Property_Condition: propertyCondition,
       Notice_of_Entry_Required: NOE,
