@@ -833,6 +833,13 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
   function detectUnitName() {
     return data?.location || "";
   }
+  ///// Detect unit address based on location or description
+  function detectUnitAddress() {
+  const location = data?.location || "";
+  // Split at first comma, trim spaces, and return the first part
+  return location.split(',')[0].trim();
+}
+
   // Detect property condition based on description
   function detectPropertyCondition(descriptionArray) {
     const combined = (descriptionArray || []).join(" ").toLowerCase();
@@ -2917,9 +2924,17 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
   }
   // 5. Province (3rd part of location)
   function extractProvince(location = "") {
-    const parts = location.split(",");
-    return parts.length >= 3 ? parts[2].trim() : "Ontario";
+  const parts = location.split(",");
+  // Scan every part except the first (address)
+  for (let i = 1; i < parts.length; i++) {
+    if (/on(t)?/i.test(parts[i])) {
+      return "Ontario";
+    }
   }
+  // If 'on'/'ont' not found, always return 'Ontario'
+  return "Ontario";
+}
+
   // 6. Postal Code (e.g., A1A 1A1)
   function extractPostalCode(location = "") {
     const match = location.match(/[A-Z]\d[A-Z][ -]?\d[A-Z]\d/i);
@@ -3083,9 +3098,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
     return cableKeywords.some(keyword => text.includes(keyword));
   }
-
-
-
   // utility notes extraction from description
   function extractUtilityNotes(descriptionArray = []) {
     const text = (descriptionArray || []).join(" ");
@@ -3172,7 +3184,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
     return false;
   }
-
   // Detect building management info based on text
   function detectBuildingMgmtInfo() {
     const text = JSON.stringify(data).toLowerCase();
@@ -3216,16 +3227,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     const text = JSON.stringify(data);
     const match = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i); // first email
     return match ? match[0] : "";
-  }
-  // Extract management phone number from data
-  function extractMgmtPhone() {
-    const text = JSON.stringify(data);
-
-    // matches formats like "+1-782-414-4299", "416-555-1234", "(902) 555-1234"
-    const match = text.match(
-      /(\+?\d{1,2}[-\s.]*)?\(?\d{3}\)?[-\s.]*\d{3}[-\s.]*\d{4}/
-    );
-    return match ? match[0].trim() : "";
   }
   // Extract office address from data
   function extractOfficeAddress() {
@@ -3332,7 +3333,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     try {
       const response = await fetch(
         "https://api.royalyorkpm.com/kijiji-ocr-new?url=" +
-        encodeURIComponent(url) + "&api_key=12345" + "&bypassCache=true"
+        encodeURIComponent(url) + "&api_key=12345"
       );
       data = await response.json();
       data=data.data;
@@ -3369,6 +3370,8 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       const Street_Name = extractStreetName(data.location || "");
       const Mailbox_Number = extractMailBoxNumber(data.description || []);
       const unitName = detectUnitName() || "";
+      const unitaddress=detectUnitAddress() || "";
+      console.log("unitaddress",unitaddress);
       const propertyCondition = detectPropertyCondition(data.description);
       const electricityProvider = detectElectricityProvider(data.description || []);
       const waterProvider = detectWaterProvider(data.description || []);
@@ -4004,6 +4007,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
         Last_Name: LastName,
         Mobile: Mobile,
         Phone: Mobile,
+        Unit_Address:unitaddress,
         Email: Email,
         City: city,
         Lead_Source: "Kijiji",
@@ -4015,7 +4019,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
         Kijiji_Data_Importer: true,
       };
       unitData = {
-        Name: UnitNamecorrected,
+        Name: `${unitaddress}, ${city}, ${Province}, ${PostalCode}`,
         Posting_Title_With_Parking_and_Locker: websiteTitle,
         Unit_Type: unitType,
         Incentives: incentives,
@@ -4123,8 +4127,8 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
         unit_count: numberOfUnits,
         Corporation_Number: condoCorpNumber,
         Pet_Restrictions: petRestrictions,
-        Address: UnitNamecorrected,
-        Name: UnitNamecorrected,
+        Address: unitaddress,
+        Name: `${unitaddress}, ${city}, ${Province}, ${PostalCode}`,
         City: city,
         Category: "Residential",
         Country: "Canada",
@@ -4222,10 +4226,13 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
 
       let buildingid = null;
       let existingBuilding = null;
-      const BuildingName = building_data.Name?.trim();
+      const BuildingName = leadData.Unit_Address;
+      const postalCode =unitData.Postal_Code;
 
       if (BuildingName) {
-        const buildingQuery = `(Name:equals:${BuildingName})`;
+      
+
+         const buildingQuery= `(Address:equals:${BuildingName}) and (Postal_Code:equals:${postalCode})`
         console.log("🔍 Building Query:", buildingQuery);
 
         const searchResp = await ZOHO.CRM.API.searchRecord({
@@ -4618,7 +4625,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
 
     // ✅ Create unitData safely
     unitData = {
-      Name: Unit_Address,
+      Name: `${Unit_Address}, ${cityValue}, ${provinceValue}, ${postalCodeValue}`,
       Address_Line_2: unitNumberValue,
       Property_Condition: propertyCondition,
       Notice_of_Entry_Required: NOE,
@@ -4658,7 +4665,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
       floor_count: floorsValue,
       unit_count: unitCountValue,
       Address: Unit_Address,
-      Name: Unit_Address + "," + cityValue + "," + provinceValue + "," + postalCodeValue,
+      Name: `${Unit_Address}, ${cityValue}, ${provinceValue}, ${postalCodeValue}`,
       City: cityValue,
       Category: "Residential",
       Country: "Canada",
@@ -4673,10 +4680,11 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
   let buildingid = null;
   let existingBuilding = null;
 
-  const BuildingName = document.getElementById("Unit_name").value?.trim();
+  const BuildingName = document.getElementById("Unitaddress1").value?.trim();
+  const postalCode = document.getElementById("Postal_Code1")?.value || "";
 
   if (BuildingName) {
-    const buildingQuery = `(Name:equals:${BuildingName})`;
+    const buildingQuery = `(Address:equals:${BuildingName}) and (Postal_Code:equals:${postalCode})`;
     console.log("🔍 Building Query:", buildingQuery);
 
     const searchResp = await ZOHO.CRM.API.searchRecord({
@@ -4869,7 +4877,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
           <td class="summary-header">👤 Prospect</td>
           <td class="summary-cell">
             <span class="summary-label">Prospect Name</span>
-            <a href="https://crm.zoho.com/crm/org680397761/tab/Leads/${leadId}" target="_blank">${leadData.Last_Name || "N/A"
+            <a href="https://crm.zoho.com/crm/org680397761/tab/Leads/${leadId}" target="_blank">${leadData.First_Name +" "+ leadData.Last_Name || "N/A"
     }</a>
           </td>
           <td class="summary-cell"><span class="summary-label">Mobile</span>${leadData.Mobile || "N/A"
