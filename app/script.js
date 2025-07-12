@@ -4684,7 +4684,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
   const postalCode = document.getElementById("Postal_Code1")?.value || "";
 
   if (BuildingName) {
-    const buildingQuery = `(Address:equals:${BuildingName}) and (Postal_Code:equals:${postalCode})`;
+    const buildingQuery = `(Address:starts_with:${BuildingName}) and (Postal_Code:equals:${postalCode})`;
     console.log("🔍 Building Query:", buildingQuery);
 
     const searchResp = await ZOHO.CRM.API.searchRecord({
