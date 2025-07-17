@@ -4,6 +4,7 @@ let leasingSel = "";
 let scrapedDate = "";
 let Source = "";
 let BuildingName = "";
+let profileurl="";
 let listingId = "";
 let loggedInUserId = "";
 let propertyCondition = "";
@@ -835,7 +836,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
   }
   ///// Detect unit address based on location or description
   function detectUnitAddress() {
-  const location = data?.location || "";
+  const location = data.data?.location || "";
   // Split at first comma, trim spaces, and return the first part
   return location.split(',')[0].trim();
 }
@@ -2937,9 +2938,13 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
   // 6. Postal Code (e.g., A1A 1A1)
   function extractPostalCode(location = "") {
-    const match = location.match(/[A-Z]\d[A-Z][ -]?\d[A-Z]\d/i);
-    return match ? match[0].toUpperCase().replace(/\s+/, "") : "";
-  }
+  const match = location.match(/[A-Z]\d[A-Z][ -]?\d[A-Z]\d/i);
+  if (!match) return "";
+  // Remove spaces/hyphens, uppercase, then insert space after 3 chars
+  const clean = match[0].toUpperCase().replace(/[\s-]/g, "");
+  return clean.length === 6 ? clean.slice(0, 3) + " " + clean.slice(3) : "";
+}
+
   // 7. Mail Box Number (e.g., MB#123, mailbox 45, box 12)
   function extractMailBoxNumber(descriptionArray = []) {
     const text = descriptionArray.join(" ").toLowerCase();
@@ -3339,44 +3344,44 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       data=data.data;
 
       console.log("Data",data);
-      
-      const StringData = JSON.stringify(data).toLowerCase();
+      const obj = { firstName: data.data.firstName || "" };
+      console.log("Obj",obj);
+      const StringData = JSON.stringify(data.data).toLowerCase();
       console.log("StringData", StringData);
       //25th June start New -
-      const obj = { firstName: data.firstName || "" };
-      console.log("Obj",obj);
+      
       
       const fullName = obj.firstName || "";
       const FirstName = extractFirstName(fullName);
       const LastName = extractLastName(fullName);
-      scrapedDate = extractAvailableDate(data.vipAttributes?.attributes);
-      const Mobile = extractPhoneNumberFromText(data);
+      scrapedDate = extractAvailableDate(data.data.vipAttributes?.attributes);
+      const Mobile = extractPhoneNumberFromText(data.data);
       const unitType = detectUnitTypeFromTitleAndDescription(data.title, data.description);
       const city = extractCityFromAddress(data);
-      const Province = extractProvince(data.location);
-      const PostalCode = extractPostalCode(data.location);
-      const bedrooms = extractBedroomsSmart(data.vipAttributes?.primary || [], data.title || "", data.description || []);
-      const bathrooms = extractBathroomsSmart(data.vipAttributes?.primary || [], data.title || "", data.description || []);
+      const Province = extractProvince(data.data.location);
+      const PostalCode = extractPostalCode(data.data.location);
+      const bedrooms = extractBedroomsSmart(data.data.vipAttributes?.primary || [], data.data.title || "", data.data.description || []);
+      const bathrooms = extractBathroomsSmart(data.data.vipAttributes?.primary || [], data.data.title || "", data.data.description || []);
       const numberOfFloors = detectNumberOfFloors() || 0;
       const numberOfUnits = detectNumberOfUnits() || 0;
       const backyard = detectBackyard();
       const backyardFenced = detectBackyardFenced();
       const Parkingspacs = extractParkingSpacesFromText();
-      const washerManufacturer = extractWasherManufacturer(data);
+      const washerManufacturer = extractWasherManufacturer(data.data);
       const parkingDetails = detectParkingDetails() || "";
       const Walkout_to_Garage = detectWalkoutToGarage(data.description || []);
       const Private_Garage = detectPrivateGarage(data.description || []);
-      const Street_Number = extractStreetNumber(data.location || "");
-      const Street_Name = extractStreetName(data.location || "");
-      const Mailbox_Number = extractMailBoxNumber(data.description || []);
+      const Street_Number = extractStreetNumber(data.data.location || "");
+      const Street_Name = extractStreetName(data.data.location || "");
+      const Mailbox_Number = extractMailBoxNumber(data.data.description || []);
       const unitName = detectUnitName() || "";
       const unitaddress=detectUnitAddress() || "";
       console.log("unitaddress",unitaddress);
-      const propertyCondition = detectPropertyCondition(data.description);
-      const electricityProvider = detectElectricityProvider(data.description || []);
-      const waterProvider = detectWaterProvider(data.description || []);
-      const gasProvider = detectGasProvider(data.description || []);
-      const hotWaterTankProvider = detectHotWaterTankProvider(data.description || []);
+      const propertyCondition = detectPropertyCondition(data.data.description);
+      const electricityProvider = detectElectricityProvider(data.data.description || []);
+      const waterProvider = detectWaterProvider(data.data.description || []);
+      const gasProvider = detectGasProvider(data.data.description || []);
+      const hotWaterTankProvider = detectHotWaterTankProvider(data.data.description || []);
       const Corner_Unit = detectCornerUnit();
       const Central_Vacuum = detectCentralVacuum();
       const Penthouse = detectPenthouse();
@@ -3435,7 +3440,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       const Golf_Range = detectGolf_Range();
       const Piano_Lounge = detectPiano_Lounge();
       const Daycare = detectDaycare();
-      const Email = extractEmailFromData(data);
+      const Email = extractEmailFromData(data.data);
       const ParkingLevelNumber = extractParkingLevelNumber();
       document.getElementById("First_Name").value = FirstName;
       document.getElementById("Last_Name").value = LastName;
@@ -3447,12 +3452,12 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       document.getElementById("Bathrooms").value = bathrooms;
       document.getElementById("Bedrooms").value = bedrooms;
       document.getElementById("Postal_Code").value = PostalCode;
-      document.getElementById("number_of_floors").value = numberOfFloors;
-      document.getElementById("number_of_units").value = numberOfUnits;
-      document.getElementById("Backyard").value = backyard;
-      document.getElementById("Backyard_Fenced").value = backyardFenced;
       document.getElementById("Parking_Spaces").value = Parkingspacs;
-      document.getElementById("Parking_Details").value = parkingDetails;
+      document.getElementById("Kijiji_url1").value = profileurl;
+      document.getElementById("Streetname").value = unitaddress;
+
+      
+
 
 
       //function for conditions ::
@@ -3820,9 +3825,9 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       const developerName = detectDeveloperName();
       const Laundary = detectOnSiteLaundry(data);
       const dateOfConstructionISO = detectDateOfConstruction();
-      document.getElementById("Year_Last_Renovated").value = Lastyearrenovated;
+      
       document.getElementById("Unit_name").value = UnitNamecorrected || "";
-      document.getElementById("Unit_number").value = Unitnumber;
+      
 
       function generateAdDescription({
         FirstName,
@@ -4007,13 +4012,13 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
         Last_Name: LastName,
         Mobile: Mobile,
         Phone: Mobile,
-        Unit_Address:unitaddress,
+        Unit_Address:`${unitaddress}, ${city}, ${Province}, ${PostalCode}`,
         Email: Email,
         City: city,
         Lead_Source: "Kijiji",
         Asking_Price: numericPrice,
         Lead_Priority_Level: "High",
-        URL: document.getElementById("unitUrl").value,
+        URL: profileurl,
         Available_Date: scrapedDate,
         Ad_ID_New: listingId,
         Kijiji_Data_Importer: true,
@@ -4037,7 +4042,6 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
         Max_Occupants: maximumOccupants,
         Property_Condition: propertyCondition,
         Year_Built: Lastyearrenovated,
-        Number_of_Floors: numberOfFloors,
         Unit_Facing: unitFacing,
         Lawn_and_Snow_Care: lawnSnowCare,
         Basement_Entrance: entranceType,
@@ -4079,7 +4083,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
         Insurance_Policy_Number: insurancePolicyNumber,
         Address_Line_2: Unitnumber,
         Street_Number: Street_Number,
-        Address: Street_Name,
+        Address: unitaddress,
         City: city,
         On_site_Laundry: Laundary,
         Province: Province,

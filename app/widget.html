@@ -202,10 +202,6 @@ $(document).ready(function () {
             <p style="margin-top: 1rem; font-weight: 800; color: #1a1a1a;">Creating Records...</p>
         </div>
 
-
-
-
-
         <!-- Leads Section For Kijiji-->
         <div class="card mb-4" id="kijijiSection1" style="display: none;">
             <div class="card-header bg-primary text-white">
@@ -251,22 +247,25 @@ $(document).ready(function () {
                         </select>
                     </div>
                     <div class="col-md-6">
+                        <label for="City" class="form-label">Street Name</label>
+                        <input type="text" class="form-control" id="Streetname" value="" />
+                    </div>
+                    <div class="col-md-6">
                         <label for="City" class="form-label">City</label>
                         <input type="text" class="form-control" id="City" value="" />
                     </div>
-                </div>
-                <div class="row mb-3">
-
                     <div class="col-md-6">
                         <label for="Province" class="form-label">Province</label>
                         <input type="text" class="form-control" id="Province" value="" />
                     </div>
+                </div>
+                <div class="row mb-3">
+
+                    
                     <div class="col-md-6">
                         <label for="Postal_Code" class="form-label">Postal Code</label>
                         <input type="text" class="form-control" id="Postal_Code" value="" style="text-transform: uppercase;" />
                     </div>
-                </div>
-                <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Bedrooms" class="form-label">Bedrooms</label>
                         <select class="form-control" id="Bedrooms" value="">
@@ -295,6 +294,9 @@ $(document).ready(function () {
                             <option value="13">13</option>
                         </select>
                     </div>
+                </div>
+                <div class="row mb-3">
+                    
                     <div class="col-md-6">
                         <label for="Bathrooms" class="form-label">Bathrooms</label>
                         <select class="form-control" id="Bathrooms" value="">
@@ -321,8 +323,12 @@ $(document).ready(function () {
                             <option value="10">10</option>
                         </select>
                     </div>
+                    <div class="col-md-6">
+                        <label for="Parking_Spaces" class="form-label">Number of Parking Spaces</label>
+                        <input type="number" class="form-control" id="Parking_Spaces" value="" inputmode="numeric" pattern="[0-9]*"/>
+                    </div>
                 </div>
-                <div class="row mb-3">
+                <!-- <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Interested_Unit_Title" class="form-label">Number of Floors</label>
                         <input type="number" class="form-control" id="number_of_floors" value=""  inputmode="numeric" pattern="[0-9]*"/>
@@ -331,8 +337,8 @@ $(document).ready(function () {
                         <label for="Available_Date_Unit" class="form-label">Number of Units</label>
                         <input type="number" class="form-control" id="number_of_units" value="" inputmode="numeric" pattern="[0-9]*"/>
                     </div>
-                </div>
-                <div class="row mb-3">
+                </div> -->
+                <!-- <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="Backyard" class="form-label">Backyard</label>
                         <select class="form-control" id="Backyard" value="">
@@ -352,19 +358,30 @@ $(document).ready(function () {
                             <option value="No Backyard">No Backyard</option>
                         </select>
                     </div>
-                </div>
+                </div> -->
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <!-- <div class="col-md-6">
                         <label for="Year_Last_Renovated" class="form-label">Year Last Renovated</label>
                         <input type="number" class="form-control" id="Year_Last_Renovated" value="" />
-                    </div>
+                    </div> -->
+                    
                     <div class="col-md-6">
-                        <label for="Parking_Spaces" class="form-label">Number of Parking Spaces</label>
-                        <input type="number" class="form-control" id="Parking_Spaces" value="" inputmode="numeric" pattern="[0-9]*"/>
+                        <label for="ownerid" class="form-label">Assign to</label>
+                        <select id="ownerid" class="form-control">
+                            <option>Loading…</option>
+                        </select>
                     </div>
+                     <div class="col-md-6"  style="display: none;">
+                        <label for="Maximum_Occupants" class="form-label">Unit Name</label>
+                        <input type="text" class="form-control" id="Unit_name" value="" />
+                    </div>
+                    <div class="col-md-6" id="Kijiji_url">
+            <label for="kijijiurl" class="form-label">Kijiji Ad Profile URL</label>
+            <input type="text" class="form-control" id="Kijiji_url1" value=""  placeholder="ex. https://www.kijiji.ca/v-apartments-condos/city-of-halifax/downtown-halifax-spacious-2-bedroom-2-bath-units-available-sep-1/1717628065"/>
+          </div>
                 </div>
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <!-- <div class="col-md-6">
                         <label for="Parking_Details" class="form-label">Parking Details</label>
                         <select class="form-control" id="Parking_Details">
                             <option value="">Select</option>
@@ -381,36 +398,28 @@ $(document).ready(function () {
                             <option value="Left Side of Driveway & Garage">Left Side of Driveway & Garage</option>
                             <option value="Right Side of Driveway & Garage">Right Side of Driveway & Garage</option>
                         </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="ownerid" class="form-label">Assign to</label>
-                        <select id="ownerid" class="form-control">
-                            <option>Loading…</option>
-                        </select>
-                    </div>
+                    </div> -->
+                    
                 </div>
                 <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="Maximum_Occupants" class="form-label">Unit Name</label>
-                        <input type="text" class="form-control" id="Unit_name" value="" />
-                    </div>
-                    <div class="col-md-6">
+                   
+
+                     
+                    <!-- <div class="col-md-6">
                         <label for="Maximum_Occupants" class="form-label">Unit Number</label>
                         <input type="text" class="form-control" id="Unit_number" value="" />
-                    </div>
-                    <div class="col-md-6">
+                    </div> -->
+                    <!-- <div class="col-md-6">
                         <label for="Backyard_Fenced" class="form-label">Constructed On</label>
                         <select class="form-control" id="Date_of_Construction" value="">
                             <option value="">Select</option>
                             <option value="Yes">Before November 15th 2018</option>
                             <option value="No">After November 15th 2018</option>
                         </select>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
-
-
 
         <!-- Leads Section For Not Kijiji-->
         <div class="card mb-4" id="notKijijiSection" style="display: none;">
@@ -1027,6 +1036,7 @@ $(document).ready(function () {
         </div>
 
         <script src="script.js"></script>
+        </div>
 </body>
 
 </html>
