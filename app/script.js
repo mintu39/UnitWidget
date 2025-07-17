@@ -3341,7 +3341,13 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
         encodeURIComponent(url) + "&api_key=12345"
       );
       data = await response.json();
-      data=data.data;
+      try{
+
+        data=data.data;
+      }catch(e){
+data=data;
+      }
+      
 
       console.log("Data",data);
       const obj = { firstName: data.data.firstName || "" };
@@ -4230,7 +4236,7 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
 
       let buildingid = null;
       let existingBuilding = null;
-      const BuildingName = leadData.Unit_Address;
+      const BuildingName = unitData.Address;
       const postalCode =unitData.Postal_Code;
 
       if (BuildingName) {
