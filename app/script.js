@@ -1,5 +1,6 @@
 var userId = "";
 let data = {};
+
 let leasingSel = "";
 let scrapedDate = "";
 let Source = "";
@@ -656,7 +657,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
   }
 
   // Detect number of floors based on description
-  function detectNumberOfFloors() {
+  function detectNumberOfFloors(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     // explicit digits: "3-storey", "4 level", "5 floors", "top floor (3rd)"
@@ -674,7 +675,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return "";
   }
   // Detect number of units based on description
-  function detectNumberOfUnits() {
+  function detectNumberOfUnits(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     const numMatch = text.match(/(\d{1,4})\s*units?/); // e.g. "40 units", "100+ units"
@@ -687,7 +688,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return "";
   }
   // detect backyard no backyard.
-  function detectBackyard() {
+  function detectBackyard(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     if (text.includes("private backyard") || text.includes("private yard")) {
@@ -710,7 +711,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return "Not Included";
   }
   // Detect backyard fenced status based on description and backyard value
-  function detectBackyardFenced() {
+  function detectBackyardFenced(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     if (text.includes("No Backyard") || text.includes("Not Included")) {
@@ -733,7 +734,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return "No";
   }
   // Extract parking spaces from vipPrimary and text content
-  function extractParkingSpacesFromText() {
+  function extractParkingSpacesFromText(data) {
     // Lowercase for easier matching
     const text = JSON.stringify(data).toLowerCase();
     // 1. Highest priority: detect "no parking"
@@ -831,12 +832,12 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return Math.round(sqft / 10) * 10;
   }
   /// Detect unit name based on location or description
-  function detectUnitName() {
+  function detectUnitName(data) {
     return data?.location || "";
   }
   ///// Detect unit address based on location or description
-  function detectUnitAddress() {
-  const location = data.data?.location || "";
+  function detectUnitAddress(data) {
+  const location = data?.location || "";
   // Split at first comma, trim spaces, and return the first part
   return location.split(',')[0].trim();
 }
@@ -1303,37 +1304,37 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return "Not Mentioned";
   }
   // Detect corner unit based on description
-  function detectCornerUnit() {
+  function detectCornerUnit(data) {
     const text = JSON.stringify(data).toLowerCase();
     return text.includes("corner unit");
   }
 
-  function detectCentralVacuum() {
+  function detectCentralVacuum(data) {
     const text = JSON.stringify(data).toLowerCase();
     return text.includes("central vacuum");
   }
 
-  function detectPenthouse() {
+  function detectPenthouse(data) {
     const text = JSON.stringify(data).toLowerCase();
     return text.includes("penthouse") || text.includes("top floor");
   }
 
-  function detectFireplaceCommonArea() {
+  function detectFireplaceCommonArea(data) {
     const text = JSON.stringify(data).toLowerCase();
     return text.includes("fireplace") || text.includes("living room fireplace");
   }
 
-  function detectFireplaceBedroom() {
+  function detectFireplaceBedroom(data) {
     const text = JSON.stringify(data).toLowerCase();
     return text.includes("fireplace in bedroom");
   }
 
-  function detectUpgradedBathrooms() {
+  function detectUpgradedBathrooms(data) {
     const text = JSON.stringify(data).toLowerCase();
     return text.includes("upgraded bathroom") || text.includes("modern bath");
   }
 
-  function detectUpgradedKitchen() {
+  function detectUpgradedKitchen(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("renovated kitchen") ||
@@ -1344,7 +1345,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectBacksplashKitchen() {
+  function detectBacksplashKitchen(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("backsplash") ||
@@ -1354,7 +1355,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
   }
   // Detect dishwasher included based on description and attributes
 
-  function detectDishwasherIncludedFromText() {
+  function detectDishwasherIncludedFromText(data) {
     const text = JSON.stringify(data).toLowerCase(); // search everywhere!
 
     // Array of possible phrases that indicate a dishwasher is included
@@ -1374,7 +1375,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return false;
   }
 
-  function detectBuilding_AC_Incl() {
+  function detectBuilding_AC_Incl(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("air conditioning included") ||
@@ -1385,7 +1386,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectBuilding_Heat_Incl() {
+  function detectBuilding_Heat_Incl(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("heating included") ||
@@ -1396,7 +1397,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectBuilding_Cable_Incl() {
+  function detectBuilding_Cable_Incl(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("cable included") ||
@@ -1407,7 +1408,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectBuilding_Internet_Incl() {
+  function detectBuilding_Internet_Incl(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("wi-fi included") ||
@@ -1418,7 +1419,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectBuilding_Water_Filtration_Rental() {
+  function detectBuilding_Water_Filtration_Rental(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("water softener") ||
@@ -1428,7 +1429,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       text.includes("water purification")
     );
   }
-  function detectRemote_Garage() {
+  function detectRemote_Garage(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("remote included") ||
@@ -1438,7 +1439,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       text.includes("remote access")
     );
   }
-  function detectParking_Garage() {
+  function detectParking_Garage(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     const remoteGarageSelected =
@@ -1457,7 +1458,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       remoteGarageSelected
     );
   }
-  function detectVisitor_Parking() {
+  function detectVisitor_Parking(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("guest parking") ||
@@ -1467,7 +1468,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectEV_Charging() {
+  function detectEV_Charging(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("electric vehicle charger") ||
@@ -1477,7 +1478,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectCar_Wash() {
+  function detectCar_Wash(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("car wash bay") ||
@@ -1485,7 +1486,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       text.includes("vehicle wash")
     );
   }
-  function detectSubway_Access() {
+  function detectSubway_Access(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("steps to subway") ||
@@ -1496,7 +1497,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectLaundry_Building() {
+  function detectLaundry_Building(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("in-suite laundry") ||
@@ -1508,7 +1509,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectLobby_Lounge() {
+  function detectLobby_Lounge(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("grand lobby") ||
@@ -1519,7 +1520,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectWheelchair_Access() {
+  function detectWheelchair_Access(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     const elevatorSelected =
@@ -1538,7 +1539,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectOnsite_Staff() {
+  function detectOnsite_Staff(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("building staff") ||
@@ -1549,7 +1550,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectConcierge_24_7() {
+  function detectConcierge_24_7(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("concierge") ||
@@ -1559,7 +1560,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       text.includes("reception 24/7")
     );
   }
-  function detectGuest_Suites() {
+  function detectGuest_Suites(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("guest rooms") ||
@@ -1568,7 +1569,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       text.includes("temporary suite")
     );
   }
-  function detectBicycle_Storage() {
+  function detectBicycle_Storage(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("bike lockers") ||
@@ -1578,7 +1579,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectElevators() {
+  function detectElevators(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("elevator") ||
@@ -1587,7 +1588,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       text.includes("service elevator")
     );
   }
-  function detectBuzzer_System() {
+  function detectBuzzer_System(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     const conciergeSelected =
@@ -1607,7 +1608,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectSecurity() {
+  function detectSecurity(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("security guard") ||
@@ -1617,7 +1618,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectKeyless_Entry() {
+  function detectKeyless_Entry(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("fob access") ||
@@ -1626,7 +1627,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       text.includes("touchpad lock")
     );
   }
-  function detectPet_Spa() {
+  function detectPet_Spa(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("dog wash") ||
@@ -1635,7 +1636,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       text.includes("pet shower")
     );
   }
-  function detectBBQ_Area() {
+  function detectBBQ_Area(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("bbq terrace") ||
@@ -1644,7 +1645,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       text.includes("rooftop bbq")
     );
   }
-  function detectRooftop_Patio() {
+  function detectRooftop_Patio(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("sky terrace") ||
@@ -1654,7 +1655,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectCabanas() {
+  function detectCabanas(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     const outdoorPoolSelected =
@@ -1676,7 +1677,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectTennis_Court() {
+  function detectTennis_Court(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("tennis") ||
@@ -1685,7 +1686,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectOutdoor_Patio() {
+  function detectOutdoor_Patio(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("backyard") ||
@@ -1695,7 +1696,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectOutdoor_Pool() {
+  function detectOutdoor_Pool(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("outdoor swimming") ||
@@ -1739,7 +1740,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
   }
 
 
-  function detectOutdoor_Child_Play_Area() {
+  function detectOutdoor_Child_Play_Area(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("playground") ||
@@ -1748,7 +1749,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       text.includes("children’s park")
     );
   }
-  function detectGym_Fitness() {
+  function detectGym_Fitness(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("gym") ||
@@ -1759,7 +1760,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectRec_Room() {
+  function detectRec_Room(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("recreation area") ||
@@ -1768,7 +1769,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectBilliards() {
+  function detectBilliards(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("billiards") ||
@@ -1777,7 +1778,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectIndoor_Pool() {
+  function detectIndoor_Pool(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("heated indoor pool") ||
@@ -1786,7 +1787,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectSauna() {
+  function detectSauna(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("dry sauna") ||
@@ -1795,7 +1796,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectLibrary() {
+  function detectLibrary(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("library") ||
@@ -1804,7 +1805,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectSquash() {
+  function detectSquash(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("squash") ||
@@ -1813,7 +1814,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectBowling() {
+  function detectBowling(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("bowling alley") ||
@@ -1822,7 +1823,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectIndoor_Child_Area() {
+  function detectIndoor_Child_Area(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("kids room") ||
@@ -1831,7 +1832,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectMeeting_Room() {
+  function detectMeeting_Room(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("conference room") ||
@@ -1839,7 +1840,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
       text.includes("meeting space")
     );
   }
-  function detectYoga_Room() {
+  function detectYoga_Room(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("yoga") ||
@@ -1848,7 +1849,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectMovie_Room() {
+  function detectMovie_Room(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("cinema") ||
@@ -1857,7 +1858,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectGames_Room() {
+  function detectGames_Room(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("games lounge") ||
@@ -1866,7 +1867,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectWhirlpool() {
+  function detectWhirlpool(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("hot tub") ||
@@ -1875,12 +1876,12 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectSteam_Room() {
+  function detectSteam_Room(data) {
     const text = JSON.stringify(data).toLowerCase();
     return text.includes("steam bath") || text.includes("steam room");
   }
 
-  function detectBasketball() {
+  function detectBasketball(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("basketball court") ||
@@ -1889,7 +1890,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectGolf_Range() {
+  function detectGolf_Range(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("golf simulator") ||
@@ -1898,7 +1899,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectPiano_Lounge() {
+  function detectPiano_Lounge(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("piano") ||
@@ -1907,7 +1908,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     );
   }
 
-  function detectDaycare() {
+  function detectDaycare(data) {
     const text = JSON.stringify(data).toLowerCase();
     return (
       text.includes("childcare") ||
@@ -1918,7 +1919,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
   }
 
   // Extract parking level and number from description
-  function extractParkingLevelNumber() {
+  function extractParkingLevelNumber(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     // Pattern: Level P1, spot 124
@@ -2952,7 +2953,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return match ? match[1] : "";
   }
   // Detect utility inclusions based on description
-  function detectACInclusionFromText() {
+  function detectACInclusionFromText(data) {
     const text = JSON.stringify(data).toLowerCase(); // search everywhere!
 
     const acKeywords = [
@@ -2971,7 +2972,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return false;
   }
 
-  function detectHeatInclusionFromText() {
+  function detectHeatInclusionFromText(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     const heatKeywords = [
@@ -2988,7 +2989,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return false;
   }
 
-  function detectInternetInclusionFromText() {
+  function detectInternetInclusionFromText(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     const internetKeywords = [
@@ -3132,7 +3133,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return unknownNotes.join(" ");
   }
   // Detect building category based on text
-  function detectBuildingCategoryFromText() {
+  function detectBuildingCategoryFromText(data) {
     const text = JSON.stringify(data).toLowerCase(); // search everywhere!
 
     const categoryMap = [
@@ -3169,7 +3170,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return "";
   }
   // Extract condo corporation number from data
-  function extractCondoCorpNumber() {
+  function extractCondoCorpNumber(data) {
     const text = JSON.stringify(data); // keep case for corp codes
 
     // formats like "TSCC 1234", "MTCC123", "YCC 567", "Condo Corp #987"
@@ -3177,7 +3178,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return match ? `${match[1].replace(/\s+/, "")} ${match[2]}` : "";
   }
   // Detect pet restrictions based on text
-  function detectPetRestrictions() {
+  function detectPetRestrictions(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     // Returns true if *any* restriction is detected
@@ -3190,7 +3191,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return false;
   }
   // Detect building management info based on text
-  function detectBuildingMgmtInfo() {
+  function detectBuildingMgmtInfo(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     const infoKeywords = [
@@ -3228,13 +3229,13 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return "Not Mentioned";
   }
   //
-  function extractMgmtEmail() {
+  function extractMgmtEmail(data) {
     const text = JSON.stringify(data);
     const match = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i); // first email
     return match ? match[0] : "";
   }
   // Extract office address from data
-  function extractOfficeAddress() {
+  function extractOfficeAddress(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     // grab a short fragment after common lead-ins
@@ -3256,7 +3257,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return "";
   }
   // Detect developer name based on text
-  function detectDeveloperName() {
+  function detectDeveloperName(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     const developers = [
@@ -3288,7 +3289,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return "";
   }
   // Detect date of construction based on text
-  function detectDateOfConstruction() {
+  function detectDateOfConstruction(data) {
     const text = JSON.stringify(data).toLowerCase();
 
     // explicit year formats:  "Built in 2015", "Year built: 2008", "2012 build"
@@ -3313,7 +3314,31 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return ""; // nothing found
   }
 
+/**
+ * Fetch helper
+ * @param {string} url
+ * @param {boolean} bypassCache
+ * @returns {Promise<object>}
+ */
+async function fetchData(url, bypassCache = false) {
+  const apiKey = "12345";
+  const endpoint = new URL("https://api.royalyorkpm.com/kijiji-ocr-new");
+  endpoint.searchParams.set("url", url);
+  endpoint.searchParams.set("api_key", apiKey);
+  if (bypassCache) endpoint.searchParams.set("bypassCache", "true");
 
+  const resp = await fetch(endpoint.toString());
+  return resp.json();
+}
+
+/**
+ * Safely unwraps your nested payload (`data.data.data` or `data.data`)
+ * @param {object} data
+ * @returns {object}
+ */
+function extractPayload(data) {
+  return (data.data && data.data.data) ? data.data.data : data.data;
+}
   // Event listener for fetching data
   document.getElementById("fetchDataBtn").addEventListener("click", async () => {
     const url = document.getElementById("unitUrl").value;
@@ -3326,33 +3351,38 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     }
     if (match) {
       listingId = match[1];
-      // console.log(listingId);
     } else {
       console.log("No ID found in URL");
     }
+    statusfc.disabled = true;
     // Show loader and disable button
     statusfc.disabled = true;
     document.getElementById("pageLoader").style.display = "flex";
 
     //"&bypassCache=true"
-    try {
-      const response = await fetch(
-        "https://api.royalyorkpm.com/kijiji-ocr-new?url=" +
-        encodeURIComponent(url) + "&api_key=12345"
-      );
-      data = await response.json();
-      try{
+     try {
+    // First attempt (no cache bypass)
+    let data = await fetchData(url);
+    if (!data.success) throw new Error(data.message);
 
-        data=data.data;
-      }catch(e){
-data=data;
-      }
+    let finalresponse = extractPayload(data);
+    
+    // If profileUrl still missing, retry with bypassCache
+    if (!finalresponse.profileUrl) {
+      data = await fetchData(url, true);
+      if (!data.success) throw new Error(data.message);
+      finalresponse = extractPayload(data);
+    }
+    
+    // TODO: do something with finalresponse
+    console.log("✅ Final response:", finalresponse);
+
       
+      const obj = { firstName: finalresponse.firstName || "" };
+      const profileurl ="https://www.kijiji.ca"+finalresponse.profileUrl || '';
 
-      console.log("Data",data);
-      const obj = { firstName: data.data.firstName || "" };
       console.log("Obj",obj);
-      const StringData = JSON.stringify(data.data).toLowerCase();
+      const StringData = JSON.stringify(finalresponse).toLowerCase();
       console.log("StringData", StringData);
       //25th June start New -
       
@@ -3360,94 +3390,93 @@ data=data;
       const fullName = obj.firstName || "";
       const FirstName = extractFirstName(fullName);
       const LastName = extractLastName(fullName);
-      scrapedDate = extractAvailableDate(data.data.vipAttributes?.attributes);
-      const Mobile = extractPhoneNumberFromText(data.data);
-      const unitType = detectUnitTypeFromTitleAndDescription(data.title, data.description);
-      const city = extractCityFromAddress(data);
-      const Province = extractProvince(data.data.location);
-      const PostalCode = extractPostalCode(data.data.location);
-      const bedrooms = extractBedroomsSmart(data.data.vipAttributes?.primary || [], data.data.title || "", data.data.description || []);
-      const bathrooms = extractBathroomsSmart(data.data.vipAttributes?.primary || [], data.data.title || "", data.data.description || []);
-      const numberOfFloors = detectNumberOfFloors() || 0;
-      const numberOfUnits = detectNumberOfUnits() || 0;
-      const backyard = detectBackyard();
-      const backyardFenced = detectBackyardFenced();
-      const Parkingspacs = extractParkingSpacesFromText();
-      const washerManufacturer = extractWasherManufacturer(data.data);
+      scrapedDate = extractAvailableDate(finalresponse.vipAttributes?.attributes);
+      const Mobile = extractPhoneNumberFromText(finalresponse);
+      const unitType = detectUnitTypeFromTitleAndDescription(finalresponse.title, finalresponse.description);
+      const city = extractCityFromAddress(finalresponse);
+      const Province = extractProvince(finalresponse.location);
+      const PostalCode = extractPostalCode(finalresponse.location);
+      const bedrooms = extractBedroomsSmart(finalresponse.vipAttributes?.primary || [], finalresponse.title || "", finalresponse.description || []);
+      const bathrooms = extractBathroomsSmart(finalresponse.vipAttributes?.primary || [], finalresponse.title || "", finalresponse.description || []);
+      const numberOfFloors = detectNumberOfFloors(finalresponse) || 0;
+      const numberOfUnits = detectNumberOfUnits(finalresponse) || 0;
+      const backyard = detectBackyard(finalresponse);
+      const backyardFenced = detectBackyardFenced(finalresponse);
+      const Parkingspacs = extractParkingSpacesFromText(finalresponse);
+      const washerManufacturer = extractWasherManufacturer(finalresponse);
       const parkingDetails = detectParkingDetails() || "";
-      const Walkout_to_Garage = detectWalkoutToGarage(data.description || []);
-      const Private_Garage = detectPrivateGarage(data.description || []);
-      const Street_Number = extractStreetNumber(data.data.location || "");
-      const Street_Name = extractStreetName(data.data.location || "");
-      const Mailbox_Number = extractMailBoxNumber(data.data.description || []);
-      const unitName = detectUnitName() || "";
-      const unitaddress=detectUnitAddress() || "";
-      console.log("unitaddress",unitaddress);
-      const propertyCondition = detectPropertyCondition(data.data.description);
-      const electricityProvider = detectElectricityProvider(data.data.description || []);
-      const waterProvider = detectWaterProvider(data.data.description || []);
-      const gasProvider = detectGasProvider(data.data.description || []);
-      const hotWaterTankProvider = detectHotWaterTankProvider(data.data.description || []);
-      const Corner_Unit = detectCornerUnit();
-      const Central_Vacuum = detectCentralVacuum();
-      const Penthouse = detectPenthouse();
-      const Fireplace_Common_Area = detectFireplaceCommonArea();
-      const Fireplace_Bedroom = detectFireplaceBedroom();
-      const Upgraded_Bathrooms = detectUpgradedBathrooms();
-      const Backsplash_Kitchen = detectBacksplashKitchen();
-      const Upgraded_Kitchen = detectUpgradedKitchen();
-      const Dishwasher_Included = detectDishwasherIncludedFromText();
-      const Building_AC_Incl = detectBuilding_AC_Incl();
-      const Building_Heat_Incl = detectBuilding_Heat_Incl();
-      const Building_Cable_Incl = detectBuilding_Cable_Incl();
-      const Building_Internet_Incl = detectBuilding_Internet_Incl();
-      const Building_Water_Filtration_Rental = detectBuilding_Water_Filtration_Rental();
-      const Parking_Garage = detectParking_Garage();
-      const Remote_Garage = detectRemote_Garage();
-      const Visitor_Parking = detectVisitor_Parking();
-      const EV_Charging = detectEV_Charging();
-      const Car_Wash = detectCar_Wash();
-      const Subway_Access = detectSubway_Access();
-      const Laundry_Building = detectLaundry_Building();
-      const Lobby_Lounge = detectLobby_Lounge();
-      const Wheelchair_Access = detectWheelchair_Access();
-      const Onsite_Staff = detectOnsite_Staff();
-      const Concierge_24_7 = detectConcierge_24_7();
-      const Guest_Suites = detectGuest_Suites();
-      const Bicycle_Storage = detectBicycle_Storage();
-      const Elevators = detectElevators();
-      const Buzzer_System = detectBuzzer_System();
-      const Security = detectSecurity();
-      const Keyless_Entry = detectKeyless_Entry();
-      const Pet_Spa = detectPet_Spa();
-      const BBQ_Area = detectBBQ_Area();
-      const Rooftop_Patio = detectRooftop_Patio();
-      const Cabanas = detectCabanas();
-      const Tennis_Court = detectTennis_Court();
-      const Outdoor_Patio = detectOutdoor_Patio();
-      const Outdoor_Pool = detectOutdoor_Pool();
-      const Outdoor_Child_Play_Area = detectOutdoor_Child_Play_Area();
-      const Gym_Fitness = detectGym_Fitness();
-      const Rec_Room = detectRec_Room();
-      const Billiards = detectBilliards();
-      const Indoor_Pool = detectIndoor_Pool();
-      const Sauna = detectSauna();
-      const Library = detectLibrary();
-      const Squash = detectSquash();
-      const Bowling = detectBowling();
-      const Indoor_Child_Area = detectIndoor_Child_Area();
-      const Meeting_Room = detectMeeting_Room();
-      const Yoga_Room = detectYoga_Room();
-      const Movie_Room = detectMovie_Room();
-      const Games_Room = detectGames_Room();
-      const Whirlpool = detectWhirlpool();
-      const Steam_Room = detectSteam_Room();
-      const Basketball = detectBasketball();
-      const Golf_Range = detectGolf_Range();
-      const Piano_Lounge = detectPiano_Lounge();
-      const Daycare = detectDaycare();
-      const Email = extractEmailFromData(data.data);
-      const ParkingLevelNumber = extractParkingLevelNumber();
+      const Walkout_to_Garage = detectWalkoutToGarage(finalresponse.description || []);
+      const Private_Garage = detectPrivateGarage(finalresponse.description || []);
+      const Street_Number = extractStreetNumber(finalresponse.location || "");
+      const Street_Name = extractStreetName(finalresponse.location || "");
+      const Mailbox_Number = extractMailBoxNumber(finalresponse.description || []);
+      const unitName = detectUnitName(data) || "";
+      const unitaddress=detectUnitAddress(data) || "";
+      const propertyCondition = detectPropertyCondition(finalresponse.description);
+      const electricityProvider = detectElectricityProvider(finalresponse.description || []);
+      const waterProvider = detectWaterProvider(finalresponse.description || []);
+      const gasProvider = detectGasProvider(finalresponse.description || []);
+      const hotWaterTankProvider = detectHotWaterTankProvider(finalresponse.description || []);
+      const Corner_Unit = detectCornerUnit(finalresponse);
+      const Central_Vacuum = detectCentralVacuum(finalresponse);
+      const Penthouse = detectPenthouse(finalresponse);
+      const Fireplace_Common_Area = detectFireplaceCommonArea(finalresponse);
+      const Fireplace_Bedroom = detectFireplaceBedroom(finalresponse);
+      const Upgraded_Bathrooms = detectUpgradedBathrooms(finalresponse);
+      const Backsplash_Kitchen = detectBacksplashKitchen(finalresponse);
+      const Upgraded_Kitchen = detectUpgradedKitchen(finalresponse);
+      const Dishwasher_Included = detectDishwasherIncludedFromText(finalresponse);
+      const Building_AC_Incl = detectBuilding_AC_Incl(finalresponse);
+      const Building_Heat_Incl = detectBuilding_Heat_Incl(finalresponse);
+      const Building_Cable_Incl = detectBuilding_Cable_Incl(finalresponse);
+      const Building_Internet_Incl = detectBuilding_Internet_Incl(finalresponse);
+      const Building_Water_Filtration_Rental = detectBuilding_Water_Filtration_Rental(finalresponse);
+      const Parking_Garage = detectParking_Garage(finalresponse);
+      const Remote_Garage = detectRemote_Garage(finalresponse);
+      const Visitor_Parking = detectVisitor_Parking(finalresponse);
+      const EV_Charging = detectEV_Charging(finalresponse);
+      const Car_Wash = detectCar_Wash(finalresponse);
+      const Subway_Access = detectSubway_Access(finalresponse);
+      const Laundry_Building = detectLaundry_Building(finalresponse);
+      const Lobby_Lounge = detectLobby_Lounge(finalresponse);
+      const Wheelchair_Access = detectWheelchair_Access(finalresponse);
+      const Onsite_Staff = detectOnsite_Staff(finalresponse);
+      const Concierge_24_7 = detectConcierge_24_7(finalresponse);
+      const Guest_Suites = detectGuest_Suites(finalresponse);
+      const Bicycle_Storage = detectBicycle_Storage(finalresponse);
+      const Elevators = detectElevators(finalresponse);
+      const Buzzer_System = detectBuzzer_System(finalresponse);
+      const Security = detectSecurity(finalresponse);
+      const Keyless_Entry = detectKeyless_Entry(finalresponse);
+      const Pet_Spa = detectPet_Spa(finalresponse);
+      const BBQ_Area = detectBBQ_Area(finalresponse);
+      const Rooftop_Patio = detectRooftop_Patio(finalresponse);
+      const Cabanas = detectCabanas(finalresponse);
+      const Tennis_Court = detectTennis_Court(finalresponse);
+      const Outdoor_Patio = detectOutdoor_Patio(finalresponse);
+      const Outdoor_Pool = detectOutdoor_Pool(finalresponse);
+      const Outdoor_Child_Play_Area = detectOutdoor_Child_Play_Area(finalresponse);
+      const Gym_Fitness = detectGym_Fitness(finalresponse);
+      const Rec_Room = detectRec_Room(finalresponse);
+      const Billiards = detectBilliards(finalresponse);
+      const Indoor_Pool = detectIndoor_Pool(finalresponse);
+      const Sauna = detectSauna(finalresponse);
+      const Library = detectLibrary(finalresponse);
+      const Squash = detectSquash(finalresponse);
+      const Bowling = detectBowling(finalresponse);
+      const Indoor_Child_Area = detectIndoor_Child_Area(finalresponse);
+      const Meeting_Room = detectMeeting_Room(finalresponse);
+      const Yoga_Room = detectYoga_Room(finalresponse);
+      const Movie_Room = detectMovie_Room(finalresponse);
+      const Games_Room = detectGames_Room(finalresponse);
+      const Whirlpool = detectWhirlpool(finalresponse);
+      const Steam_Room = detectSteam_Room(finalresponse);
+      const Basketball = detectBasketball(finalresponse);
+      const Golf_Range = detectGolf_Range(finalresponse);
+      const Piano_Lounge = detectPiano_Lounge(finalresponse);
+      const Daycare = detectDaycare(finalresponse);
+      const Email = extractEmailFromData(finalresponse);
+      const ParkingLevelNumber = extractParkingLevelNumber(finalresponse);
       document.getElementById("First_Name").value = FirstName;
       document.getElementById("Last_Name").value = LastName;
       document.getElementById("Available_Date").value = scrapedDate;
@@ -3714,7 +3743,7 @@ data=data;
 
         return "";
       }
-      function detectBBQ_Area_Synced() {
+      function detectBBQ_Area_Synced(data) {
         if (Outdoor_Patio) return true;
 
         const text = JSON.stringify(data).toLowerCase();
@@ -3725,7 +3754,7 @@ data=data;
           text.includes("rooftop bbq")
         );
       }
-      function detectOutdoor_Patio_Synced() {
+      function detectOutdoor_Patio_Synced(data) {
         if (BBQ_Area) return true;
 
         const text = JSON.stringify(data).toLowerCase();
@@ -3775,8 +3804,8 @@ data=data;
 
       //Condition const here updated ones
       const UnitNamecorrected = correctUnitName(unitType, unitName);
-      const dryerBrand = extractDryerManufacturer(data);
-      const cableIncluded = detectCableInclusion(data);
+      const dryerBrand = extractDryerManufacturer(finalresponse);
+      const cableIncluded = detectCableInclusion(finalresponse);
       const Unitnumber = detectUnitNumber(unitType,);
       const lawnSnowCare = detectLawnAndSnowCare(data.description || []);
       const basement = detectBasementIncluded(data.title || "", data.description || [], data.unitType || "");
@@ -3788,10 +3817,11 @@ data=data;
       const privateTerraceOrBackyard = detectPrivateTerraceOrBackyardFromBackyardValue(backyard);
       const view = detectViewCombined(data.unitType || "");
       const numericPrice = data.price ? Number(data.price.replace(/[$,]/g, "")) : "";
-      const hydroIncluded = detectHydroProvider(data);
-      const BBQ_Area_Final = detectBBQ_Area_Synced();
-      const Outdoor_Patio_Final = detectOutdoor_Patio_Synced();
-      const waterIncluded = detectWaterInclusion(data);
+
+      const hydroIncluded = detectHydroProvider(finalresponse);
+      const BBQ_Area_Final = detectBBQ_Area_Synced(finalresponse);
+      const Outdoor_Patio_Final = detectOutdoor_Patio_Synced(finalresponse);
+      const waterIncluded = detectWaterInclusion(finalresponse);
       const sqFt = extractSqFt(data.vipAttributes?.primary);
       const furnished = detectFurnished(data.description || []);
       const maximumOccupants = detectMaxOccupants(data.description);
@@ -3818,19 +3848,19 @@ data=data;
       const utilityShare = extractUtilityResponsibility(data.description || []);
       const insuranceCompany = detectHomeInsurance(data.description || []);
       const insurancePolicyNumber = extractInsurancePolicyNumber(data.description || []);
-      const AC_Inclusion = detectACInclusionFromText();
-      const Heat_Inclusion = detectHeatInclusionFromText();
-      const Internet_Inclusion = detectInternetInclusionFromText();
+      const AC_Inclusion = detectACInclusionFromText(finalresponse);
+      const Heat_Inclusion = detectHeatInclusionFromText(finalresponse);
+      const Internet_Inclusion = detectInternetInclusionFromText(finalresponse);
       const utilityNotes = extractUtilityNotes(data.description || []);
-      const buildingCategory = detectBuildingCategoryFromText(data.title, data.description);
-      const condoCorpNumber = extractCondoCorpNumber();
-      const petRestrictions = detectPetRestrictions();
-      const mgmtInfo = detectBuildingMgmtInfo();
-      const mgmtEmail = extractMgmtEmail();
-      const officeAddress = extractOfficeAddress();
-      const developerName = detectDeveloperName();
-      const Laundary = detectOnSiteLaundry(data);
-      const dateOfConstructionISO = detectDateOfConstruction();
+      const buildingCategory = detectBuildingCategoryFromText(finalresponse);
+      const condoCorpNumber = extractCondoCorpNumber(finalresponse);
+      const petRestrictions = detectPetRestrictions(finalresponse);
+      const mgmtInfo = detectBuildingMgmtInfo(finalresponse);
+      const mgmtEmail = extractMgmtEmail(finalresponse);
+      const officeAddress = extractOfficeAddress(finalresponse);
+      const developerName = detectDeveloperName(finalresponse);
+      const Laundary = detectOnSiteLaundry(finalresponse);
+      const dateOfConstructionISO = detectDateOfConstruction(finalresponse);
       
       document.getElementById("Unit_name").value = UnitNamecorrected || "";
       
@@ -4201,14 +4231,27 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
       document.getElementById("pageLoader").style.display = "none";
       Swal.fire("Success", "All Details fectched successfully!", "success");
       statusfc.innerText = "✅ Data fetched.";
+  
     } catch (err) {
       console.error("❌ Fetch error:", err);
-      Swal.fire("Error", "Could not fetch data. See console.", "error");
+      
 
       // ❌ Hide loader and show error
       document.getElementById("pageLoader").style.display = "none";
-      statusfc.innerText = "❌ Error fetching data.";
-      location.reload();
+      
+      if (String(err).includes("Unable to reveal phone number for ad")) {
+        
+        err = "This Listing doesn't have any mobile number";
+      }
+     Swal.fire({
+        icon: "error",
+        title: "ERROR",
+        html: err,
+        confirmButtonText: "Close",
+        confirmButtonColor: "#d33",
+      }).then(() => {
+        location.reload();
+      });
     }
   });
 
@@ -4559,12 +4602,14 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
         confirmButtonColor: "#d33",
       }).then(() => {
         location.reload();
-      });;
+      });
     } finally {
       document.getElementById("pageLoader").style.display = "none";
       document.getElementById("pageLoader2").style.display = "none";
     }
   });
+
+
 
   document.getElementById("createRecordsBtn2").addEventListener("click", async () => {
     const statuscr = document.getElementById("createRecordsBtn2");
