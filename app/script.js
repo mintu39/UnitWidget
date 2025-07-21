@@ -4,6 +4,7 @@ let data = {};
 let leasingSel = "";
 let scrapedDate = "";
 let Source = "";
+let unitaddress="";
 let BuildingName = "";
 let profileurl="";
 let listingId = "";
@@ -218,6 +219,38 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
 
 
   // validateAllFields();
+  function validateAllFields() {
+    const requiredFieldIds = [
+        "First_Name", "Last_Name", "Mobile", "ownerid",
+        "Unit_Type", "City", "Available_Date", "Province", "Postal_Code", "Bedrooms",
+        "Bathrooms", "Parking_Spaces", "Kijiji_url1", "Streetname"
+    ];
+    let missingFields = [];
+    requiredFieldIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        // Remove previous red border if any
+        el.style.border = "";
+        let value = el.value ? el.value.trim() : "";
+        if (!value) {
+          // Add red border if empty
+          el.style.border = "2px solid red";
+          let label = el.previousElementSibling ? el.previousElementSibling.innerText : id;
+          missingFields.push(label);
+        }
+      }
+    });
+
+    if (missingFields.length > 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Please fill all required fields",
+        html: `<ul style="text-align:left;">${missingFields.map(f => `<li>${f}</li>`).join("")}</ul>`,
+      });
+      return false;
+    }
+    return true;
+  }
 
   function validateAllFields1() {
     // List all required field IDs here
@@ -252,9 +285,12 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     requiredFieldIds.forEach(id => {
       const el = document.getElementById(id);
       if (el) {
-        // For select elements, check selected value
+        // Reset any previous border style
+        el.style.border = "";
         let value = el.value ? el.value.trim() : "";
         if (!value) {
+          // Set red outline if missing
+          el.style.border = "2px solid red";
           let label = el.previousElementSibling ? el.previousElementSibling.innerText : id;
           missingFields.push(label);
         }
@@ -271,10 +307,6 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     }
     return true;
   }
-
-
-
-
 
   function capitalizeNamePart(name) {
     return name
@@ -639,22 +671,39 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
   ];
 
   function extractCityFromAddress(data) {
-    const text = JSON.stringify(data).toLowerCase();
+  const sortedCities = cityList.slice().sort((a, b) => b.length - a.length);
+  const location = (data?.location || "").toLowerCase();
+  const fullText = JSON.stringify(data).toLowerCase();
 
-    // For best matching, sort by length (to match "St. Catharines" before "St Catharines")
-    const sortedCities = cityList.slice().sort((a, b) => b.length - a.length);
+  // Helper to build a regex for a city name
+  const buildCityRegex = (city) => {
+    return new RegExp(
+      `\\b${city
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')      // Escape regex specials
+        .replace(/[\.\,]/g, '[\\.\\,\\s]?')}\\b`,     // Match ., or space
+      'i'
+    );
+  };
 
-    for (const city of sortedCities) {
-      // Allow matching ignoring periods/commas (St. Catharines ~ St Catharines)
-      const cityPattern = city.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // escape regex
-        .replace(/[\.\,]/g, '[\\.\\,\\s]?'); // period/comma/space flexible
-      const regex = new RegExp(`\\b${cityPattern}\\b`, 'i');
-      if (regex.test(text)) {
-        return city; // Return the first matched city
-      }
+  // 1. Check in location field first
+  for (const city of sortedCities) {
+    const regex = buildCityRegex(city);
+    if (regex.test(location)) {
+      return city;
     }
-    return ""; // Nothing found
   }
+
+  // 2. If not found in location, check entire data string
+  for (const city of sortedCities) {
+    const regex = buildCityRegex(city);
+    if (regex.test(fullText)) {
+      return city;
+    }
+  }
+
+  return ""; // No match found
+}
+
 
   // Detect number of floors based on description
   function detectNumberOfFloors(data) {
@@ -836,10 +885,21 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
     return data?.location || "";
   }
   ///// Detect unit address based on location or description
-  function detectUnitAddress(data) {
+ function detectUnitAddress(data) {
   const location = data?.location || "";
-  // Split at first comma, trim spaces, and return the first part
-  return location.split(',')[0].trim();
+
+  // Get the first part before the comma
+  let unitAddress = location.split(',')[0].trim();
+
+  // Remove any city name that matches (case-insensitive, full or partial word)
+  for (const city of cityList) {
+    const regex = new RegExp(`\\b${city}\\b`, 'i');
+    if (regex.test(unitAddress)) {
+      unitAddress = unitAddress.replace(regex, '').trim();
+    }
+  }
+
+  return unitAddress;
 }
 
   // Detect property condition based on description
@@ -2907,7 +2967,7 @@ ZOHO.embeddedApp.on("PageLoad", async function () {
   }
 
   // 2. Extract Street Name: Gets street name and suffix, stops at comma/city/province/postal
-  function extractStreetName(location = "") {
+  function extractStreetName(location = "",city) {
     if (!location) return "";
     const streetTypes = [
       "street", "st", "road", "rd", "avenue", "ave", "boulevard", "blvd", "drive", "dr",
@@ -3410,8 +3470,10 @@ function extractPayload(data) {
       const Street_Number = extractStreetNumber(finalresponse.location || "");
       const Street_Name = extractStreetName(finalresponse.location || "");
       const Mailbox_Number = extractMailBoxNumber(finalresponse.description || []);
-      const unitName = detectUnitName(data) || "";
-      const unitaddress=detectUnitAddress(data) || "";
+      const unitName = detectUnitName(finalresponse) || "";
+      const unitaddress=detectUnitAddress(finalresponse) || "";
+      console.log("unitaddress",unitaddress);
+      
       const propertyCondition = detectPropertyCondition(finalresponse.description);
       const electricityProvider = detectElectricityProvider(finalresponse.description || []);
       const waterProvider = detectWaterProvider(finalresponse.description || []);
@@ -3482,20 +3544,15 @@ function extractPayload(data) {
       document.getElementById("Available_Date").value = scrapedDate;
       document.getElementById("Mobile").value = Mobile;
       document.getElementById("Unit_Type").value = unitType;
+      document.getElementById("Streetname").value = unitaddress;
       document.getElementById("City").value = city;
       document.getElementById("Province").value = Province;
+      document.getElementById("Postal_Code").value = PostalCode;
       document.getElementById("Bathrooms").value = bathrooms;
       document.getElementById("Bedrooms").value = bedrooms;
-      document.getElementById("Postal_Code").value = PostalCode;
       document.getElementById("Parking_Spaces").value = Parkingspacs;
       document.getElementById("Kijiji_url1").value = profileurl;
-      document.getElementById("Streetname").value = unitaddress;
 
-      
-
-
-
-      //function for conditions ::
 
       // Detect maximum occupants based on bedroom value
       function detectMaxOccupants(bedroomValue = "") {
@@ -4262,6 +4319,32 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
     const statuscr = document.getElementById("createRecordsBtn1");
     const aid = leasingSel.value;
 
+
+      if (!validateAllFields()) {
+      // Stop the function if validation fails
+      return;
+    }
+      
+
+let untstreet = unitData.Address;
+let untcity = leadData.City;
+
+console.log("untstreet", untstreet);
+console.log("untcity", untcity);
+
+if (untstreet.trim().toLowerCase() === untcity.trim().toLowerCase()) {
+  Swal.fire({
+    icon: "error",
+    title: "ERROR",
+    html: "Street Name and Number is missing or it matches the city",
+    confirmButtonText: "Close",
+    confirmButtonColor: "#d33",
+  }).then(() => {
+    location.reload();
+  });
+  return;
+}
+
     //     if (!validateAllFields()) {
     //     // Stop the function if validation fails
     //     return;
@@ -4281,11 +4364,28 @@ READY FOR YOU: Your new home will be spotlessly clean before move-in!`;
       let existingBuilding = null;
       const BuildingName = unitData.Address;
       const postalCode =unitData.Postal_Code;
+      function formatBuildingName(BuildingName) {
+  const words = BuildingName.trim().split(/\s+/);
+  
+  if (words.length >= 3) {
+    const firstWord = words[0];
+    const secondWord = words[1];
+    const thirdWordAbbrev = words[2].substring(0, 2);
+    BuildingName= `${firstWord} ${secondWord} ${thirdWordAbbrev}`;
+  }else{
+
+    BuildingName= BuildingName;
+
+  }
+
+  // Return original name if less than 3 words
+  
+}
 
       if (BuildingName) {
       
 
-         const buildingQuery= `(Address:equals:${BuildingName}) and (Postal_Code:equals:${postalCode})`
+         const buildingQuery= `(Address:startswith:${BuildingName}) and (Postal_Code:equals:${postalCode})`
         console.log("🔍 Building Query:", buildingQuery);
 
         const searchResp = await ZOHO.CRM.API.searchRecord({
