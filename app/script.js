@@ -4780,7 +4780,7 @@ if (untstreet.trim().toLowerCase() === untcity.trim().toLowerCase()) {
 
     // ✅ Create unitData safely
     unitData = {
-      Name: `${Unit_Address}, ${cityValue}, ${provinceValue}, ${postalCodeValue}`,
+      Name: `${unitNumberValue}-${Unit_Address}, ${cityValue}, ${provinceValue}, ${postalCodeValue}`,
       Address_Line_2: unitNumberValue,
       Property_Condition: propertyCondition,
       Notice_of_Entry_Required: NOE,
@@ -4804,7 +4804,6 @@ if (untstreet.trim().toLowerCase() === untcity.trim().toLowerCase()) {
       Is_the_backyard_fenced: backyardFencedValue,
       Number_of_Parking_Spaces: parkingSpacesValue,
       Parking_Details: parkingDetailsValue,
-      Address_Line_2: Unit_Address,
       City: cityValue,
       Province: provinceValue,
       Postal_Code: postalCodeValue,
